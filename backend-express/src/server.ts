@@ -8,11 +8,19 @@ import { Server as SocketIOServer } from 'socket.io';
 import { env } from './config/env';
 import { connectDB } from './config/db';
 import { errorMiddleware } from './middleware/error';
+import { logger } from './utils/logger';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import favicon from 'serve-favicon';
+import path from 'path';
+
 
 const app = express();
 const httpServer = createServer(app);
+
+
+// Usar el middleware antes de tus rutas o registradores (loggers)
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 // Middlewares globales
 app.use(helmet());
@@ -43,9 +51,9 @@ const io = new SocketIOServer(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  console.log(`[Socket] Cliente conectado: ${socket.id}`);
+  logger.info(`[Socket] Cliente conectado: ${socket.id}`);
   socket.on('disconnect', () => {
-    console.log(`[Socket] Cliente desconectado: ${socket.id}`);
+    logger.info(`[Socket] Cliente desconectado: ${socket.id}`);
   });
 });
 
