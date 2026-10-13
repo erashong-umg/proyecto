@@ -1,0 +1,256 @@
+@startuml
+title Diagrama UML General de Casos de Uso\nPlataforma de Tutorías
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #F8FBFF
+  BorderColor #24558A
+  ArrowColor #52677D
+}
+skinparam actorStyle awesome
+
+actor Visitante as visitante
+actor "Usuario autenticado" as usuario
+actor Estudiante as estudiante
+actor Tutor as tutor
+actor Administrador as admin
+actor "Google OAuth 2.0" as google
+actor "Servicio de mapas y rutas\n(Google Maps / OpenStreetMap)" as mapas
+actor "Servicio de mensajería\n(Socket.io)" as socket
+actor "Servicio de pagos\n(mockup)" as pagos
+
+rectangle "Plataforma web de tutorías" {
+
+  package "1. Autenticación, roles y onboarding" {
+    usecase "CU-01\nRegistrarse e iniciar sesión\ncon Google" as CU01
+    usecase "CU-02\nCerrar sesión" as CU02
+    usecase "CU-03\nCompletar perfil" as CU03
+    usecase "CU-04\nSeleccionar rol principal" as CU04
+    usecase "CU-05\nRegistrar ubicación habitual" as CU05
+    usecase "CU-06\nRegistrar credenciales\nacadémicas y profesionales" as CU06
+    usecase "CU-07\nRegistrar categorías\nde afinidad" as CU07
+    usecase "CU-08\nValidar JWT en solicitudes" as CU08
+    usecase "CU-09\nRestringir navegación\nde cuenta suspendida" as CU09
+    usecase "CU-10\nConsultar suspensión\ny presentar apelación" as CU10
+    usecase "CU-11\nAprobar solicitud\nde tutor" as CU11
+  }
+
+  package "2. Gestión de tutores y oferta académica" {
+    usecase "CU-12\nConsultar categorías" as CU12
+    usecase "CU-13\nCrear oferta de tutoría" as CU13
+    usecase "CU-14\nModificar oferta de tutoría" as CU14
+    usecase "CU-15\nDesactivar o eliminar oferta" as CU15
+    usecase "CU-16\nConfigurar modalidades\ny tarifas" as CU16
+    usecase "CU-17\nAdministrar categorías\ny subcategorías" as CU17
+    usecase "CU-18\nConsultar perfil público\ndel tutor" as CU18
+    usecase "CU-19\nCompartir perfil por WhatsApp" as CU19
+  }
+
+  package "3. Búsqueda geoespacial y rutas" {
+    usecase "CU-20\nBuscar tutores" as CU20
+    usecase "CU-21\nFiltrar por categoría,\nmodalidad y precio" as CU21
+    usecase "CU-22\nFiltrar por cercanía" as CU22
+    usecase "CU-23\nFiltrar por calificación\ny cantidad de reseñas" as CU23
+    usecase "CU-24\nConsultar ubicación\ny ruta" as CU24
+    usecase "CU-25\nCalcular presupuesto\nde tutoría y traslado\n(viaje redondo)" as CU25
+    usecase "CU-57\nTrazar ruta manualmente" as CU57
+  }
+
+  package "4. Disponibilidad, agendamiento y suscripciones" {
+    usecase "CU-26\nConfigurar disponibilidad semanal" as CU26
+    usecase "CU-27\nConsultar calendario\n(diario, semanal, mensual)" as CU27
+    usecase "CU-28\nSolicitar contratación\nde tutoría" as CU28
+    usecase "CU-29\nProgramar sesiones recurrentes" as CU29
+    usecase "CU-30\nValidar disponibilidad\ny prevenir traslapes" as CU30
+    usecase "CU-31\nConsultar detalle de sesión" as CU31
+    usecase "CU-32\nCancelar tutoría\n(mínimo 2 horas antes)" as CU32
+    usecase "CU-33\nRegistrar cumplimiento\nde sesión" as CU33
+    usecase "CU-34\nConsultar historial\nde tutorías" as CU34
+    usecase "CU-56\nSolicitar devolución\no reasignación de tutor" as CU56
+  }
+
+  package "5. Mensajería y comunicación" {
+    usecase "CU-35\nConsultar conversaciones" as CU35
+    usecase "CU-36\nEnviar mensaje privado" as CU36
+    usecase "CU-37\nRecibir mensajes en tiempo real" as CU37
+    usecase "CU-38\nConsultar confirmaciones\nde lectura" as CU38
+  }
+
+  package "6. Calificaciones y reseñas" {
+    usecase "CU-39\nCalificar sesión completada" as CU39
+    usecase "CU-40\nAgregar comentario" as CU40
+    usecase "CU-41\nEditar reseña durante\nlas primeras 72 horas" as CU41
+    usecase "CU-42\nActualizar promedio\ny cantidad de reseñas" as CU42
+  }
+
+  package "7. Seguridad, reportes y apelaciones" {
+    usecase "CU-43\nDenunciar a otro usuario" as CU43
+    usecase "CU-44\nConsultar reportes activos" as CU44
+    usecase "CU-45\nConsultar historial\nde reportes por usuario" as CU45
+    usecase "CU-46\nRecibir notificación\nde reporte" as CU46
+    usecase "CU-47\nPresentar apelación\ncon pruebas" as CU47
+    usecase "CU-48\nRevisar y resolver apelaciones" as CU48
+    usecase "CU-49\nSuspender o reactivar cuenta" as CU49
+    usecase "CU-58\nConsultar reporte simplificado" as CU58
+  }
+
+  package "8. Administración y reportería" {
+    usecase "CU-50\nConsultar panel administrativo" as CU50
+    usecase "CU-51\nConsultar tutores mejor\ny peor calificados" as CU51
+    usecase "CU-52\nConsultar categorías\ncon mayor demanda" as CU52
+    usecase "CU-53\nConsultar tutorías impartidas\ny canceladas" as CU53
+    usecase "CU-54\nConsultar gráficos estadísticos" as CU54
+  }
+
+  package "9. Pagos (prototipo)" {
+    usecase "CU-55\nVisualizar y simular\nflujo de pago (mockup)" as CU55
+  }
+}
+
+' Asociaciones de actores
+visitante --> CU01
+visitante --> CU18
+visitante --> CU19
+
+usuario --> CU02
+usuario --> CU03
+usuario --> CU04
+usuario --> CU05
+usuario --> CU07
+usuario --> CU08
+usuario --> CU09
+usuario --> CU10
+
+estudiante --> CU20
+estudiante --> CU21
+estudiante --> CU22
+estudiante --> CU23
+estudiante --> CU24
+estudiante --> CU25
+estudiante --> CU27
+estudiante --> CU28
+estudiante --> CU31
+estudiante --> CU32
+estudiante --> CU34
+estudiante --> CU35
+estudiante --> CU36
+estudiante --> CU37
+estudiante --> CU38
+estudiante --> CU39
+estudiante --> CU40
+estudiante --> CU41
+estudiante --> CU43
+estudiante --> CU56
+estudiante --> CU55
+
+tutor --> CU06
+tutor --> CU11
+tutor --> CU12
+tutor --> CU13
+tutor --> CU14
+tutor --> CU15
+tutor --> CU16
+tutor --> CU18
+tutor --> CU19
+tutor --> CU26
+tutor --> CU27
+tutor --> CU31
+tutor --> CU32
+tutor --> CU33
+tutor --> CU34
+tutor --> CU35
+tutor --> CU36
+tutor --> CU37
+tutor --> CU38
+tutor --> CU43
+tutor --> CU56
+
+admin --> CU11
+admin --> CU17
+admin --> CU44
+admin --> CU45
+admin --> CU48
+admin --> CU49
+admin --> CU50
+admin --> CU51
+admin --> CU52
+admin --> CU53
+admin --> CU54
+
+google --> CU01
+mapas --> CU24
+mapas --> CU25
+socket --> CU37
+pagos --> CU55
+
+' Relaciones include: subprocesos requeridos
+CU01 ..> CU08 : <<include>>
+CU03 ..> CU04 : <<include>>
+CU03 ..> CU05 : <<include>>
+CU03 ..> CU07 : <<include>>
+CU13 ..> CU12 : <<include>>
+CU28 ..> CU30 : <<include>>
+CU28 ..> CU25 : <<include>>\n[si hay traslado]
+CU28 ..> CU29 : <<include>>\n[si es recurrente]
+CU36 ..> CU08 : <<include>>
+CU39 ..> CU42 : <<include>>
+CU43 ..> CU08 : <<include>>
+CU49 ..> CU08 : <<include>>
+
+' Relaciones extend: comportamientos condicionales
+CU03 ..> CU01 : <<extend>>\n[perfil incompleto]
+CU22 ..> CU20 : <<extend>>
+CU23 ..> CU20 : <<extend>>
+CU24 ..> CU20 : <<extend>>
+CU57 ..> CU24 : <<extend>>\n[ruta automática no disponible]
+CU32 ..> CU31 : <<extend>>\n[solicita cancelación]
+CU33 ..> CU31 : <<extend>>\n[el tutor registra cumplimiento]
+CU40 ..> CU39 : <<extend>>\n[agrega comentario]
+CU41 ..> CU39 : <<extend>>\n[edición dentro de 72 h]
+CU47 ..> CU10 : <<extend>>\n[usuario presenta pruebas]
+CU58 ..> CU46 : <<extend>>\n[reporte notificado]
+CU56 ..> CU32 : <<extend>>\n[servicio afectado]
+CU55 ..> CU28 : <<extend>>\n[si se simula el pago]
+
+note bottom of CU28
+  La solicitud queda PENDIENTE hasta que el tutor la confirme.
+  El estudiante debe ver claramente que aún no está confirmada.
+end note
+
+note bottom of CU33
+  El conteo de sesiones del bloque/suscripción aumenta
+  únicamente cuando la sesión finaliza correctamente.
+end note
+
+note bottom of CU32
+  Regla ordinaria: cancelar con al menos 2 horas
+  de anticipación al inicio de la sesión.
+end note
+
+note bottom of CU25
+  El costo de traslado considera viaje redondo.
+  Si no hay ruta automática, se ofrece trazado manual.
+end note
+
+note bottom of CU49
+  Una apelación no levanta la suspensión por sí sola.
+  La cuenta se reactiva cuando el administrador acepta.
+end note
+
+note bottom of CU55
+  Es un mockup/prototipo visual; no representa
+  una pasarela de pago real.
+end note
+
+legend bottom
+  |= Elemento |= Significado |
+  | Actor | Rol o sistema externo que interactúa con la plataforma |
+  | <<include>> | Comportamiento incluido obligatoriamente en el caso base |
+  | <<extend>> | Comportamiento condicional que amplía un caso base |
+  | CU-01 ... CU-58 | Identificadores de casos de uso |
+  | Zona horaria | Guatemala (configuración inicial del sistema) |
+endlegend
+
+@enduml
