@@ -1,0 +1,47 @@
+# Stack de producción — se ejecuta en el servidor con podman-compose (o
+# `podman compose`), NO en el repo/CI. Las imágenes vienen de GHCR, ya
+# construidas por .github/workflows/deploy.yml; este archivo solo las corre.
+#
+# Setup inicial y comandos: ver docs/despliegue.md
+
+services:
+  mongodb:
+    image: docker.io/library/mongo:8
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: educaspot
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Sin "ports": solo accesible desde otros contenedores de este compose.
+
+  backend:
+    image: ghcr.io/${GHCR_OWNER}/proyecto-backend:latest
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/educaspot?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGIN: https://${DOMAIN}
+      LOG_LEVEL: combined
+    ports:
+      - "127.0.0.1:4000:4000"
+
+  frontend:
+    image: ghcr.io/${GHCR_OWNER}/proyecto-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+
+volumes:
+  mongodb_data:

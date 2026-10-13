@@ -29,6 +29,9 @@ import path from 'path';
 const app = express();
 const httpServer = createServer(app);
 
+// Detrás de nginx (reverse proxy en producción) — sin esto, req.ip y los logs
+// de morgan muestran la IP de nginx (127.0.0.1) en vez de la del cliente real.
+app.set('trust proxy', 1);
 
 // Usar el middleware antes de tus rutas o registradores (loggers)
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

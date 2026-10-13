@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.local
+.env.*
+!.env.example
+.git
+.gitignore
+*.log
+.vscode
+.idea
+.impeccable
+DESIGN.md
+coverage
+.dockerignore
+Dockerfile
