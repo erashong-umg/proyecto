@@ -6,12 +6,14 @@ Registry (GHCR) y luego se conecte por SSH al servidor solo para bajar las
 imágenes nuevas y reiniciar los contenedores. El servidor nunca compila
 nada — solo corre `podman-compose pull && up -d`.
 
-Arquitectura: un solo dominio (`yettotools.com`) sirve el frontend en `/`;
-nginx (en el host, fuera de los contenedores) enruta `/api` y `/socket.io`
-al contenedor del backend. Mismo origen entre frontend y backend → no hace
-falta CORS cruzado ni tocar código. MongoDB, backend y frontend corren como
-contenedores Podman atados a `127.0.0.1` (no expuestos a internet
-directamente); nginx + certbot manejan TLS.
+Arquitectura: un solo dominio (`educaspot.yettotools.com`, un subdominio
+propio — `yettotools.com` raíz ya está en uso por otro servicio en este
+mismo servidor) sirve el frontend en `/`; nginx (en el host, fuera de los
+contenedores) enruta `/api` y `/socket.io` al contenedor del backend. Mismo
+origen entre frontend y backend → no hace falta CORS cruzado ni tocar
+código. MongoDB, backend y frontend corren como contenedores Podman atados
+a `127.0.0.1` (no expuestos a internet directamente); nginx + certbot
+manejan TLS.
 
 Todos los pasos de esta guía (excepto los de la sección "Secrets de
 GitHub") se ejecutan **en el servidor**, por SSH, una sola vez. Los pasos
@@ -19,16 +21,16 @@ posteriores a cada push a `main` los hace el workflow automáticamente.
 
 ## 1. DNS
 
-Crear en tu proveedor de DNS dos registros `A` apuntando a la IP pública
-del servidor:
+Crear en tu proveedor de DNS un registro `A` apuntando al subdominio del
+proyecto (NO al dominio raíz, que ya está en uso) hacia la IP pública del
+servidor:
 
 ```
-yettotools.com      A    <IP-del-servidor>
-www.yettotools.com  A    <IP-del-servidor>
+educaspot.yettotools.com  A    <IP-del-servidor>
 ```
 
-Espera a que propaguen antes del paso de certbot (`dig yettotools.com` debe
-devolver la IP correcta).
+Espera a que propague antes del paso de certbot (`dig
+educaspot.yettotools.com` debe devolver la IP correcta).
 
 ## 2. Preparar el servidor
 
@@ -88,16 +90,16 @@ sudo apt update
 sudo apt install -y nginx certbot python3-certbot-nginx
 ```
 
-Copiar `deploy/nginx-yettotools.conf` del repo a
-`/etc/nginx/sites-available/yettotools.com`, luego:
+Copiar `deploy/nginx-educaspot.conf` del repo a
+`/etc/nginx/sites-available/educaspot.yettotools.com`, luego:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/yettotools.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/educaspot.yettotools.com /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 
 # Certbot reescribe el server block para agregar HTTPS + redirect 80→443
-sudo certbot --nginx -d yettotools.com -d www.yettotools.com
+sudo certbot --nginx -d educaspot.yettotools.com
 
 # Abrir el firewall si usas ufw
 sudo ufw allow 'Nginx Full'
@@ -145,4 +147,9 @@ repetir los comandos de "Primer arranque manual" arriba.
   revertir el commit en `main` y dejar que el workflow vuelva a desplegar.
 - **CORS raro / 404 en `/api`**: confirmar que `DOMAIN` en `.env` coincide
   con el dominio real y que `nginx -t` no tiene errores tras copiar
-  `nginx-yettotools.conf`.
+  `nginx-educaspot.conf`.
+- **"conflicting server name" en `nginx -t`**: este servidor aloja varios
+  sitios (`yettotools.com` raíz, `auth.yettotools.com`,
+  `desktop.yettotools.com`); si aparece ese warning, algún `server_name` se
+  repite entre archivos de `sites-enabled/` — revisar con `grep -rl
+  <dominio> /etc/nginx/sites-available/` antes de tocar nada ahí.
