@@ -24,7 +24,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # Sin "ports": solo accesible desde otros contenedores de este compose.
+    ports:
+      # Atado a 127.0.0.1: NO expuesto a internet. Acceso externo solo vía
+      # túnel SSH — ver docs/despliegue.md "Conectarse a Mongo desde fuera".
+      - "127.0.0.1:27017:27017"
 
   backend:
     image: ghcr.io/${GHCR_OWNER}/proyecto-backend:latest

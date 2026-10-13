@@ -136,6 +136,28 @@ A partir de aquí, cada push/merge a `main` dispara
 Para desplegar manualmente sin esperar un push, conectarse por SSH y
 repetir los comandos de "Primer arranque manual" arriba.
 
+## 6. Conectarse a Mongo desde fuera
+
+El puerto 27017 está atado a `127.0.0.1` en el servidor (no expuesto a
+internet — ver `deploy/compose.yml`). Para usar Compass/`mongosh`/etc.
+desde tu máquina, abre un túnel SSH:
+
+```bash
+ssh -L 27017:localhost:27017 deploy@yettotools.com
+```
+
+Déjalo abierto y conéctate en tu cliente a:
+
+```
+mongodb://admin:<MONGO_ROOT_PASSWORD>/educaspot?authSource=admin
+```
+
+(`<MONGO_ROOT_PASSWORD>` es el valor real que está en `.env` en el
+servidor — no el placeholder de `.env.example`). El host/puerto locales
+(`localhost:27017`) los resuelve el túnel, no hace falta ponerlos en la
+cadena de conexión si tu cliente ya asume `localhost:27017` por defecto;
+si no, usa `mongodb://admin:<password>@localhost:27017/educaspot?authSource=admin`.
+
 ## Troubleshooting
 
 - **`podman-compose pull` falla con 401/403**: la sesión de `podman login
