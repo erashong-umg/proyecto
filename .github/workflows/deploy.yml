@@ -51,6 +51,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment: DEPLOY_PRD
     steps:
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1
