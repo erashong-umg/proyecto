@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
-import { signToken, COOKIE_NAME, jwtCookieOptions } from '../utils/jwt';
+import { signToken } from '../utils/jwt';
 import {
   BadRequest, Unauthorized, NotFound, Conflict,
 } from '../utils/errors';
@@ -28,9 +28,9 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     const user = await User.create({ email, password, name, role });
 
     const token = signToken(buildAuthUserFromDoc(user));
-    res.cookie(COOKIE_NAME, token, jwtCookieOptions);
     res.status(201).json({
       user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
+      token,
     });
   } catch (error) {
     next(error);
@@ -48,22 +48,22 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     const ok = await user.comparePassword(password);
     if (!ok) throw Unauthorized('Correo o contraseña incorrectos.');
 
-    if (user.status === 'suspended') {
-      throw Unauthorized('Su cuenta está suspendida. Por favor, apele desde su perfil.');
-    }
-
+    // Las cuentas suspendidas SÍ pueden iniciar sesión (requisito del enunciado) —
+    // su navegación queda restringida a la vista de Suspensión por statusMiddleware
+    // en el backend y por ProtectedRoute en el frontend, no bloqueando el login aquí.
     const token = signToken(buildAuthUserFromDoc(user));
-    res.cookie(COOKIE_NAME, token, jwtCookieOptions);
     res.json({
       user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
+      token,
     });
   } catch (error) {
     next(error);
   }
 };
 
+// El JWT es stateless (Bearer header) — no hay cookie ni estado de servidor que limpiar;
+// el cliente simplemente descarta el token guardado.
 export const logout = (_req: Request, res: Response): void => {
-  res.clearCookie(COOKIE_NAME, { path: '/' });
   res.json({ message: 'Sesión cerrada correctamente.' });
 };
 
@@ -98,9 +98,9 @@ export const googleStub = async (req: Request, res: Response, next: NextFunction
     }
 
     const token = signToken(buildAuthUserFromDoc(user));
-    res.cookie(COOKIE_NAME, token, jwtCookieOptions);
     res.json({
       user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
+      token,
     });
   } catch (error) {
     next(error);

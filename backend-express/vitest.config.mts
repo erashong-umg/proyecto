@@ -4,6 +4,13 @@ import path from 'path';
 const root = import.meta.dirname;
 
 export default defineConfig({
+  test: {
+    setupFiles: ['./tests/setup.ts'],
+    // Los tests de integración comparten una sola base Mongo real (educaspot-test).
+    // Correr archivos de test en paralelo interleaves sus beforeEach/deleteMany y
+    // corrompe los fixtures de otros archivos — forzar ejecución secuencial.
+    fileParallelism: false,
+  },
   resolve: {
     alias: {
       '@': path.resolve(root, 'src'),

@@ -1,12 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
-import { COOKIE_NAME, verifyToken } from '../utils/jwt';
+import { verifyToken } from '../utils/jwt';
 import { Unauthorized } from '../utils/errors';
 import { User } from '../models/User';
 
 export const authMiddleware = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = req.cookies?.[COOKIE_NAME];
-    if (!token) throw Unauthorized('No hay sesión activa. Por favor, inicie sesión.');
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw Unauthorized('No hay sesión activa. Por favor, inicie sesión.');
+    }
+    const token = authHeader.slice('Bearer '.length);
 
     const decoded = verifyToken(token);
 

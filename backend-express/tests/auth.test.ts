@@ -26,7 +26,7 @@ beforeEach(async () => {
 });
 
 describe('Auth', () => {
-  it('POST /api/auth/register crea un usuario y devuelve cookie', async () => {
+  it('POST /api/auth/register crea un usuario y devuelve token', async () => {
     const res = await request(app)
       .post('/api/auth/register')
       .send({
@@ -38,8 +38,8 @@ describe('Auth', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.user.email).toBe('test@educaspot.gt');
-    expect(res.headers['set-cookie']).toBeDefined();
-    expect(res.headers['set-cookie'][0]).toMatch(/educaspot_token=/);
+    expect(res.body.token).toBeDefined();
+    expect(typeof res.body.token).toBe('string');
   });
 
   it('POST /api/auth/login con credenciales correctas', async () => {
@@ -56,7 +56,7 @@ describe('Auth', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user.email).toBe('login@educaspot.gt');
-    expect(res.headers['set-cookie']).toBeDefined();
+    expect(res.body.token).toBeDefined();
   });
 
   it('POST /api/auth/login con password incorrecto falla con 401', async () => {
@@ -80,7 +80,7 @@ describe('Auth', () => {
     expect(res.status).toBe(401);
   });
 
-  it('GET /api/auth/me con cookie devuelve usuario', async () => {
+  it('GET /api/auth/me con Authorization header devuelve usuario', async () => {
     const reg = await request(app).post('/api/auth/register').send({
       email: 'me@educaspot.gt',
       password: 'Clave1234',
@@ -88,9 +88,9 @@ describe('Auth', () => {
       role: 'student',
     });
 
-    const cookie = reg.headers['set-cookie'][0].split(';')[0];
-
-    const res = await request(app).get('/api/auth/me').set('Cookie', cookie);
+    const res = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${reg.body.token}`);
     expect(res.status).toBe(200);
     expect(res.body.user.email).toBe('me@educaspot.gt');
   });

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { INVARIANT_THEME_KEYS, REACTIVE_THEME_KEYS } from '../models/ThemeSettings';
 
 export const registerSchema = z.object({
   email: z.string().email('Correo inválido').toLowerCase().trim(),
@@ -39,3 +40,23 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type GoogleStubInput = z.infer<typeof googleStubSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+// Valida un color hexadecimal de 6 dígitos (el mismo formato que produce
+// <input type="color"> en el navegador) — rechaza cualquier otro valor para
+// que no termine un string arbitrario dentro de una custom property CSS.
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Debe ser un color hexadecimal, ej. #b73e17');
+
+const invariantShape = Object.fromEntries(
+  INVARIANT_THEME_KEYS.map((key) => [key, hexColor.optional()])
+);
+const reactiveShape = Object.fromEntries(
+  REACTIVE_THEME_KEYS.map((key) => [key, hexColor.optional()])
+);
+
+export const themeSettingsSchema = z.object({
+  invariant: z.object(invariantShape).partial().optional(),
+  light: z.object(reactiveShape).partial().optional(),
+  dark: z.object(reactiveShape).partial().optional(),
+});
+
+export type ThemeSettingsInput = z.infer<typeof themeSettingsSchema>;

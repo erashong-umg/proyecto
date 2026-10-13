@@ -164,3 +164,75 @@ export const adminListUsers = async (req: Request, res: Response, next: NextFunc
     res.json({ users });
   } catch (error) { next(error); }
 };
+
+// --- Reportería / Analytics ---
+
+export const adminAnalytics = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!_req.user || _req.user.role !== 'admin') throw Unauthorized('Solo admin.');
+
+    const [topTutors, categoryDemand, monthlyStats] = await Promise.all([
+      // Top 5 tutores por rating
+      User.find({ role: 'tutor', 'tutorData.reviewCount': { $gte: 1 } })
+        .sort({ 'tutorData.avgRating': -1 })
+        .limit(5)
+        .select('name photoUrl tutorData')
+        .lean(),
+
+      // Demanda por categoría (total horas reservadas)
+      Booking.aggregate([
+        { $match: { status: { $in: ['confirmed', 'completed'] } } },
+        { $lookup: { from: 'courses', localField: 'courseId', foreignField: '_id', as: 'course' } },
+        { $unwind: '$course' },
+        { $group: { _id: '$course.categoryId', totalHours: { $sum: '$durationMin' }, count: { $sum: 1 } } },
+        { $lookup: { from: 'categories', localField: '_id', foreignField: '_id', as: 'category' } },
+        { $unwind: '$category' },
+        { $project: { _id: 0, categoryName: '$category.name', totalHours: { $divide: ['$totalHours', 60] }, count: '$count' } },
+        { $sort: { totalHours: -1 } },
+        { $limit: 10 },
+      ]),
+
+      // Stats mensuales: impartidas vs canceladas (último mes)
+      (() => {
+        const since = new Date();
+        since.setMonth(since.getMonth() - 1);
+        return Booking.aggregate([
+          { $match: { createdAt: { $gte: since } } },
+          { $group: { _id: '$status', count: { $sum: 1 } } },
+        ]);
+      })(),
+    ]);
+
+    res.json({
+      topTutors,
+      categoryDemand,
+      monthlyStats,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) { next(error); }
+};
+
+// --- Aprobar tutor ---
+
+export const adminApproveTutor = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.user || req.user.role !== 'admin') throw Unauthorized('Solo admin.');
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, role: 'tutor' },
+      { 'tutorData.approved': true },
+      { new: true }
+    ).select('name email tutorData');
+    if (!user) throw NotFound('Tutor no encontrado.');
+    res.json({ user });
+  } catch (error) { next(error); }
+};
+
+export const adminListPendingTutors = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!_req.user || _req.user.role !== 'admin') throw Unauthorized('Solo admin.');
+    const tutors = await User.find({ role: 'tutor', 'tutorData.approved': false })
+      .select('name email photoUrl tutorData createdAt')
+      .lean();
+    res.json({ tutors });
+  } catch (error) { next(error); }
+};

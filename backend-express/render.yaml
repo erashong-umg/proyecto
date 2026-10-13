@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: educaspot-backend
+    runtime: docker
+    plan: free
+    rootDir: backend-express
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: MONGODB_URI
+        sync: false                      # set from Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        value: https://educaspot-frontend.onrender.com
+      - key: LOG_LEVEL
+        value: combined

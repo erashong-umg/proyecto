@@ -8,7 +8,10 @@ export const statusMiddleware = (req: Request, _res: Response, next: NextFunctio
   if (!req.user) return next(); // sin usuario, asume que authMiddleware rechazó antes
 
   if (req.user.status === 'suspended') {
-    const isAllowed = SUSPENSION_ALLOWED.some((path) => req.path.startsWith(path));
+    // req.path es relativo al router donde corre este middleware (p.ej. '/me'
+    // dentro de auth.routes.ts, montado en /api/auth) — hay que comparar contra
+    // la URL completa para que la lista blanca de abajo funcione en cualquier router.
+    const isAllowed = SUSPENSION_ALLOWED.some((path) => req.originalUrl.startsWith(path));
     if (!isAllowed) {
       return next(Forbidden('Su cuenta está suspendida. Por favor, apele desde su perfil.'));
     }

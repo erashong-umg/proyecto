@@ -85,9 +85,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// Índice 2dsphere para búsqueda geoespacial (Fase 2)
-userSchema.index({ 'address.coords': '2dsphere' });
-
 // Hash automático del password antes de guardar
 userSchema.pre('save', async function () {
   if (this.isModified('password') && this.password) {
