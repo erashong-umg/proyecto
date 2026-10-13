@@ -12,6 +12,11 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: educaspot
+      # Workaround para SERVER-121912: mongo:8 (TCMalloc) se niega a arrancar
+      # en kernel Linux >= 6.19 por un cambio incompatible en rseq — ver
+      # docs/despliegue.md. Quitar si el servidor baja de kernel o Mongo
+      # publica un fix.
+      GLIBC_TUNABLES: "glibc.pthread.rseq=1"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
