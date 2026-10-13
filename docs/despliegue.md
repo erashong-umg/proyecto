@@ -47,15 +47,20 @@ mkdir -p ~/apps/educaspot
 cd ~/apps/educaspot
 ```
 
-Copiar `deploy/compose.yml` y `deploy/.env.example` del repo a ese
-directorio del servidor (por `scp`, `rsync`, o pegando el contenido a
-mano). Luego:
+Copiar `deploy/compose.yml` del repo a ese directorio del servidor (por
+`scp`, `rsync`, o pegando el contenido a mano). El workflow
+(`.github/workflows/deploy.yml`) escribe `.env` automáticamente en cada
+deploy a partir de los secrets del ambiente `DEPLOY_PRD` (ver sección 4),
+así que no hace falta crearlo a mano — salvo para el "Primer arranque
+manual" de abajo, antes del primer push a `main`:
 
 ```bash
 cp .env.example .env
 nano .env   # completar GHCR_OWNER, DOMAIN, MONGO_ROOT_PASSWORD, JWT_SECRET
             # con valores reales — JWT_SECRET distinto al de desarrollo,
             # mínimo 32 caracteres (ej: openssl rand -hex 32)
+            # Estos deben coincidir con los secrets que cargues en GitHub,
+            # porque el próximo deploy sobrescribe este archivo.
 ```
 
 ### Autenticar Podman contra GHCR
@@ -110,15 +115,26 @@ tocarlo de nuevo salvo que cambie el dominio.
 
 ## 4. Secrets de GitHub
 
-En el repo → **Settings → Secrets and variables → Actions → New repository
-secret**, crear:
+En el repo → **Settings → Secrets and variables → Actions**, ambiente
+`DEPLOY_PRD` → **Add environment secret**, crear:
 
-| Secret            | Valor                                                              |
-|--------------------|---------------------------------------------------------------------|
-| `SSH_HOST`         | IP o hostname del servidor                                         |
-| `SSH_USER`         | usuario SSH que ya tiene acceso (y permiso para correr `podman`)    |
-| `SSH_PRIVATE_KEY`  | llave privada SSH cuya pública ya está en `~/.ssh/authorized_keys` del servidor para `SSH_USER` |
-| `SSH_PORT`         | opcional — solo si el SSH del servidor no usa el puerto 22          |
+| Secret                 | Valor                                                              |
+|------------------------|---------------------------------------------------------------------|
+| `SSH_HOST`             | IP o hostname del servidor                                         |
+| `SSH_USER`             | usuario SSH que ya tiene acceso (y permiso para correr `podman`)    |
+| `SSH_PRIVATE_KEY`      | llave privada SSH cuya pública ya está en `~/.ssh/authorized_keys` del servidor para `SSH_USER` |
+| `SSH_PORT`             | opcional — solo si el SSH del servidor no usa el puerto 22          |
+| `GHCR_OWNER`           | `erashong-umg` (dueño de los paquetes en GHCR)                     |
+| `DOMAIN`               | `educaspot.yettotools.com`                                          |
+| `MONGO_ROOT_USERNAME`  | usuario root de Mongo en producción                                |
+| `MONGO_ROOT_PASSWORD`  | contraseña fuerte, distinta a la de desarrollo                     |
+| `JWT_SECRET`           | secreto aleatorio ≥32 caracteres, distinto al de desarrollo (ej: `openssl rand -hex 32`) |
+
+Estos últimos cinco son los mismos campos de `deploy/.env.example` — el
+workflow los escribe como `.env` en el servidor en cada deploy (ver paso
+"Desplegar en el servidor vía SSH" en `deploy.yml`), así que son la fuente
+de verdad real; cambiar `deploy/.env.example` o el `.env` del servidor a
+mano ya no tiene efecto después del siguiente push a `main`.
 
 `GITHUB_TOKEN` (usado para publicar en GHCR) es automático, no hay que
 crearlo.

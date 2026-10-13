@@ -63,6 +63,13 @@ jobs:
           script: |
             set -e
             cd ${{ env.DEPLOY_PATH }}
+            cat > .env <<'ENVEOF'
+            GHCR_OWNER=${{ secrets.GHCR_OWNER }}
+            DOMAIN=${{ secrets.DOMAIN }}
+            MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
+            MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            ENVEOF
             podman-compose pull
             podman-compose up -d
             podman image prune -f
