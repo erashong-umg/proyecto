@@ -1,0 +1,19 @@
+@use '../../styles/variables' as *;
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  color: $color-text;
+  transition: background $transition-fast, color $transition-fast;
+
+  svg { width: 17px; height: 17px; }
+
+  &:hover { background: $color-surface-alt; }
+}

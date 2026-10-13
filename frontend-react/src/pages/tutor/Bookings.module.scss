@@ -1,0 +1,42 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  margin-bottom: $space-8;
+}
+
+.status {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-12 0;
+}
+
+.error {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.empty {
+  text-align: center;
+  padding: $space-16 $space-4;
+  color: $color-text-muted;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    color: $color-text-light;
+    margin-bottom: $space-4;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  max-width: 760px;
+}

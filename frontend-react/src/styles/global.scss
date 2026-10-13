@@ -1,0 +1,110 @@
+@use 'theme';
+@use 'variables' as *;
+@use 'mixins' as *;
+
+:root {
+  color-scheme: light dark;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: $font-base;
+  background-color: $color-bg;
+  color: $color-text;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  transition: background-color $transition-normal, color $transition-normal;
+}
+
+a {
+  color: $color-primary;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// `color-scheme: light dark` (arriba) deja que el navegador aplique sus
+// colores nativos de controles de formulario según el modo oscuro del SO,
+// sin importar nuestro `data-theme` — un usuario con SO oscuro que fija el
+// sitio en claro (el toggle de ThemeToggle.tsx lo permite) terminaba viendo
+// texto blanco sobre fondo blanco en CUALQUIER input/select/button sin color
+// explícito (confirmado con getComputedStyle en Chrome: color y background
+// ambos rgb(255,255,255)). Fijar el color acá, una sola vez, evita repetirlo
+// en cada componente nuevo.
+button {
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: $color-text;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $space-4 0;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: $font-size-4xl;
+  font-family: $font-display;
+  font-weight: 600;
+}
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+
+p { margin: 0 0 $space-4 0; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $space-4;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Accesibilidad: nadie debe recibir movimiento que no pidió. Corta todas las
+// transiciones/animaciones a lo imperceptible en vez de desactivarlas del
+// todo, para que el estado final siga apareciendo sin el desplazamiento.
+// Ver accessibility.md § Cognitive: "respond by reducing automatic and
+// repetitive animations".
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Progressive enhancement: donde se usa transparencia (paneles, badges sobre
+// el hero), ofrecer una versión sólida si el sistema operativo lo pide.
+@media (prefers-reduced-transparency: reduce) {
+  .glass, [class*='Glass'] {
+    backdrop-filter: none !important;
+    background-color: $color-surface !important;
+  }
+}

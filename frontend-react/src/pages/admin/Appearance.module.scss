@@ -1,0 +1,151 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.status {
+  color: $color-text-muted;
+  padding: $space-8 0;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-8;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-2;
+
+    svg { width: 22px; height: 22px; color: $color-primary; }
+  }
+}
+
+.subtitle {
+  color: $color-text-muted;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: $space-3;
+  flex-shrink: 0;
+
+  button svg { width: 16px; height: 16px; }
+}
+
+.errorMsg {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.successMsg {
+  color: $color-success-dark;
+  margin-bottom: $space-4;
+}
+
+.section {
+  @include card;
+  margin-bottom: $space-6;
+
+  h3 {
+    margin-bottom: $space-2;
+  }
+}
+
+.sectionHint {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin-bottom: $space-5;
+}
+
+.modesRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: $space-6;
+
+  .section { margin-bottom: 0; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: $space-5;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+  }
+}
+
+.fieldControls {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.swatch {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &::-webkit-color-swatch-wrapper { padding: 2px; }
+  &::-webkit-color-swatch { border: none; border-radius: $radius-sm; }
+}
+
+.hexInput {
+  flex: 1;
+  min-width: 0;
+  padding: $space-2 $space-3;
+  font-size: $font-size-sm;
+  font-family: monospace;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  background: $color-surface;
+  color: $color-text;
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 1px;
+  }
+}
+
+.hexInputError {
+  border-color: $color-danger;
+}
+
+.fieldError {
+  color: $color-danger;
+  font-size: $font-size-xs;
+  margin: 0;
+}
+
+.confirmText {
+  margin: 0 0 $space-6;
+  color: $color-text-muted;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}

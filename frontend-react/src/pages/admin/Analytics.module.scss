@@ -1,0 +1,227 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.header {
+  margin-bottom: $space-6;
+}
+
+.subtitle {
+  color: $color-text-muted;
+}
+
+.generatedAt {
+  color: $color-text-light;
+}
+
+.status {
+  color: $color-text-muted;
+  padding: $space-8 0;
+  text-align: center;
+}
+
+.errorMsg {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: $space-6;
+
+  // La primera tarjeta (ranking de tutores) ocupa todo el ancho cuando hay
+  // espacio para dos columnas — las otras dos (dona + líneas) quedan lado a
+  // lado debajo, en vez de las tres apiladas en una sola columna angosta.
+  @include respond-above(lg) {
+    grid-template-columns: repeat(2, 1fr);
+
+    > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.chartCard {
+  @include card;
+  margin: 0;
+}
+
+.chartTitle {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-weight: 700;
+  font-size: $font-size-base;
+  color: $color-text;
+  margin-bottom: $space-4;
+
+  svg { width: 18px; height: 18px; color: $color-primary; flex-shrink: 0; }
+}
+
+.emptyChart {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  padding: $space-6 0;
+  text-align: center;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+// --- Barras horizontales (top tutores) ---
+
+.axisLabel {
+  fill: $color-text;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.barTrack {
+  fill: $color-border;
+}
+
+.barFill {
+  fill: $color-primary;
+}
+
+.barValue {
+  fill: $color-text-muted;
+  font-size: 10px;
+}
+
+// --- Dona (demanda por categoría) ---
+
+.donutTrack {
+  stroke: $color-border;
+}
+
+.sliceA { stroke: $color-primary; }
+.sliceB { stroke: $color-info; }
+.sliceC { stroke: $color-warning-dark; }
+.sliceD { stroke: $color-success-dark; }
+.sliceE { stroke: $color-danger; }
+.sliceF { stroke: $color-text-muted; }
+
+.donutCenterValue {
+  fill: $color-text;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.donutCenterLabel {
+  fill: $color-text-muted;
+  font-size: 10px;
+}
+
+.legend {
+  list-style: none;
+  margin: $space-4 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-4;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+  }
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: $radius-full;
+  display: inline-block;
+  background: $color-primary;
+
+  &.sliceA { background: $color-primary; }
+  &.sliceB { background: $color-info; }
+  &.sliceC { background: $color-warning-dark; }
+  &.sliceD { background: $color-success-dark; }
+  &.sliceE { background: $color-danger; }
+  &.sliceF { background: $color-text-muted; }
+}
+
+// --- Líneas (reservas del último mes) ---
+
+.axisLine {
+  stroke: $color-border;
+  stroke-width: 1;
+}
+
+.lineArea {
+  fill: color-mix(in srgb, $color-primary 14%, transparent);
+  stroke: none;
+}
+
+.linePath {
+  fill: none;
+  stroke: $color-primary;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.linePoint {
+  fill: $color-primary;
+  stroke: $color-surface;
+  stroke-width: 2;
+}
+
+.lineValue {
+  fill: $color-text;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chartCaption {
+  color: $color-text-light;
+  font-size: $font-size-xs;
+  margin: $space-3 0 0;
+}
+
+// --- Alternativa textual (todas las gráficas) ---
+
+.dataTable {
+  margin-top: $space-4;
+
+  summary {
+    cursor: pointer;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-primary;
+
+    &:hover { color: $color-primary-dark; }
+
+    @include focus-ring;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: $space-3;
+    font-size: $font-size-sm;
+
+    th, td {
+      text-align: left;
+      padding: $space-2 $space-3;
+      border-bottom: 1px solid $color-border;
+    }
+
+    th {
+      color: $color-text-muted;
+      font-weight: 600;
+    }
+  }
+}

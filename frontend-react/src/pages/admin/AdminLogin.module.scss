@@ -1,0 +1,84 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Fondo distinto del naranja de marca del sitio público (deliberado — ver
+// CLAUDE.md "panel de administración independiente"): un neutro oscuro fijo,
+// no reactivo a light/dark, para que se perciba de inmediato como una
+// consola interna y no como una pantalla más del marketplace.
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-6;
+  background: var(--neutral-900);
+}
+
+.status {
+  color: $color-text-light;
+  text-align: center;
+  padding: $space-16 0;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: $color-surface;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  padding: $space-8;
+  text-align: center;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto $space-4;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, $color-primary 12%, transparent);
+  color: $color-primary;
+
+  svg { width: 24px; height: 24px; }
+}
+
+.title {
+  font-size: $font-size-2xl;
+  margin-bottom: $space-2;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  margin-bottom: $space-6;
+}
+
+.errorMsg {
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  margin-bottom: $space-4;
+  font-size: $font-size-sm;
+  text-align: left;
+}
+
+.form {
+  text-align: left;
+}
+
+.submit { width: 100%; margin-top: $space-2; }
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  margin-top: $space-6;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover { color: $color-text; }
+}

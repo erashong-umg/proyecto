@@ -1,0 +1,175 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// El panel de administración es independiente del shell público (sin Header
+// ni Footer globales, ver router.tsx/PublicShell.tsx) — por eso trae su
+// propia barra superior con marca + cuenta + logout.
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-4 $space-6;
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-weight: 700;
+
+  svg { width: 20px; height: 20px; color: $color-primary; }
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: $on-accent-text;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.accountName {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+
+  @include respond-below(sm) {
+    display: none;
+  }
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  background: none;
+  border: none;
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+  color: $color-danger;
+  font-weight: 600;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  svg { width: 16px; height: 16px; }
+
+  &:hover { background: color-mix(in srgb, $color-danger 10%, transparent); }
+
+  @include focus-ring;
+}
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+
+  @include respond-below(md) {
+    flex-direction: column;
+  }
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 240px;
+  background: $color-surface;
+  border-right: 1px solid $color-border;
+  padding: $space-6 $space-4;
+
+  @include respond-below(md) {
+    width: auto;
+    border-right: none;
+    border-bottom: 1px solid $color-border;
+    padding: $space-3 $space-4;
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+
+  @include respond-below(md) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  color: $color-text-muted;
+  font-weight: 600;
+  font-size: $font-size-sm;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  &:hover {
+    background: $color-surface-alt;
+    color: $color-text;
+    text-decoration: none;
+  }
+
+  @include focus-ring;
+}
+
+.navLinkActive {
+  background: color-mix(in srgb, $color-primary 12%, transparent);
+  color: $color-primary;
+}
+
+.content {
+  flex: 1;
+  // Evita que contenido ancho (tablas, grids) empuje el layout y provoque
+  // scroll horizontal en la página completa.
+  min-width: 0;
+}
+
+.header {
+  padding: $space-6 $space-8 $space-4;
+  border-bottom: 1px solid $color-border;
+
+  h1 {
+    margin: 0;
+    font-size: $font-size-2xl;
+  }
+
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}
+
+.main {
+  padding: $space-6 $space-8 $space-16;
+
+  @include respond-below(md) {
+    padding: $space-4;
+  }
+}

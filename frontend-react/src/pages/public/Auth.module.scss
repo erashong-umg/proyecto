@@ -1,0 +1,136 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.auth {
+  min-height: calc(100vh - 130px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: $color-bg;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-8 $space-4;
+  min-width: 0;
+}
+
+.form {
+  background: $color-surface;
+  padding: $space-8;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+}
+
+.title {
+  font-size: $font-size-3xl;
+  margin-bottom: $space-2;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: $color-text-muted;
+  margin-bottom: $space-6;
+}
+
+.errorMsg {
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  margin-bottom: $space-4;
+  font-size: $font-size-sm;
+}
+
+.expiredMsg {
+  background: color-mix(in srgb, $color-warning 10%, transparent);
+  color: $color-warning-dark;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  margin-bottom: $space-4;
+  font-size: $font-size-sm;
+}
+
+.submit { width: 100%; }
+
+.divider {
+  text-align: center;
+  color: $color-text-muted;
+  margin: $space-4 0;
+  position: relative;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 1.5rem);
+    height: 1px;
+    background: $color-border;
+  }
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+
+.roleSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+  margin-bottom: $space-4;
+}
+
+.roleOption {
+  border: 2px solid $color-border;
+  border-radius: $radius-md;
+  padding: $space-3;
+  cursor: pointer;
+  text-align: center;
+  transition: all $transition-fast;
+  background: $color-surface;
+
+  input { display: none; }
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    font-weight: 600;
+    margin-bottom: $space-1;
+  }
+
+  small { color: $color-text-muted; }
+
+  &.selected {
+    border-color: $color-primary;
+    background: color-mix(in srgb, $color-primary 5%, transparent);
+  }
+}
+
+.roleIcon {
+  width: 18px;
+  height: 18px;
+  color: $color-primary;
+}
+
+.forgotLink {
+  display: block;
+  text-align: right;
+  font-size: $font-size-sm;
+  margin-bottom: $space-4;
+}
+
+.footer {
+  text-align: center;
+  margin-top: $space-6;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+}

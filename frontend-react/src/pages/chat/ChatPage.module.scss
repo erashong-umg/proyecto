@@ -1,0 +1,153 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  background: $color-bg;
+  padding: $space-6 0 $space-10;
+  min-height: calc(100vh - 130px);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: $space-5;
+  height: calc(100vh - 210px);
+  min-height: 440px;
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 170px);
+  }
+}
+
+.sidebar {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  padding: $space-5;
+  overflow-y: auto;
+
+  @include respond-below(md) {
+    &.hiddenMobile { display: none; }
+  }
+}
+
+.sidebarTitle {
+  font-family: $font-display;
+  font-size: $font-size-xl;
+  margin: 0 0 $space-4;
+}
+
+.main {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+
+  @include respond-below(md) {
+    &.hiddenMobile { display: none; }
+  }
+}
+
+.status {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-10 $space-5;
+  margin: 0;
+}
+
+.connectingBanner {
+  @include flex-center;
+  gap: $space-2;
+  background: color-mix(in srgb, $color-warning 15%, transparent);
+  color: $color-warning-dark;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  padding: $space-2 $space-4;
+  flex-shrink: 0;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: $radius-full;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.placeholder {
+  flex: 1;
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-3;
+  color: $color-text-muted;
+  padding: $space-10;
+  text-align: center;
+
+  svg { width: 40px; height: 40px; color: $color-text-light; }
+
+  p { margin: 0; }
+}
+
+.conversation {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.conversationHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-bottom: 1px solid $color-border;
+  flex-shrink: 0;
+}
+
+.backLink {
+  display: none;
+  color: $color-text;
+
+  svg { width: 20px; height: 20px; }
+
+  @include respond-below(md) {
+    display: inline-flex;
+  }
+}
+
+.headerPhoto,
+.headerAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.headerPhoto { object-fit: cover; }
+
+.headerAvatar {
+  background: $color-primary;
+  color: $on-accent-text;
+  font-weight: 700;
+  @include flex-center;
+}
+
+.headerName {
+  font-weight: 700;
+}
+
+.sendError {
+  color: $color-danger;
+  font-size: $font-size-sm;
+  padding: 0 $space-5;
+  margin: $space-2 0 0;
+}

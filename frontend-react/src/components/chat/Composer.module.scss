@@ -1,0 +1,34 @@
+@use '../../styles/variables' as *;
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-top: 1px solid $color-border;
+  flex-shrink: 0;
+}
+
+.textarea {
+  flex: 1;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  font-family: inherit;
+  font-size: $font-size-base;
+  background: $color-surface;
+  color: $color-text;
+  transition: border-color $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $color-primary 10%, transparent);
+  }
+
+  &::placeholder { color: $color-text-light; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}

@@ -1,0 +1,191 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+  background: $color-bg;
+  min-height: calc(100vh - 130px);
+}
+
+.status {
+  text-align: center;
+  color: $color-text-muted;
+  padding: $space-16 0;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  margin-bottom: $space-6;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $space-5;
+  margin-bottom: $space-8;
+}
+
+.photo {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: $on-accent-text;
+  font-weight: 700;
+  font-size: $font-size-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin: $space-1 0;
+}
+
+.starIcon {
+  width: 16px;
+  height: 16px;
+  color: $color-warning;
+  fill: $color-warning;
+}
+
+.rate {
+  font-weight: 700;
+  margin: 0;
+
+  small { font-weight: 400; color: $color-text-muted; }
+}
+
+.section {
+  margin-bottom: $space-10;
+
+  h2 { font-size: $font-size-xl; margin-bottom: $space-4; }
+}
+
+.bio {
+  color: $color-text-muted;
+  max-width: 65ch;
+}
+
+.empty { color: $color-text-muted; }
+
+.courses {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $space-4;
+}
+
+.courseCard {
+  @include card;
+
+  p { color: $color-text-muted; font-size: $font-size-sm; margin: $space-2 0 $space-3; }
+}
+
+.courseHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-2;
+
+  h3 { margin: 0; font-size: $font-size-base; }
+}
+
+.courseCategory {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.modalities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-bottom: $space-3;
+}
+
+.modality {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  background: $color-surface-alt;
+  color: $color-text-muted;
+  padding: $space-1 $space-2;
+  border-radius: $radius-full;
+
+  svg { width: 12px; height: 12px; }
+}
+
+.coursePrice {
+  font-weight: 700;
+  margin: 0;
+
+  small { font-weight: 400; color: $color-text-muted; }
+}
+
+.reviews {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.review {
+  padding-bottom: $space-4;
+  border-bottom: 1px solid $color-border;
+
+  p { margin: $space-2 0 0; color: $color-text-muted; }
+
+  &:last-child { border-bottom: none; }
+}
+
+.reviewHead {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+}
+
+.reviewStars {
+  display: flex;
+  gap: 1px;
+
+  svg { width: 14px; height: 14px; }
+}
+
+.starFilled { color: $color-warning; fill: $color-warning; }
+.starEmpty { color: $color-border-strong; }
+
+.reviewDate {
+  font-size: $font-size-xs;
+  color: $color-text-light;
+  margin-left: auto;
+}
+
+.bookingNote {
+  text-align: center;
+  color: $color-text-light;
+  font-size: $font-size-sm;
+  padding-top: $space-6;
+  border-top: 1px solid $color-border;
+}

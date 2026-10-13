@@ -1,0 +1,50 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.button {
+  @include button-base;
+  @include focus-ring;
+
+  &.primary {
+    background: $color-primary;
+    color: $on-accent-text;
+    &:hover:not(:disabled) { background: $color-primary-dark; }
+  }
+
+  &.secondary {
+    background: $color-surface;
+    color: $color-text;
+    border: 1px solid $color-border-strong;
+    &:hover:not(:disabled) { background: $color-surface-alt; }
+  }
+
+  &.danger {
+    background: $color-danger;
+    color: $on-accent-text;
+    &:hover:not(:disabled) { background: $color-danger-dark; }
+  }
+
+  &.ghost {
+    background: transparent;
+    color: $color-primary;
+    &:hover:not(:disabled) { background: color-mix(in srgb, $color-primary 8%, transparent); }
+  }
+
+  &.sm { padding: $space-2 $space-3; font-size: $font-size-sm; }
+  &.md { padding: $space-3 $space-4; }
+  &.lg { padding: $space-4 $space-6; font-size: $font-size-lg; }
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

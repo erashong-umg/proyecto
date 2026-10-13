@@ -1,0 +1,102 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  margin: auto;
+  color: $color-text-muted;
+  text-align: center;
+}
+
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $space-4;
+}
+
+.loadMore {
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-full;
+  padding: $space-1 $space-4;
+  font-size: $font-size-xs;
+  font-family: inherit;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover:not(:disabled) { background: $color-surface-alt; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.dayDivider {
+  display: flex;
+  justify-content: center;
+  margin: $space-3 0;
+
+  span {
+    font-size: $font-size-xs;
+    color: $color-text-light;
+    background: $color-surface-alt;
+    padding: $space-1 $space-3;
+    border-radius: $radius-full;
+  }
+}
+
+.row {
+  display: flex;
+  margin-bottom: $space-1;
+}
+
+.rowMine { justify-content: flex-end; }
+.rowTheirs { justify-content: flex-start; }
+
+.bubble {
+  max-width: 70%;
+  padding: $space-2 $space-3;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  @include respond-below(sm) {
+    max-width: 85%;
+  }
+}
+
+.bubbleMine {
+  background: $color-primary;
+  color: $on-accent-text;
+  border-bottom-right-radius: $radius-sm;
+}
+
+.bubbleTheirs {
+  background: $color-surface-alt;
+  color: $color-text;
+  border-bottom-left-radius: $radius-sm;
+}
+
+.content {
+  margin: 0 0 2px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font-size: $font-size-sm;
+}
+
+.time {
+  display: block;
+  font-size: 11px;
+  opacity: 0.75;
+  text-align: right;
+}

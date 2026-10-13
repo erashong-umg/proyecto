@@ -1,0 +1,253 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.header {
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  box-shadow: $shadow-sm;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-3 $space-4;
+  gap: $space-4;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text;
+  flex-shrink: 0;
+
+  &:hover { text-decoration: none; }
+}
+
+.brandMark { color: $color-primary; flex-shrink: 0; }
+
+// === Nav principal (desktop) ===
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  height: 64px;
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text-muted;
+  font-weight: 500;
+  font-size: $font-size-sm;
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+  transition: background $transition-fast, color $transition-fast;
+
+  svg { width: 16px; height: 16px; }
+
+  &:hover { background: $color-surface-alt; color: $color-text; text-decoration: none; }
+}
+
+.navLinkActive {
+  color: $color-primary;
+  background: color-mix(in srgb, $color-primary 8%, transparent);
+
+  &:hover { background: color-mix(in srgb, $color-primary 12%, transparent); color: $color-primary; }
+}
+
+// === Cluster de cuenta ===
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-shrink: 0;
+}
+
+.authActions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: $on-accent-text;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userMenu {
+  position: relative;
+
+  @include respond-below(lg) {
+    display: none;
+  }
+}
+
+.userTrigger {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  padding: $space-1 $space-3 $space-1 $space-1;
+
+  &:hover { background: $color-surface-alt; }
+}
+
+.userTriggerName {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  color: $color-text-light;
+  transition: transform $transition-fast;
+}
+
+.chevronOpen { transform: rotate(180deg); }
+
+.menuPanel {
+  position: absolute;
+  top: calc(100% + #{$space-2});
+  right: 0;
+  min-width: 200px;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  padding: $space-3;
+  z-index: $z-dropdown;
+}
+
+.menuName {
+  font-weight: 600;
+  font-size: $font-size-sm;
+  margin: 0;
+}
+
+.menuRole {
+  color: $color-text-muted;
+  font-size: $font-size-xs;
+  margin: 2px 0 $space-3;
+}
+
+.menuLogout {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  width: 100%;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  padding: $space-2 $space-3;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-danger;
+
+  svg { width: 15px; height: 15px; }
+
+  &:hover { background: color-mix(in srgb, $color-danger 8%, transparent); border-color: $color-danger; }
+}
+
+// === Hamburguesa + panel móvil ===
+
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  color: $color-text;
+  flex-shrink: 0;
+
+  svg { width: 18px; height: 18px; }
+
+  @include respond-below(lg) {
+    display: flex;
+  }
+}
+
+.mobilePanel {
+  display: none;
+  border-top: 1px solid $color-border;
+  padding: $space-4;
+  background: $color-surface;
+
+  @include respond-below(lg) {
+    display: block;
+  }
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+
+  .navLink { font-size: $font-size-base; padding: $space-3; }
+  svg { width: 18px; height: 18px; }
+}
+
+.mobileDivider {
+  height: 1px;
+  background: $color-border;
+  margin: $space-4 0;
+}
+
+.mobileAccount {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  .avatar { width: 36px; height: 36px; font-size: $font-size-sm; }
+  .menuName, .menuRole { margin: 0; }
+  .menuRole { margin-top: 2px; }
+
+  > div { flex: 1; min-width: 0; }
+  .menuLogout { width: auto; }
+}
+
+.mobileAuthActions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  .navLink { padding: $space-3; font-size: $font-size-base; }
+}
+
+.mobileFullButton { width: 100%; }

@@ -1,0 +1,291 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.onboarding {
+  min-height: calc(100vh - 200px);
+  padding: $space-8 $space-4;
+  background: $color-bg;
+}
+
+.layout {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: $space-10;
+  align-items: start;
+
+  @include respond-below(lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.container {
+  background: $color-surface;
+  padding: $space-8;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+}
+
+// Rail vertical de pasos — desktop. Los puntos se conectan con una línea
+// punteada (el mismo motivo de "ruta" del logomark y el hero) en vez de la
+// barra de progreso genérica de arriba.
+.rail {
+  position: sticky;
+  top: $space-8;
+  display: none;
+
+  @include respond-above(lg) {
+    display: block;
+  }
+}
+
+.railList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.railItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding-bottom: $space-8;
+
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    bottom: 0;
+    border-left: 2px dashed $color-border-strong;
+  }
+
+  &[data-status='done']:not(:last-child)::before {
+    border-left-color: $color-primary;
+  }
+}
+
+.railDot {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  background: $color-surface;
+  border: 2px solid $color-border-strong;
+  color: $color-text-muted;
+  z-index: 1;
+
+  svg { width: 14px; height: 14px; }
+
+  [data-status='current'] & {
+    border-color: $color-primary;
+    color: $color-primary;
+    box-shadow: 0 0 0 4px color-mix(in srgb, $color-primary 15%, transparent);
+  }
+
+  [data-status='done'] & {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: $on-accent-text;
+  }
+}
+
+.railLabel {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-muted;
+
+  [data-status='current'] & {
+    color: $color-text;
+    font-weight: 600;
+  }
+}
+
+.progress {
+  margin-bottom: $space-6;
+
+  @include respond-above(lg) {
+    display: none;
+  }
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: $color-surface-alt;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.progressFill {
+  width: 100%;
+  height: 100%;
+  background: $color-primary;
+  transform-origin: left;
+  transition: transform $transition-normal;
+}
+
+.stepLabel {
+  margin: $space-2 0 0 0;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  text-align: right;
+}
+
+.errorMsg {
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  margin-bottom: $space-4;
+}
+
+.step {
+  h2 { margin-bottom: $space-4; }
+}
+
+.bullets {
+  margin: $space-4 0;
+  padding-left: $space-6;
+  li { margin-bottom: $space-2; }
+}
+
+.hint {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin-bottom: $space-4;
+}
+
+.field { margin-bottom: $space-4; }
+
+.label {
+  display: block;
+  font-weight: 600;
+  font-size: $font-size-sm;
+  margin-bottom: $space-2;
+}
+
+.addressSearch {
+  display: flex;
+  align-items: flex-end;
+  gap: $space-3;
+
+  > div:first-child { flex: 1; }
+
+  button svg { width: 15px; height: 15px; }
+}
+
+.searchOk, .searchWarn {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  margin: $space-3 0 0;
+
+  svg { width: 15px; height: 15px; flex-shrink: 0; }
+}
+
+.searchOk { color: $color-success-dark; }
+.searchWarn { color: $color-warning-dark; }
+
+.textarea {
+  width: 100%;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  font-family: inherit;
+  font-size: $font-size-base;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $color-primary 10%, transparent);
+  }
+}
+
+.numberInput {
+  width: 100%;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $color-primary 10%, transparent);
+  }
+}
+
+.radioGroup {
+  display: flex;
+  gap: $space-4;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  cursor: pointer;
+}
+
+.categoryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-top: $space-4;
+}
+
+.categoryChip {
+  padding: $space-2 $space-4;
+  border: 1px solid $color-border-strong;
+  background: $color-surface;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &.selected {
+    background: $color-primary;
+    color: $on-accent-text;
+    border-color: $color-primary;
+  }
+
+  &:hover:not(.selected) {
+    border-color: $color-primary;
+  }
+}
+
+.coords {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  font-family: monospace;
+  margin-top: $space-2;
+}
+
+.note {
+  margin-top: $space-4;
+  padding: $space-3 $space-4;
+  background: color-mix(in srgb, $color-warning 10%, transparent);
+  color: $color-warning-dark;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: $space-4;
+  margin-top: $space-8;
+  padding-top: $space-6;
+  border-top: 1px solid $color-border;
+}

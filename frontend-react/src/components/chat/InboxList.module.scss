@@ -1,0 +1,106 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.empty {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  padding: $space-2 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  border-radius: $radius-lg;
+  color: $color-text;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background: $color-surface-alt;
+    text-decoration: none;
+  }
+}
+
+.active {
+  background: color-mix(in srgb, $color-primary 10%, transparent);
+}
+
+.photo,
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.avatar {
+  background: $color-primary;
+  color: $on-accent-text;
+  font-weight: 700;
+  @include flex-center;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.topRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-2;
+}
+
+.name {
+  font-weight: 600;
+  font-size: $font-size-sm;
+  @include truncate;
+}
+
+.time {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  color: $color-text-light;
+}
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  margin-top: 2px;
+}
+
+.preview {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  @include truncate;
+}
+
+.badge {
+  flex-shrink: 0;
+  background: $color-primary;
+  color: $on-accent-text;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: $radius-full;
+  padding: 0 $space-1;
+  @include flex-center;
+}

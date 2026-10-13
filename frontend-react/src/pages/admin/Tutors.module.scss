@@ -1,0 +1,104 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-6;
+}
+
+.status {
+  color: $color-text-muted;
+  padding: $space-8 0;
+  text-align: center;
+}
+
+.errorMsg {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.empty {
+  @include card;
+  color: $color-text-muted;
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-4;
+  flex-wrap: wrap;
+}
+
+.photo, .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.avatar {
+  background: $color-primary;
+  color: $on-accent-text;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info {
+  flex: 1;
+  min-width: 200px;
+
+  h3 {
+    margin: 0;
+    font-size: $font-size-base;
+  }
+}
+
+.email, .date {
+  margin: 2px 0 0;
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+.actions {
+  display: flex;
+  gap: $space-2;
+  flex-shrink: 0;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.confirmText {
+  margin: 0 0 $space-4;
+  color: $color-text-muted;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+  margin-top: $space-4;
+}

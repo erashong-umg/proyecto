@@ -1,0 +1,85 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.subtitle {
+  color: $color-text-muted;
+  margin: 0;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger-dark;
+  padding: $space-4;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+
+  svg { width: 18px; height: 18px; flex-shrink: 0; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: $space-4;
+}
+
+.card {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+}
+
+.cardIcon {
+  @include flex-center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  background: color-mix(in srgb, $color-primary 12%, transparent);
+  color: $color-primary;
+
+  svg { width: 22px; height: 22px; }
+}
+
+.primary .cardIcon {
+  background: color-mix(in srgb, $color-primary 12%, transparent);
+  color: $color-primary;
+}
+
+.warning .cardIcon {
+  background: color-mix(in srgb, $color-warning 15%, transparent);
+  color: $color-warning-dark;
+}
+
+.danger .cardIcon {
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger-dark;
+}
+
+.success .cardIcon {
+  background: color-mix(in srgb, $color-success 15%, transparent);
+  color: $color-success-dark;
+}
+
+.cardValue {
+  font-size: $font-size-3xl;
+  font-weight: 700;
+  margin: 0;
+  color: $color-text;
+  line-height: 1.1;
+}
+
+.cardLabel {
+  margin: $space-1 0 0;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+}

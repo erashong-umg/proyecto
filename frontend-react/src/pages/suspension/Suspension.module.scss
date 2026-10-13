@@ -1,0 +1,89 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-8 $space-4;
+  background: $color-bg;
+}
+
+.card {
+  @include card;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $space-4;
+  color: $color-danger;
+
+  svg {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.reason, .date {
+  margin: $space-2 0;
+  font-size: $font-size-base;
+}
+
+.info {
+  margin: $space-4 0;
+  color: $color-text-muted;
+}
+
+.form {
+  margin-top: $space-6;
+  text-align: left;
+  padding-top: $space-6;
+  border-top: 1px solid $color-border;
+
+  h2 {
+    text-align: center;
+    margin-bottom: $space-4;
+  }
+}
+
+.errorMsg {
+  background: color-mix(in srgb, $color-danger 10%, transparent);
+  color: $color-danger;
+  padding: $space-3 $space-4;
+  border-radius: $radius-md;
+  margin: $space-4 0;
+  font-size: $font-size-sm;
+}
+
+.successMsg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  background: color-mix(in srgb, $color-success 10%, transparent);
+  color: $color-success-dark;
+  padding: $space-4;
+  border-radius: $radius-md;
+  margin-top: $space-4;
+  text-align: center;
+}
+
+.successIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $space-8;
+  padding-top: $space-4;
+  border-top: 1px solid $color-border;
+}

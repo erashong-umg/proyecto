@@ -1,0 +1,89 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.help {
+  color: $color-text-muted;
+  margin-bottom: $space-6;
+  max-width: 640px;
+}
+
+.status {
+  color: $color-text-muted;
+  padding: $space-8 0;
+}
+
+.errorMsg {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.successMsg {
+  color: $color-success-dark;
+  margin-bottom: $space-4;
+}
+
+.gridWrap {
+  overflow-x: auto;
+  margin-bottom: $space-6;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.grid {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 64px repeat(7, 48px);
+}
+
+.cell {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xs;
+  border: 1px solid $color-border;
+  margin: -0.5px;
+}
+
+.corner, .dayHeader, .hourCell {
+  background: $color-surface-alt;
+  color: $color-text-muted;
+  font-weight: 600;
+  height: 32px;
+}
+
+.slot {
+  height: 28px;
+  background: $color-surface;
+  cursor: pointer;
+  padding: 0;
+  transition: background $transition-fast;
+
+  &:hover { background: color-mix(in srgb, $color-primary 15%, transparent); }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: -2px;
+    z-index: 1;
+  }
+
+  &.selected {
+    background: $color-primary;
+    &:hover { background: $color-primary-dark; }
+  }
+}
+
+.saveBtn {
+  min-width: 220px;
+}

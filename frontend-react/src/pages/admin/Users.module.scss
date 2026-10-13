@@ -1,0 +1,152 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $space-8 $space-4 $space-16;
+}
+
+.header {
+  margin-bottom: $space-6;
+}
+
+.subtitle {
+  color: $color-text-muted;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-bottom: $space-2;
+  max-width: 480px;
+
+  > div { flex: 1; min-width: 160px; }
+}
+
+.status {
+  color: $color-text-muted;
+  padding: $space-8 0;
+  text-align: center;
+}
+
+.errorMsg {
+  color: $color-danger;
+  margin-bottom: $space-4;
+}
+
+.empty {
+  @include card;
+  color: $color-text-muted;
+  text-align: center;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: $color-text-light;
+    margin-bottom: $space-3;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $color-surface;
+
+  th, td {
+    text-align: left;
+    padding: $space-3 $space-4;
+    font-size: $font-size-sm;
+    border-bottom: 1px solid $color-border;
+    white-space: nowrap;
+  }
+
+  th {
+    color: $color-text-muted;
+    font-weight: 600;
+    background: $color-surface-alt;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  padding: 2px $space-2;
+  border-radius: $radius-full;
+  white-space: nowrap;
+}
+
+.statusActive {
+  background: color-mix(in srgb, $color-success 12%, transparent);
+  color: $color-success-dark;
+}
+
+.statusSuspended {
+  background: color-mix(in srgb, $color-danger 12%, transparent);
+  color: $color-danger-dark;
+}
+
+.actionsCell {
+  display: flex;
+  gap: $space-4;
+}
+
+.linkBtn, .linkBtnDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg { width: 14px; height: 14px; }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.linkBtn {
+  color: $color-primary;
+  &:hover:not(:disabled) { color: $color-primary-dark; }
+}
+
+.linkBtnDanger {
+  color: $color-danger;
+  &:hover:not(:disabled) { color: $color-danger-dark; }
+}
+
+.pagination {
+  @include flex-center;
+  gap: $space-4;
+  margin-top: $space-6;
+}
+
+.pageInfo {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+}
+
+.confirmText {
+  margin: 0 0 $space-5;
+  color: $color-text-muted;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}
