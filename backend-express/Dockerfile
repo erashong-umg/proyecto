@@ -1,5 +1,5 @@
 # Multi-stage build para optimizar el tamaño de la imagen final
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY src ./src
 RUN npm run build
 
 # --- Runtime stage ---
-FROM node:20-alpine AS runtime
+FROM node:25-alpine AS runtime
 
 WORKDIR /app
 
