@@ -7,7 +7,10 @@
 services:
   mongodb:
     image: docker.io/library/mongo:8
-    restart: unless-stopped
+    # "always" (no "unless-stopped"): systemd/podman-restart.service solo
+    # re-arranca contenedores filtrando restart-policy=always tras un reboot
+    # del host — ver docs/despliegue.md "Arranque automático tras reboot".
+    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
@@ -31,7 +34,7 @@ services:
 
   backend:
     image: ghcr.io/${GHCR_OWNER}/proyecto-backend:latest
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mongodb
     environment:
@@ -47,7 +50,7 @@ services:
 
   frontend:
     image: ghcr.io/${GHCR_OWNER}/proyecto-frontend:latest
-    restart: unless-stopped
+    restart: always
     ports:
       - "127.0.0.1:8080:80"
 
