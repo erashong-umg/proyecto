@@ -1,5 +1,3 @@
-> **Nota:** Este README reemplaza al brief del curso. El brief original se conserva en el historial de git y en `.omo/plans/plan-edumarket.md` (sección de contexto).
-
 # EducaSpot — Marketplace Educativo
 
 EducaSpot es un marketplace de tutorías académicas (Guatemala) que conecta estudiantes y tutores: búsqueda geoespacial de tutores, agendamiento con prevención de traslapes, chat en tiempo real, reseñas y un panel de moderación/administración. Proyecto académico individual (Universidad Mariano Gálvez), construido con Express 5 + TypeScript + MongoDB en el backend y React 19 + TypeScript en el frontend.
@@ -41,8 +39,7 @@ proyecto/
 ├── backend-express/      API REST + WebSocket (Express 5, TypeScript, Mongoose, Socket.io)
 ├── frontend-react/        SPA (React 19, TypeScript, SASS modules, Zustand, Leaflet)
 ├── MongoDB/                docker-compose para levantar MongoDB localmente
-├── docs/                   manual técnico y manual de usuario
-└── .omo/plans/              plan de proyecto y briefs de ejecución por fase
+└── docs/                   manual técnico y manual de usuario
 ```
 
 ## Stack técnico
@@ -86,6 +83,5 @@ Generadas por `backend-express/src/seed/seed.ts` (`npm run seed`):
 
 ## Notas para el revisor
 
-- Las decisiones técnicas y el razonamiento detrás de cada una están documentados en `.omo/plans/plan-edumarket.md`. Es la fuente de verdad sobre alcance, secuenciación y decisiones ya cerradas.
-- El plan documenta explícitamente un conjunto de simplificaciones aceptadas (tabla D1–D10 en el plan), entre ellas: el login con Google es un endpoint simulado que emite un JWT real sin flujo OAuth completo; el CV y la foto de perfil se guardan como URL en vez de subida de archivo; la ruta en el mapa entre tutor y estudiante es una línea recta (Haversine), no un motor de ruteo real; el calendario solo tiene vista semanal (sin vista diaria/mensual); la suscripción periódica crea N reservas individuales en vez de un motor de recurrencia; y la búsqueda geoespacial filtra por radio en memoria (Haversine) en vez de un índice `2dsphere` de MongoDB. Todas estas son decisiones aceptadas y documentadas, no pendientes ni bugs.
+- Este proyecto documenta explícitamente un conjunto de simplificaciones aceptadas por restricciones de tiempo/alcance del curso, entre ellas: el login con Google es un endpoint simulado que emite un JWT real sin flujo OAuth completo; el CV y la foto de perfil se guardan como URL en vez de subida de archivo; la ruta en el mapa entre tutor y estudiante es una línea recta (Haversine), no un motor de ruteo real; el calendario solo tiene vista semanal (sin vista diaria/mensual); la suscripción periódica crea N reservas individuales en vez de un motor de recurrencia; y la búsqueda geoespacial filtra por radio en memoria (Haversine) en vez de un índice `2dsphere` de MongoDB. Todas estas son decisiones aceptadas y documentadas, no pendientes ni bugs.
 - Credenciales de demo: ver la tabla de la sección anterior.
