@@ -1,5 +1,5 @@
 # Multi-stage build: compila el SPA con pnpm y lo sirve con nginx
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
