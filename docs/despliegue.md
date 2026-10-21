@@ -88,6 +88,28 @@ curl http://127.0.0.1:4000/api/health
 curl http://127.0.0.1:8080/
 ```
 
+### Arranque automático tras reboot del host
+
+Podman rootless no tiene un daemon persistente tipo `dockerd` — sin este
+paso, un reinicio del servidor (mantenimiento del proveedor, OOM del host,
+etc.) deja los contenedores apagados para siempre, aunque `restart: always`
+esté puesto en `compose.yml` y el lingering del usuario esté habilitado.
+Habilitar una sola vez:
+
+```bash
+systemctl --user enable --now podman-restart.service
+```
+
+Ese servicio corre `podman start --all --filter restart-policy=always` en
+cada boot — **solo** recoge contenedores con política `always`, no
+`unless-stopped` (por eso `deploy/compose.yml` usa `always`, no lo cambies).
+Verificar que quedó habilitado:
+
+```bash
+systemctl --user is-enabled podman-restart.service   # debe decir "enabled"
+loginctl show-user $(whoami) | grep Linger            # debe decir "yes"
+```
+
 ## 3. nginx + HTTPS (host, fuera de los contenedores)
 
 ```bash
@@ -176,6 +198,12 @@ si no, usa `mongodb://admin:<password>@localhost:27017/educaspot?authSource=admi
 
 ## Troubleshooting
 
+- **Los contenedores quedaron "Exited" después de un reinicio del
+  servidor** (verificar con `podman ps -a` y `journalctl --list-boots` si
+  el boot coincide con la hora del "Exited"): falta
+  `systemctl --user enable --now podman-restart.service` — ver sección
+  "Arranque automático tras reboot del host" arriba. Levantar a mano
+  mientras tanto con `podman-compose up -d`.
 - **`podman-compose pull` falla con 401/403**: la sesión de `podman login
   ghcr.io` expiró o el PAT no tiene `read:packages` — repetir el login.
 - **Logs de un contenedor**: `podman logs -f educaspot_backend_1` (el
