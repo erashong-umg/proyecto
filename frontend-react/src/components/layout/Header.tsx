@@ -120,6 +120,13 @@ export const Header = () => {
             </div>
           )}
 
+          {/* En móvil el acceso queda visible en la barra, sin abrir el menú. */}
+          {!isAuthenticated && (
+            <Link to="/login" className={styles.mobileLogin}>
+              <Button variant="secondary" size="sm">Ingresar</Button>
+            </Link>
+          )}
+
           <button
             type="button"
             className={styles.hamburger}
@@ -149,9 +156,11 @@ export const Header = () => {
             </div>
           ) : (
             <div className={styles.mobileAuthActions}>
-              <Link to="/login" className={styles.navLink} onClick={() => setMobileOpen(false)}>Iniciar sesión</Link>
+              <Link to="/login" onClick={() => setMobileOpen(false)}>
+                <Button variant="secondary" className={styles.mobileFullButton}>Iniciar sesión</Button>
+              </Link>
               <Link to="/register" onClick={() => setMobileOpen(false)}>
-                <Button size="sm" className={styles.mobileFullButton}>Crear cuenta</Button>
+                <Button className={styles.mobileFullButton}>Crear cuenta</Button>
               </Link>
             </div>
           )}

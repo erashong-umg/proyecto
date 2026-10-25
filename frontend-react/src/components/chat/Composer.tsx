@@ -24,7 +24,8 @@ export const Composer = ({ onSend, onTyping, disabled = false }: ComposerProps) 
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
+    // scrollHeight no incluye el borde (border-box): sin sumarlo aparece scroll de 1-2px.
+    el.style.height = `${el.scrollHeight + (el.offsetHeight - el.clientHeight)}px`;
   }, [value]);
 
   const handleSend = () => {
