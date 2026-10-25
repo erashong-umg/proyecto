@@ -74,6 +74,7 @@ export const GuidedTour = () => {
       overlayColor: 'rgba(0, 0, 0, 0.55)',
       zIndex: 1300,
       width: 340,
+      spotlightPadding: 4,
       showProgress: true,
       skipBeacon: true,
       buttons: ['back', 'skip', 'primary'] as ('back' | 'close' | 'primary' | 'skip')[],

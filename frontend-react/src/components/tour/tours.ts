@@ -12,6 +12,8 @@ export interface TourDef {
   steps: Step[];
 }
 
+// En las burbujas se usa 'auto' para que Joyride elija el lado con espacio (en móvil el panel
+// de la búsqueda es una hoja inferior y 'bottom' o 'left' quedarían fuera de la pantalla).
 // Guías cortas, una por página y de 1 a 3 pasos: la idea es orientar sin abrumar.
 // Arrancan solas únicamente en las páginas clave de cada rol (buscar, reservar y
 // el panel del tutor); el resto se abre a demanda con el botón de ayuda.
@@ -25,19 +27,23 @@ export const TOURS: Record<TourId, TourDef> = {
         target: '[data-tour="buscar-barra"]',
         title: 'Busque por materia',
         content: 'Escriba lo que quiere aprender (inglés, natación, programación…) y verá los tutores cercanos. Con «Filtros» afina por distancia, calificación, reseñas, precio y modalidad.',
-        placement: 'bottom',
+        placement: 'auto',
+        skipScroll: true,
       },
       {
         target: '[data-tour="buscar-mapa"]',
         title: 'Usted y los tutores',
         content: 'El punto naranja con pulso es usted; cada pin es un tutor cercano. Al elegir uno (en el mapa o en la lista) se traza la ruta hasta él, con la distancia y el tiempo.',
-        placement: 'right',
+        // El mapa ocupa toda la pantalla: no hay un lado libre donde colocar la burbuja.
+        placement: 'center',
+        skipScroll: true,
       },
       {
         target: '[data-tour="buscar-resultados"]',
         title: 'Elija un tutor',
         content: 'Abra un perfil para ver sus cursos y reseñas, y reservar una tutoría.',
-        placement: 'left',
+        placement: 'auto',
+        skipScroll: true,
       },
     ],
   },
@@ -50,7 +56,7 @@ export const TOURS: Record<TourId, TourDef> = {
         target: '[data-tour="booking-widget"]',
         title: 'Reserve en 3 pasos',
         content: 'Elija qué quiere aprender, cuándo (solo verá horas realmente libres) y confirme. Para clases a domicilio verá el mapa con la ruta y el costo del traslado.',
-        placement: 'left',
+        placement: 'auto',
       },
     ],
   },
@@ -63,7 +69,7 @@ export const TOURS: Record<TourId, TourDef> = {
         target: '[data-tour="reservas-lista"]',
         title: 'Sus tutorías',
         content: 'Aquí están sus reservas, en lista o en calendario (día, semana y mes). Las tutorías se marcan como completadas solas al terminar; entonces podrá calificarlas o reportar un problema.',
-        placement: 'top',
+        placement: 'auto',
       },
     ],
   },
@@ -76,13 +82,13 @@ export const TOURS: Record<TourId, TourDef> = {
         target: '[data-tour="tutor-checklist"]',
         title: 'Sus pasos para empezar',
         content: 'Siga esta lista para recibir reservas. El paso resaltado es el que le toca ahora; la aprobación depende de la administración.',
-        placement: 'bottom',
+        placement: 'auto',
       },
       {
         target: '[data-tour="tutor-tarjetas"]',
         title: 'Accesos rápidos',
         content: 'Sus cursos, sus horarios y las reservas que reciba, siempre a un clic.',
-        placement: 'top',
+        placement: 'auto',
       },
     ],
   },
@@ -95,13 +101,13 @@ export const TOURS: Record<TourId, TourDef> = {
         target: '[data-tour="chat-bandeja"]',
         title: 'Sus conversaciones',
         content: 'Escríbale a un tutor o estudiante desde su perfil o una reserva. Verá los mensajes sin leer.',
-        placement: 'right',
+        placement: 'auto',
       },
       {
         target: '[data-tour="chat-redactor"]',
         title: 'Escriba aquí',
         content: 'Enter envía el mensaje. Un check es enviado, dos es entregado y dos azules es leído.',
-        placement: 'top',
+        placement: 'auto',
       },
     ],
   },
