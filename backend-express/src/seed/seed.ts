@@ -4,7 +4,7 @@ config();
 
 import { User } from '../models/User';
 import { Category } from '../models/Category';
-import { Course } from '../models/Course';
+import { Course, type Modality } from '../models/Course';
 import { Availability } from '../models/Availability';
 import { Booking } from '../models/Booking';
 import { Review } from '../models/Review';
@@ -54,7 +54,7 @@ const seed = async (): Promise<void> => {
     idDocument: { type: 'dpi', number: '2456712340101' },
     phone: '+502 5555-1001',
     address: { street: 'Zona 10, Guatemala', coords: { lat: 14.5905, lng: -90.5155 } },
-    photoUrl: '',
+    photoUrl: '/tutores/maria-lopez.png',
     categoryIds: [cats[0]._id, cats[3]._id],
     tutorData: {
       bio: 'Profesora bilingüe con 8 años de experiencia enseñando inglés conversacional y desarrollo web.',
@@ -79,7 +79,7 @@ const seed = async (): Promise<void> => {
     idDocument: { type: 'dpi', number: '1987654320101' },
     phone: '+502 5555-1002',
     address: { street: 'Zona 14, Guatemala', coords: { lat: 14.5845, lng: -90.5155 } },
-    photoUrl: '',
+    photoUrl: '/tutores/juan-perez.png',
     categoryIds: [cats[1]._id],
     tutorData: {
       bio: 'Entrenador personal certificado, especializado en natación y crossfit.',
@@ -102,6 +102,7 @@ const seed = async (): Promise<void> => {
     onboardingCompleted: true,
     idDocument: { type: 'dpi', number: '3012456780101' },
     address: { street: 'Mixco', coords: { lat: 14.6333, lng: -90.6067 } },
+    photoUrl: '/tutores/carlos-mendoza.png',
     categoryIds: [cats[2]._id],
     tutorData: {
       bio: 'Doctor en Física, ofrece tutorías universitarias de cálculo y álgebra.',
@@ -190,6 +191,96 @@ const seed = async (): Promise<void> => {
     },
   ]);
 
+  console.log('[Seed] Creando más tutores y cursos de ejemplo...');
+  // Cada tutor aprobado trae un curso. Las fotos viven en frontend-react/public/tutores;
+  // los que tienen `photo: ''` se muestran con sus iniciales hasta tener su retrato.
+  const demoTutors = [
+    {
+      key: 'laura', name: 'Laura Sandoval', photo: '/tutores/laura-sandoval.png', cat: 2, dpi: '2345098760101', phone: '+502 5555-1004',
+      street: 'Zona 11, Guatemala', coords: { lat: 14.6000, lng: -90.5400 }, baseRate: 130, ratePerKm: 6, avgRating: 4.9, reviewCount: 21,
+      bio: 'Licenciada en Matemática con 15 años de experiencia preparando estudiantes de bachillerato y primer año universitario.',
+      course: { title: 'Cálculo y álgebra para primer año de universidad', description: 'Refuerzo de límites, derivadas y álgebra con ejercicios resueltos paso a paso.', modalities: ['virtual', 'presencial-tutor', 'presencial-estudiante'] },
+    },
+    {
+      key: 'diego', name: 'Diego Morales', photo: '/tutores/diego-morales.png', cat: 3, dpi: '2890123450101', phone: '+502 5555-1005',
+      street: 'Zona 4, Guatemala', coords: { lat: 14.6220, lng: -90.5160 }, baseRate: 110, ratePerKm: 4, avgRating: 4.6, reviewCount: 14,
+      bio: 'Desarrollador de software que enseña programación desde cero con proyectos pequeños y prácticos.',
+      course: { title: 'Programación con Python desde cero', description: 'Variables, funciones y un primer proyecto real, sin experiencia previa.', modalities: ['virtual', 'presencial-estudiante'] },
+    },
+    {
+      key: 'patricia', name: 'Patricia Fuentes', photo: '/tutores/patricia-fuentes.png', cat: 4, dpi: '2567890120101', phone: '+502 5555-1006',
+      street: 'Zona 15, Guatemala', coords: { lat: 14.6050, lng: -90.4900 }, baseRate: 220, ratePerKm: 8, avgRating: 4.9, reviewCount: 9,
+      bio: 'Maestra en Investigación Educativa. Acompaña a estudiantes de posgrado en el diseño y la redacción de su tesis.',
+      course: { title: 'Asesoría de tesis y metodología de investigación', description: 'Planteamiento del problema, marco teórico, método y revisión de avances.', modalities: ['virtual', 'presencial-estudiante'] },
+    },
+    {
+      key: 'ricardo', name: 'Ricardo Alvarado', photo: '/tutores/ricardo-alvarado.png', cat: 0, dpi: '1764532980101', phone: '+502 5555-1007',
+      street: 'Zona 9, Guatemala', coords: { lat: 14.6040, lng: -90.5110 }, baseRate: 100, ratePerKm: 5, avgRating: 4.4, reviewCount: 6,
+      bio: 'Profesor de francés y portugués con residencia en Francia y Brasil. Clases conversacionales para viajeros.',
+      course: { title: 'Francés para viajeros', description: 'Frases y vocabulario útiles para viajar, con práctica de pronunciación.', modalities: ['virtual', 'presencial-tutor'] },
+    },
+    {
+      key: 'daniela', name: 'Daniela Cifuentes', photo: '', cat: 1, dpi: '2678901230101', phone: '+502 5555-1008',
+      street: 'Zona 16, Guatemala', coords: { lat: 14.6040, lng: -90.4700 }, baseRate: 90, ratePerKm: 6, avgRating: 4.7, reviewCount: 17,
+      bio: 'Instructora certificada de yoga y movilidad. Sesiones suaves para principiantes y para quienes pasan el día sentados.',
+      course: { title: 'Yoga y movilidad para principiantes', description: 'Respiración, posturas básicas y estiramientos para el día a día.', modalities: ['virtual', 'presencial-tutor', 'presencial-estudiante'] },
+    },
+    {
+      key: 'andres', name: 'Andrés Castillo', photo: '', cat: 2, dpi: '2101234560101', phone: '+502 5555-1009',
+      street: 'Villa Nueva', coords: { lat: 14.5270, lng: -90.5880 }, baseRate: 95, ratePerKm: 5, avgRating: 4.2, reviewCount: 5,
+      bio: 'Químico biólogo con experiencia en laboratorio. Explica química y biología con ejemplos de la vida diaria.',
+      course: { title: 'Química y biología para bachillerato', description: 'Repaso por temas con práctica para exámenes de fin de ciclo.', modalities: ['virtual', 'presencial-estudiante'] },
+    },
+    {
+      key: 'sofia', name: 'Sofía Barrios', photo: '', cat: 0, dpi: '2890765430101', phone: '+502 5555-1010',
+      street: 'Zona 10, Guatemala', coords: { lat: 14.5960, lng: -90.5050 }, baseRate: 140, ratePerKm: 5, avgRating: 4.8, reviewCount: 11,
+      bio: 'Tutora de inglés académico, con experiencia preparando el TOEFL y exámenes de ingreso a universidades en el extranjero.',
+      course: { title: 'Preparación TOEFL e inglés académico', description: 'Estrategias por sección, simulacros cronometrados y retroalimentación.', modalities: ['virtual'] },
+    },
+  ];
+
+  const demoAvailabilitySlots = [
+    { dayOfWeek: 1, startMinute: 480, endMinute: 1020 },
+    { dayOfWeek: 2, startMinute: 480, endMinute: 1020 },
+    { dayOfWeek: 4, startMinute: 600, endMinute: 1140 },
+    { dayOfWeek: 6, startMinute: 540, endMinute: 780 },
+  ];
+
+  for (const t of demoTutors) {
+    const tutor = await User.create({
+      email: `${t.key}@educaspot.gt`,
+      password: 'Tutor123!',
+      name: t.name,
+      role: 'tutor',
+      status: 'active',
+      onboardingCompleted: true,
+      idDocument: { type: 'dpi', number: t.dpi },
+      phone: t.phone,
+      address: { street: t.street, coords: t.coords },
+      photoUrl: t.photo,
+      categoryIds: [cats[t.cat]._id],
+      tutorData: {
+        bio: t.bio,
+        cvUrl: `https://linkedin.com/in/${t.key}-educaspot`,
+        baseRate: t.baseRate,
+        ratePerKm: t.ratePerKm,
+        categories: [cats[t.cat]._id],
+        avgRating: t.avgRating,
+        reviewCount: t.reviewCount,
+        approved: true,
+      },
+    });
+    await Availability.create({ tutorId: tutor._id, slots: demoAvailabilitySlots });
+    await Course.create({
+      tutorId: tutor._id,
+      categoryId: cats[t.cat]._id,
+      ...t.course,
+      modalities: t.course.modalities as Modality[],
+      baseRate: t.baseRate,
+      ratePerKm: t.ratePerKm,
+    });
+  }
+
   console.log('[Seed] Creando booking completado de prueba...');
   const course = await Course.findOne({ tutorId: tutor1._id });
   if (course) {
@@ -221,6 +312,7 @@ const seed = async (): Promise<void> => {
   console.log('maria@educaspot.gt / Tutor123!  (TUTOR APROBADO - inglés y JS)');
   console.log('juan@educaspot.gt / Tutor123!   (TUTOR APROBADO - natación)');
   console.log('carlos@educaspot.gt / Tutor123! (TUTOR PENDIENTE DE APROBACIÓN)');
+  console.log('laura, diego, patricia, ricardo, daniela, andres, sofia @educaspot.gt / Tutor123! (tutores aprobados, un curso cada uno)');
   console.log('ana@educaspot.gt / Est123!     (estudiante)');
   console.log('luis@educaspot.gt / Est123!     (estudiante)');
   console.log('==============================\n');

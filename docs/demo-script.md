@@ -59,6 +59,7 @@ durante:
    | `maria@educaspot.gt` | `Tutor123!` | Tutora aprobada — Inglés y JavaScript |
    | `juan@educaspot.gt` | `Tutor123!` | Tutor aprobado — Natación |
    | `carlos@educaspot.gt` | `Tutor123!` | Tutor **pendiente** de aprobación |
+   | `laura`, `diego`, `patricia`, `ricardo`, `daniela`, `andres`, `sofia` `@educaspot.gt` | `Tutor123!` | Tutores aprobados, un curso cada uno |
    | `ana@educaspot.gt` | `Est123!` | Estudiante (tiene un booking completado + reseña de ejemplo con María) |
    | `luis@educaspot.gt` | `Est123!` | Estudiante |
 

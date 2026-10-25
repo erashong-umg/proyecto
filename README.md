@@ -82,6 +82,7 @@ Generadas por `backend-express/src/seed/seed.ts` (`npm run seed`):
 | Tutor | `maria@educaspot.gt` | `Tutor123!` | Aprobado — inglés y desarrollo web |
 | Tutor | `juan@educaspot.gt` | `Tutor123!` | Aprobado — natación |
 | Tutor | `carlos@educaspot.gt` | `Tutor123!` | Pendiente de aprobación (para probar el flujo de moderación) |
+| Tutores | `laura`, `diego`, `patricia`, `ricardo`, `daniela`, `andres`, `sofia` `@educaspot.gt` | `Tutor123!` | Aprobados, un curso cada uno (10 tutores y 10 cursos en total) |
 | Estudiante | `ana@educaspot.gt` | `Est123!` | Tiene una tutoría completada + reseña de prueba |
 | Estudiante | `luis@educaspot.gt` | `Est123!` | — |
 
