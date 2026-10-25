@@ -29,7 +29,7 @@ export const StepPersonalInfo = ({
   <div className={styles.step}>
     <h2>Bienvenido/a{userName ? `, ${userName}` : ''}</h2>
     <p className={styles.hint}>
-      Complete su perfil en {isTutor ? 4 : 3} pasos rápidos. Empecemos por sus datos de contacto.
+      Complete su perfil en {isTutor ? 3 : 2} pasos rápidos. Empecemos por usted.
     </p>
 
     <Input

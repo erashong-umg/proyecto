@@ -144,7 +144,7 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
 - `auth.controller.ts` — `register`, `login`, `logout` (no-op, token sin
   estado), `me`, `googleLogin` (OAuth 2.0 con Google, D4 — ver §10), `forgotPassword`/`resetPassword`.
 - `user.controller.ts` — `getMe`, `updateMe`, `completeOnboarding` (marca
-  `onboardingCompleted` tras el wizard de 5 pasos del frontend). El onboarding
+  `onboardingCompleted` tras el wizard de 2 o 3 pasos del frontend). El onboarding
   exige el **documento de identificación** (`User.idDocument`): DPI de 13
   dígitos o pasaporte de 6 a 20 caracteres, validado con `idDocumentSchema` y
   guardado normalizado (sin espacios ni guiones). Es un dato sensible:
@@ -280,7 +280,7 @@ src/
 │   ├── bookings/    BookingCard
 │   ├── layout/       Header, Footer, ProtectedRoute, ThemeToggle, ComingSoon
 │   ├── map/          MapPicker (Leaflet, selección de dirección)
-│   ├── onboarding/   OnboardingProgress + 4 Step* (wizard de 5 pasos)
+│   ├── onboarding/   OnboardingProgress + Step* (2 pasos estudiante, 3 tutor)
 │   ├── tutors/        BookingWizard, RouteMap, SearchMap, TutorResultItem
 │   └── ui/            Button, Input, Modal, Textarea (design system base)
 ├── hooks/            un hook por caso de uso de datos (ver abajo)
@@ -880,5 +880,8 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
   terminó pasa a `completed` (`syncCompletedBookings`, al consultar reservas y
   al calificar); ya no existe el endpoint de completar a mano. No se puede
   cancelar una tutoría que ya comenzó.
+- **Tarifas sin duplicar:** el tutor las indica una vez en su perfil (onboarding,
+  paso 3) y `POST /api/courses` las hereda si el curso no trae las suyas; en la
+  interfaz solo se piden al marcar "Usar otra tarifa para este curso".
 - **Calificar y reportar** se hacen desde "Mis reservas" (`BookingList`,
   `ReviewDialog`, `ReportDialog`) sobre tutorías completadas.
