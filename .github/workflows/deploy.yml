@@ -110,9 +110,27 @@ jobs:
       - name: Resumen
         run: echo "Desplegando la rama ${{ inputs.branch || github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
 
+      # El workflow solo escribía el .env: el compose.yml del servidor se copió a
+      # mano una vez y quedó desactualizado (el backend no recibía variables
+      # nuevas como GOOGLE_CLIENT_ID). Ahora cada despliegue lo sincroniza desde
+      # la misma rama que se construyó.
+      - name: Checkout (solo compose.yml)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch || github.sha }}
+          sparse-checkout: deploy/compose.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Preparar compose.yml
+        id: compose
+        run: echo "b64=$(base64 -w0 deploy/compose.yml)" >> "$GITHUB_OUTPUT"
+
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1
+        env:
+          COMPOSE_B64: ${{ steps.compose.outputs.b64 }}
         with:
+          envs: COMPOSE_B64
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -120,6 +138,14 @@ jobs:
           script: |
             set -e
             cd ${{ env.DEPLOY_PATH }}
+
+            # Sincroniza compose.yml con el de la rama desplegada (queda una copia
+            # de respaldo del anterior en compose.yml.bak).
+            printf '%s' "$COMPOSE_B64" | base64 -d > compose.yml.new
+            [ -s compose.yml.new ] || { echo "compose.yml vacío: se aborta" >&2; exit 1; }
+            [ -f compose.yml ] && cp compose.yml compose.yml.bak
+            mv compose.yml.new compose.yml
+
             cat > .env <<'ENVEOF'
             GHCR_OWNER=${{ secrets.GHCR_OWNER }}
             DOMAIN=${{ secrets.DOMAIN }}

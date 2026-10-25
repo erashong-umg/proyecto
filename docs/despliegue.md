@@ -48,8 +48,11 @@ cd ~/apps/educaspot
 ```
 
 Copiar `deploy/compose.yml` del repo a ese directorio del servidor (por
-`scp`, `rsync`, o pegando el contenido a mano). El workflow
-(`.github/workflows/deploy.yml`) escribe `.env` automáticamente en cada
+`scp`, `rsync`, o pegando el contenido a mano) solo para el primer arranque
+manual: a partir de ahí **cada deploy lo vuelve a escribir** desde la rama que se
+despliega (dejando el anterior como `compose.yml.bak`), así que el del repo es la
+fuente de verdad y no conviene editarlo a mano en el servidor. El workflow
+(`.github/workflows/deploy.yml`) también escribe `.env` automáticamente en cada
 deploy a partir de los secrets del ambiente `DEPLOY_PRD` (ver sección 4),
 así que no hace falta crearlo a mano — salvo para el "Primer arranque
 manual" de abajo, antes del primer push a `main`:
@@ -182,7 +185,8 @@ A partir de aquí, cada push/merge a `main` dispara
 
 1. Construye y publica `ghcr.io/erashong-umg/proyecto-backend` y
    `...-frontend` (tags `latest` y el SHA del commit).
-2. Se conecta por SSH y, en `~/apps/educaspot`, corre `podman-compose pull`,
+2. Se conecta por SSH y, en `~/apps/educaspot`, sincroniza `compose.yml` y `.env`,
+   corre `podman-compose pull`,
    elimina los contenedores `educaspot_backend_1` y `educaspot_frontend_1` y
    corre `podman-compose up -d`. Los elimina a propósito: `podman-compose up -d`
    no recrea un contenedor ya existente aunque haya una imagen nueva ni aplica
