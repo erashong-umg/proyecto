@@ -180,6 +180,9 @@ sección 7.
 
 ## 5. Uso diario
 
+> Cómo llega un cambio a producción (ramas `develop` → `release` → `main`, PR, tags y
+> sincronización): ver [flujo-de-ramas.md](flujo-de-ramas.md).
+
 A partir de aquí, cada push/merge a `main` dispara
 `.github/workflows/deploy.yml`:
 

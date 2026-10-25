@@ -65,6 +65,8 @@ El repositorio incluye `backend-express/Dockerfile` y `backend-express/render.ya
 
 ## Documentación
 
+- [Flujo de ramas y publicación](docs/flujo-de-ramas.md) — `develop` → `release` → `main`
+- [Despliegue](docs/despliegue.md)
 - [Manual técnico](docs/manual-tecnico.md)
 - [Manual de usuario](docs/manual-usuario.md)
 
