@@ -24,7 +24,7 @@ export const TOURS: Record<TourId, TourDef> = {
       {
         target: '[data-tour="buscar-barra"]',
         title: 'Busque por materia',
-        content: 'Escriba lo que quiere aprender (inglés, natación, programación…) y verá los tutores cercanos.',
+        content: 'Escriba lo que quiere aprender (inglés, natación, programación…) y verá los tutores cercanos. Con «Filtros» afina por distancia, calificación, reseñas, precio y modalidad.',
         placement: 'bottom',
       },
       {

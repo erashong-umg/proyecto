@@ -7,10 +7,22 @@ import { useNearbySearch } from '../../hooks/useNearbySearch';
 import { matchCategory } from '../../services/categoryMatch';
 import { SearchMap } from '../../components/tutors/SearchMap';
 import { TutorResultItem } from '../../components/tutors/TutorResultItem';
+import { SearchFilters, EMPTY_FILTERS, activeFilterCount, validateFilters, type SearchFilterValues } from '../../components/tutors/SearchFilters';
 import { Button } from '../../components/ui/Button';
-import type { Category } from '../../types/api';
+import type { Category, SearchCriteria } from '../../types/api';
 import inputStyles from '../../components/ui/Input.module.scss';
 import styles from './TutorSearch.module.scss';
+
+// Convierte lo que se escribió en los filtros (texto) en los criterios numéricos de la API.
+const toCriteria = (categoryId: string | undefined, f: SearchFilterValues): SearchCriteria => ({
+  categoryId,
+  radiusKm: f.radiusKm ? Number(f.radiusKm) : undefined,
+  minRating: f.minRating ? Number(f.minRating) : undefined,
+  minReviews: f.minReviews ? Number(f.minReviews) : undefined,
+  minPrice: f.minPrice ? Number(f.minPrice) : undefined,
+  maxPrice: f.maxPrice ? Number(f.maxPrice) : undefined,
+  modality: f.modality || undefined,
+});
 
 const buildCategoryMap = (categories: Category[]): Map<string, string> =>
   new Map(categories.map((c) => [c._id, c.name]));
@@ -24,6 +36,8 @@ export const TutorSearchPage = () => {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [noMatchNote, setNoMatchNote] = useState(false);
+  const [filters, setFilters] = useState<SearchFilterValues>(EMPTY_FILTERS);
+  const [filterError, setFilterError] = useState<string | null>(null);
 
   const categoryMap = buildCategoryMap(categories);
 
@@ -37,10 +51,22 @@ export const TutorSearchPage = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!coords) return;
+    const invalid = validateFilters(filters);
+    setFilterError(invalid);
+    if (invalid) return;
     const match = matchCategory(query, categories);
     setNoMatchNote(query.trim() !== '' && !match);
     setSelectedId(null);
-    search(coords, match?._id);
+    search(coords, toCriteria(match?._id, filters));
+  };
+
+  const clearFilters = () => {
+    setFilters(EMPTY_FILTERS);
+    setFilterError(null);
+    setSelectedId(null);
+    if (!coords) return;
+    const match = matchCategory(query, categories);
+    search(coords, toCriteria(match?._id, EMPTY_FILTERS));
   };
 
   if (isLocating) {
@@ -72,16 +98,19 @@ export const TutorSearchPage = () => {
       </div>
 
       <div className={styles.panel}>
-        <form className={styles.searchBar} onSubmit={handleSearch} data-tour="buscar-barra">
-          <Search aria-hidden="true" className={styles.searchIcon} />
-          <input
-            type="text"
-            className={inputStyles.input}
-            placeholder="¿Qué quiere aprender? Ej. natación, inglés…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <Button type="submit" size="sm" isLoading={isLoading}>Buscar</Button>
+        <form className={styles.searchForm} onSubmit={handleSearch} data-tour="buscar-barra">
+          <div className={styles.searchBar}>
+            <Search aria-hidden="true" className={styles.searchIcon} />
+            <input
+              type="text"
+              className={inputStyles.input}
+              placeholder="¿Qué quiere aprender? Ej. natación, inglés…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <Button type="submit" size="sm" isLoading={isLoading}>Buscar</Button>
+          </div>
+          <SearchFilters values={filters} onChange={setFilters} onClear={clearFilters} error={filterError} />
         </form>
 
         <p className={styles.locationCaption}>
@@ -110,7 +139,14 @@ export const TutorSearchPage = () => {
           ) : tutors.length === 0 ? (
             <div className={styles.empty}>
               <SearchX aria-hidden="true" />
-              <p>No hay tutores cerca con ese criterio.</p>
+              <p>
+                {activeFilterCount(filters) > 0
+                  ? 'Ningún tutor cumple todos esos filtros. Pruebe ampliarlos o limpiarlos.'
+                  : 'No hay tutores cerca con ese criterio.'}
+              </p>
+              {activeFilterCount(filters) > 0 && (
+                <Button type="button" variant="secondary" size="sm" onClick={clearFilters}>Limpiar filtros</Button>
+              )}
             </div>
           ) : (
             <>
