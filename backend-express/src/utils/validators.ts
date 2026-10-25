@@ -16,11 +16,12 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'La contraseña es requerida'),
 });
 
-export const googleStubSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1),
-  photoUrl: z.string().url().optional(),
-  role: z.enum(['student', 'tutor']).default('student'),
+// `credential` es el ID token (JWT) que entrega el botón de Google Identity
+// Services. `role` es obligatorio solo para crear una cuenta nueva (pantalla de registro);
+// para una cuenta existente se ignora.
+export const googleAuthSchema = z.object({
+  credential: z.string().min(20, 'Credencial de Google inválida'),
+  role: z.enum(['student', 'tutor']).optional(),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -55,7 +56,7 @@ export const idDocumentSchema = z
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-export type GoogleStubInput = z.infer<typeof googleStubSchema>;
+export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
