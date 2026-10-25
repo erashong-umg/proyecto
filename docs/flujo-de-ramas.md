@@ -4,10 +4,14 @@ Cómo se trabaja y cómo llega un cambio a producción. Es un proyecto universit
 
 ## Resumen
 
+**De hoy en adelante, todo cambio sigue siempre este camino, en un solo sentido y sin excepciones:**
+
 ```
-rama de trabajo ──PR──▶ develop ──PR──▶ release ──PR──▶ main ──▶ despliegue automático ──▶ tag vX.Y
-(feature/… fix/…)     (integración)   (candidata)    (producción)
+local ──▶ feature/* ──PR──▶ develop ──PR──▶ release ──PR──▶ main ──▶ despliegue automático ──▶ tag vX.Y
+(tu máquina) (rama de trabajo)  (integración)   (candidata)    (producción)
 ```
+
+El código nunca baja: no se trae nada de `main` ni de `release` hacia `develop`. Todo nace en una rama de trabajo y sube por las tres ramas, en ese orden.
 
 | Rama | Para qué sirve | Quién escribe en ella |
 |---|---|---|
@@ -64,35 +68,21 @@ Mientras no haya tag nuevo, la versión se muestra como el último tag más el c
 - El badge de versión (abajo a la izquierda) y `/api/version` indican qué rama y commit están corriendo, y avisan si frontend y backend no coinciden.
 - Solo corre un despliegue a la vez.
 
-## 4. Qué rama manda
+## 4. Un solo sentido, siempre
 
-Regla: **manda la rama con el código más reciente, y las demás se alinean a ella en el orden `develop` → `release` → `main`.**
-
-- Lo normal es que el código nuevo nazca en una rama de trabajo, entre a `develop` y suba. En ese caso la fuente es `develop`.
-- Si alguna vez una rama inferior tuviera cambios que las otras no tienen (por ejemplo, un arreglo urgente), esa rama pasa a ser la fuente y se baja a las demás: se abre PR de ella a `develop` y de `develop` a `release`.
-- Para saber si hay código distinto entre ramas, compara archivos, no commits:
+- Todo cambio, **también un arreglo urgente**, nace en una rama de trabajo (`feature/…`, `fix/…`, …) y recorre `develop` → `release` → `main`. No hay atajos ni caminos de vuelta.
+- **No se hacen PR "hacia atrás"** (`main` → `develop`, `release` → `develop`). Tras publicar, las ramas quedan con commits de merge distintos: es lo normal con este flujo y **no se corrige**, porque no hay código distinto.
+- Para saber si dos ramas difieren de verdad, compara **archivos**, no commits:
   ```bash
   git fetch --all && git diff --name-only origin/develop origin/release origin/main
   ```
   Sin salida = el contenido es idéntico.
 
-### Sincronizar después de publicar
+> **Nota histórica.** El 25-oct-2026 se hizo **una única vez** una sincronización (`main` → `develop` → `release`) para aplanar incongruencias de historial que venían de los primeros días del proyecto. Fue una corrección puntual, no forma parte del flujo y no se repite.
 
-Cada PR deja un commit de merge en su rama destino, así que tras publicar, `main` y `release` tienen commits de merge que `develop` no tiene (no es código). Para dejar el historial alineado, abre dos PR:
+## 5. Arreglos urgentes
 
-```bash
-gh pr create --base develop --head main    --title "chore: sincroniza main en develop"
-gh pr create --base release --head develop --title "chore: lleva a release el historial de main"
-```
-
-Siempre queda un commit de merge de diferencia (el del propio PR de sincronización): es inevitable con este flujo y no afecta al código.
-
-## 5. Arreglo urgente
-
-`main` está protegida, así que un arreglo urgente también pasa por una rama y un PR. Opciones:
-
-- **Normal (recomendada):** rama `fix/…` desde `develop` → `develop` → `release` → `main`.
-- **Muy urgente:** rama `fix/…` desde `main`, PR directo a `main` (quitando la protección un momento en *Settings → Branches* solo si no hubiera forma de abrir el PR) y después bajarlo a `develop` y `release` como indica la sección 4.
+Siguen el mismo camino que cualquier cambio: rama `fix/…` desde `develop` y un PR por tramo hasta `main`. Si hay prisa, los tres PR se pueden abrir e integrar seguidos; lo que no se hace es escribir directo en `release` o `main` (están protegidas) ni saltarse un tramo.
 
 ## 6. Buenas prácticas
 
