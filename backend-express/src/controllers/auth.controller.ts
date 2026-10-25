@@ -2,11 +2,13 @@ import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import { signToken } from '../utils/jwt';
+import { env } from '../config/env';
+import { verifyGoogleCredential } from '../services/google.service';
 import {
-  BadRequest, Unauthorized, NotFound, Conflict,
+  BadRequest, Unauthorized, Forbidden, NotFound, Conflict, ServiceUnavailable,
 } from '../utils/errors';
 import type {
-  RegisterInput, LoginInput, GoogleStubInput,
+  RegisterInput, LoginInput, GoogleAuthInput,
   ForgotPasswordInput, ResetPasswordInput,
 } from '../utils/validators';
 
@@ -80,27 +82,58 @@ export const me = async (req: Request, res: Response, next: NextFunction): Promi
   }
 };
 
-// Stub OAuth: simula el flujo de Google sin OAuth real (D4 del plan)
-export const googleStub = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Inicio de sesión / registro con Google (OAuth 2.0 + OpenID Connect). El
+// frontend entrega el ID token del botón de Google; aquí se verifica contra
+// Google y se emite NUESTRO JWT, igual que en el login con contraseña.
+export const googleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { email, name, photoUrl, role } = req.body as GoogleStubInput;
+    if (!env.GOOGLE_CLIENT_ID) throw ServiceUnavailable('El inicio de sesión con Google no está configurado.');
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      // Crear nuevo usuario sin password
+    const { credential, role } = req.body as GoogleAuthInput;
+    const profile = await verifyGoogleCredential(credential);
+
+    // 1) cuenta ya vinculada a este Google; 2) cuenta con el mismo correo.
+    let user = await User.findOne({ googleId: profile.googleId })
+      ?? await User.findOne({ email: profile.email });
+    let isNewUser = false;
+
+    if (user) {
+      // El panel de administración tiene su propio acceso (/admin/login).
+      if (user.role === 'admin') {
+        throw Forbidden('Los administradores deben ingresar desde el panel de administración.');
+      }
+      if (user.googleId && user.googleId !== profile.googleId) {
+        throw Conflict('Ese correo ya está vinculado a otra cuenta de Google.');
+      }
+      // Correo verificado por Google: se vincula la cuenta existente (registrada
+      // con contraseña) y se completa la foto si faltaba.
+      if (!user.googleId || (!user.photoUrl && profile.photoUrl)) {
+        user.googleId = profile.googleId;
+        if (!user.photoUrl && profile.photoUrl) user.photoUrl = profile.photoUrl;
+        await user.save();
+      }
+    } else {
+      // Crear una cuenta exige haber elegido el rol (pantalla "Crear cuenta"):
+      // el rol no se puede cambiar después, así que nunca se asigna uno por defecto.
+      if (!role) {
+        throw NotFound('No existe una cuenta con esa cuenta de Google. Cree una desde "Crear cuenta" y elija si es estudiante o tutor.');
+      }
       user = await User.create({
-        email,
-        name,
-        photoUrl,
+        email: profile.email,
+        name: profile.name,
+        photoUrl: profile.photoUrl,
+        googleId: profile.googleId,
         role,
         onboardingCompleted: false,
       });
+      isNewUser = true;
     }
 
     const token = signToken(buildAuthUserFromDoc(user));
     res.json({
       user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
       token,
+      isNewUser,
     });
   } catch (error) {
     next(error);

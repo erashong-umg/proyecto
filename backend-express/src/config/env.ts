@@ -11,6 +11,13 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.string().default('dev'),
+  // Client ID de OAuth 2.0 de Google (Google Cloud Console → Credenciales). Es
+  // público, no un secreto. Vacío = el inicio de sesión con Google queda
+  // deshabilitado (el endpoint responde 503).
+  GOOGLE_CLIENT_ID: z.string().default(''),
+  // Servidor OSRM para rutas por calles. Vacío = sin routing (línea recta).
+  // El demo público es solo para desarrollo; en producción conviene uno propio.
+  OSRM_URL: z.string().default('https://router.project-osrm.org'),
 });
 
 const parsed = envSchema.safeParse(process.env);

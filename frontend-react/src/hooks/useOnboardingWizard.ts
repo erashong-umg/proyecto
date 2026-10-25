@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useCategories } from './useCategories';
 import api, { getErrorMessage } from '../services/api';
+import { normalizeIdNumber, validateIdNumber, type IdDocumentType } from '../services/idDocument';
 
 // 4 pasos: Datos personales (con saludo), Ubicación, Info profesional
 // (tutores), Intereses — sin un paso de "Bienvenida" separado que no
@@ -13,6 +14,8 @@ export interface OnboardingData {
   // Paso 1: datos comunes
   phone: string;
   gender: 'M' | 'F' | 'other' | '';
+  idType: IdDocumentType;
+  idNumber: string;
   // Paso 2: dirección
   street: string;
   coords: { lat: number; lng: number };
@@ -31,6 +34,8 @@ const GUATEMALA_CENTER = { lat: 14.6349, lng: -90.5069 };
 const INITIAL_DATA: OnboardingData = {
   phone: '',
   gender: '',
+  idType: 'dpi',
+  idNumber: '',
   street: '',
   coords: GUATEMALA_CENTER,
   bio: '',
@@ -44,6 +49,7 @@ const INITIAL_DATA: OnboardingData = {
 interface OnboardingPayload {
   phone: string;
   gender: OnboardingData['gender'];
+  idDocument: { type: IdDocumentType; number: string };
   address: { street: string; coords: { lat: number; lng: number } };
   categoryIds: string[];
   bio?: string;
@@ -87,6 +93,7 @@ export const useOnboardingWizard = (): UseOnboardingWizardResult => {
       const payload: OnboardingPayload = {
         phone: data.phone,
         gender: data.gender,
+        idDocument: { type: data.idType, number: normalizeIdNumber(data.idNumber) },
         address: { street: data.street, coords: data.coords },
         categoryIds: data.categoryIds,
       };
@@ -114,6 +121,8 @@ export const useOnboardingWizard = (): UseOnboardingWizardResult => {
     if (step === 1) {
       if (!data.phone.trim()) { setError('Ingrese su número de teléfono.'); return; }
       if (!data.gender) { setError('Seleccione su género.'); return; }
+      const idError = validateIdNumber(data.idType, data.idNumber);
+      if (idError) { setError(idError); return; }
       setStep(2);
     } else if (step === 2) {
       if (!data.street.trim()) { setError('Ingrese una descripción de su dirección.'); return; }

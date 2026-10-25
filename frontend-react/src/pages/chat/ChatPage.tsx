@@ -4,11 +4,11 @@ import { useAuth } from '../../hooks/useAuth';
 import { useSocketStore } from '../../store/socketStore';
 import { useChatThreads } from '../../hooks/useChatThreads';
 import { useChatMessages } from '../../hooks/useChatMessages';
-import { useSendMessage } from '../../hooks/useSendMessage';
+import { useChatPeer } from '../../hooks/useChatPeer';
 import { InboxList } from '../../components/chat/InboxList';
 import { MessageList } from '../../components/chat/MessageList';
 import { Composer } from '../../components/chat/Composer';
-import { getInitials } from '../../services/formatters';
+import { formatLastSeen, getInitials } from '../../services/formatters';
 import styles from './ChatPage.module.scss';
 
 export const ChatPage = () => {
@@ -28,16 +28,20 @@ export const ChatPage = () => {
     hasMore,
     error: messagesError,
     loadMore,
+    sendMessage,
+    retryMessage,
   } = useChatMessages(user?._id, otherUserId);
-  const { sendMessage, isSending, error: sendError } = useSendMessage(otherUserId);
+  const { contact, presence, isTyping, notifyTyping } = useChatPeer(otherUserId);
 
-  // El nombre/foto de la contraparte solo se conoce si ya existe un thread
-  // con mensajes previos (GET /api/chat/threads no incluye conversaciones
-  // "vacías" porque se arma agregando sobre la colección Message). Si el
-  // usuario llega a /chat?with=:id desde un perfil de tutor sin haber
-  // conversado todavía, mostramos un encabezado genérico hasta que el
-  // primer mensaje cree el thread.
+  // El contacto sale de chat:join (funciona también en una conversación nueva,
+  // sin mensajes previos); el inbox sirve de respaldo mientras ese ack llega.
   const activeThread = threads.find((thread) => thread.otherUser._id === otherUserId);
+  const peer = contact ?? activeThread?.otherUser ?? null;
+
+  let peerStatus: string | null = null;
+  if (isTyping) peerStatus = 'escribiendo…';
+  else if (presence?.online) peerStatus = 'en línea';
+  else if (presence?.lastSeenAt) peerStatus = formatLastSeen(presence.lastSeenAt);
 
   return (
     <div className={styles.page}>
@@ -73,17 +77,27 @@ export const ChatPage = () => {
                   <Link to="/chat" className={styles.backLink} aria-label="Volver a mensajes">
                     <ArrowLeft aria-hidden="true" />
                   </Link>
-                  {activeThread ? (
+                  {peer ? (
                     <>
-                      {activeThread.otherUser.photoUrl ? (
-                        <img src={activeThread.otherUser.photoUrl} alt="" className={styles.headerPhoto} />
+                      {peer.photoUrl ? (
+                        <img src={peer.photoUrl} alt="" className={styles.headerPhoto} />
                       ) : (
-                        <span className={styles.headerAvatar}>{getInitials(activeThread.otherUser.name)}</span>
+                        <span className={styles.headerAvatar}>{getInitials(peer.name)}</span>
                       )}
-                      <span className={styles.headerName}>{activeThread.otherUser.name}</span>
+                      <div className={styles.headerInfo}>
+                        <span className={styles.headerName}>{peer.name}</span>
+                        {peerStatus && (
+                          <span
+                            className={`${styles.headerStatus} ${isTyping || presence?.online ? styles.headerStatusLive : ''}`}
+                            aria-live="polite"
+                          >
+                            {peerStatus}
+                          </span>
+                        )}
+                      </div>
                     </>
                   ) : (
-                    <span className={styles.headerName}>Conversación nueva</span>
+                    <span className={styles.headerName}>Conversación</span>
                   )}
                 </div>
 
@@ -95,14 +109,15 @@ export const ChatPage = () => {
                   <MessageList
                     messages={messages}
                     currentUserId={currentUserId}
+                    otherUserId={otherUserId!}
                     hasMore={hasMore}
                     isLoadingMore={isLoadingMore}
                     onLoadMore={loadMore}
+                    onRetry={retryMessage}
                   />
                 )}
 
-                {sendError && <p className={styles.sendError} role="alert">{sendError}</p>}
-                <Composer onSend={sendMessage} isSending={isSending} disabled={!isConnected} />
+                <Composer onSend={sendMessage} onTyping={notifyTyping} />
               </div>
             )}
           </section>

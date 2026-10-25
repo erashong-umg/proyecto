@@ -225,31 +225,40 @@ Cerrar sesión e iniciar como `admin@educaspot.gt` / `Admin123!`:
 
 ## Preguntas frecuentes anticipadas
 
-### P1 — ¿Por qué el login de Google es un stub y no OAuth real?
+### P1 — ¿Cómo funciona el inicio de sesión con Google?
 
-Es una decisión de alcance documentada desde el día 1 del proyecto (tabla
-D1–D10 de `.omo/plans/plan-edumarket.md`, decisión **D4**): el endpoint
-`POST /api/auth/google` acepta un payload simulado (`{ email, name,
-photoUrl }`) y devuelve un JWT real del sistema, pero no implementa
-`passport-google-oauth20` ni verifica un identity token real de Google. Fue
-una decisión consciente para no desviar tiempo de desarrollo (apretado,
-proyecto solo) hacia la configuración de credenciales OAuth de un proveedor
-externo, cuando el valor académico está en demostrar el flujo de
-autenticación y emisión de JWT, no en la integración particular con Google.
-La alternativa completa (`passport-google-oauth20` real) queda identificada
-en el plan como trabajo futuro, no como algo pendiente de esta entrega.
+Es OAuth 2.0 / OpenID Connect real. El botón oficial de Google Identity
+Services abre la selección de cuenta y devuelve un **ID token** (JWT firmado
+por Google). El frontend lo manda a `POST /api/auth/google` y el backend lo
+verifica con `google-auth-library` (`services/google.service.ts`): firma con
+las claves públicas de Google, vigencia, que el token fue emitido para
+**nuestro** Client ID y que el correo esté verificado. Con eso extrae nombre,
+correo y foto y emite el JWT propio del sistema, igual que en el login con
+contraseña. Si el correo ya tenía cuenta se vincula; si no, solo se crea desde "Crear
+cuenta", con el rol elegido ahí (estudiante o tutor), y pasa al onboarding;
+desde "Iniciar sesión" nunca se crea una cuenta, porque el rol no se puede
+cambiar después y no se debe asignar uno por defecto. Los
+administradores no entran por aquí: tienen su propio acceso en `/admin/login`.
+El Client ID es público; no hay ningún secreto de Google en el repositorio.
 
-### P2 — ¿Por qué la distancia al tutor es una línea recta Haversine y no una ruta real?
+### P2 — ¿Cómo se calcula la distancia y el costo de traslado?
 
-También es una decisión de alcance documentada (decisión **D3** del mismo
-plan): el mapa traza una línea recta entre las coordenadas del tutor y del
-estudiante, y el costo de traslado se calcula con la fórmula de Haversine
-sobre esa distancia en línea recta, no con un motor de ruteo real como
-OSRM o GraphHopper. La razón es la misma que en D8 (ver P5): una ruta real
-por calles exige una API externa adicional, con sus propios límites de uso
-y puntos de falla, para una mejora que no cambia la lógica de negocio que
-se está evaluando (cálculo de tarifa de traslado, búsqueda por cercanía).
-Documentado como mejora futura, no como una funcionalidad rota.
+Con una ruta real por calles. Al elegir la modalidad "a domicilio del
+estudiante", el frontend pide `POST /api/geo/route` y el backend consulta un
+servidor OSRM (`geo.service.ts::getRoute`, configurable con `OSRM_URL`). El
+mapa dibuja la trayectoria entre el tutor y el domicilio, y muestra
+distancia y tiempo estimado en auto. El costo de traslado es
+`distancia de la ruta × tarifa por km del tutor`, y esa misma distancia es la
+que se guarda en la reserva (`quoteTrip`), así el precio que se ve es el que
+se cobra.
+
+Si OSRM no responde, está deshabilitado o no encuentra ruta, el sistema cae a
+la fórmula de Haversine (línea recta, trazo punteado en el mapa) y avisa que
+la distancia es aproximada: un servicio externo caído nunca bloquea una
+reserva. En producción conviene un OSRM propio, porque el servidor demo
+público tiene límites de uso. La búsqueda por cercanía (D8) sigue usando
+Haversine, a propósito: filtra muchos candidatos y no justifica una llamada
+de ruteo por cada uno.
 
 ### P3 — ¿Cómo funciona el anti-traslape de reservas?
 

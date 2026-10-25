@@ -231,7 +231,7 @@ export const adminListPendingTutors = async (_req: Request, res: Response, next:
   try {
     if (!_req.user || _req.user.role !== 'admin') throw Unauthorized('Solo admin.');
     const tutors = await User.find({ role: 'tutor', 'tutorData.approved': false })
-      .select('name email photoUrl tutorData createdAt')
+      .select('name email photoUrl tutorData createdAt +idDocument')  // +idDocument: el admin verifica la identidad al aprobar
       .lean();
     res.json({ tutors });
   } catch (error) { next(error); }

@@ -16,11 +16,12 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'La contraseña es requerida'),
 });
 
-export const googleStubSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1),
-  photoUrl: z.string().url().optional(),
-  role: z.enum(['student', 'tutor']).default('student'),
+// `credential` es el ID token (JWT) que entrega el botón de Google Identity
+// Services. `role` es obligatorio solo para crear una cuenta nueva (pantalla de registro);
+// para una cuenta existente se ignora.
+export const googleAuthSchema = z.object({
+  credential: z.string().min(20, 'Credencial de Google inválida'),
+  role: z.enum(['student', 'tutor']).optional(),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -35,9 +36,27 @@ export const resetPasswordSchema = z.object({
     .regex(/[0-9]/),
 });
 
+// Documento de identificación personal. DPI guatemalteco: 13 dígitos (se
+// aceptan espacios o guiones al escribirlo, p. ej. "1234 56789 0101").
+// Pasaporte: 6 a 20 letras o números. Se guarda normalizado.
+export const idDocumentSchema = z
+  .object({
+    type: z.enum(['dpi', 'pasaporte'], { message: 'Seleccione el tipo de documento' }),
+    number: z.string({ message: 'Ingrese el número de documento' }),
+  })
+  .transform((doc) => ({ type: doc.type, number: doc.number.replace(/[\s-]/g, '').toUpperCase() }))
+  .superRefine((doc, ctx) => {
+    if (doc.type === 'dpi' && !/^\d{13}$/.test(doc.number)) {
+      ctx.addIssue({ code: 'custom', path: ['number'], message: 'El DPI debe tener 13 dígitos' });
+    }
+    if (doc.type === 'pasaporte' && !/^[A-Z0-9]{6,20}$/.test(doc.number)) {
+      ctx.addIssue({ code: 'custom', path: ['number'], message: 'El pasaporte debe tener entre 6 y 20 letras o números' });
+    }
+  });
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-export type GoogleStubInput = z.infer<typeof googleStubSchema>;
+export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 

@@ -2,7 +2,9 @@
 @use '../../styles/mixins' as *;
 
 .auth {
-  min-height: calc(100vh - 130px);
+  // Sin Header: la pantalla de acceso llena el alto menos el Footer (70px + 64px de margen).
+  min-height: calc(100vh - 134px);
+  min-height: calc(100dvh - 134px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   background: $color-bg;
@@ -14,6 +16,7 @@
 
 .formPanel {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: $space-8 $space-4;
@@ -61,6 +64,13 @@
 }
 
 .submit { width: 100%; }
+
+.googleHint {
+  text-align: center;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin: $space-3 0 0;
+}
 
 .divider {
   text-align: center;

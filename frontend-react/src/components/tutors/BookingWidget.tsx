@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { CalendarClock, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAvailability } from '../../hooks/useAvailability';
+import { useTripRoute } from '../../hooks/useTripRoute';
 import { Button } from '../ui/Button';
-import { calculateTripPrice } from '../../services/geo';
+import { RouteMap } from './RouteMap';
+import { calculateTripPrice, haversineKm } from '../../services/geo';
 import { formatQ, minuteToHHMM, dayOfWeekLabel } from '../../services/formatters';
 import api, { getErrorMessage } from '../../services/api';
 import type { TutorProfileCourse, TutorSummary, Modality } from '../../types/api';
@@ -58,15 +60,31 @@ export const BookingWidget = ({ tutor, courses }: BookingWidgetProps) => {
     return times;
   }, [isVirtual, dayOfWeek, availability, durationMin]);
 
+  // Traslado a domicilio: ruta real por calles (backend) entre el tutor y el
+  // domicilio del estudiante. Mientras llega, o si falla, se muestra una
+  // estimación en línea recta; el backend recalcula el precio al reservar.
+  const tutorCoords = tutor.address?.coords;
+  const studentCoords = user?.address?.coords;
+  const needsRoute = modality === 'presencial-estudiante';
+  const routeEnabled = needsRoute && !!tutorCoords && !!studentCoords;
+  const { route, isLoading: routeLoading } = useTripRoute(
+    routeEnabled ? tutorCoords : undefined,
+    routeEnabled ? studentCoords : undefined
+  );
+  const distanceKm = routeEnabled ? (route?.distanceKm ?? haversineKm(tutorCoords!, studentCoords!)) : undefined;
+  const isEstimate = routeEnabled && route?.source !== 'osrm';
+
   const priceBreakdown = course
-    ? calculateTripPrice(
-        course.baseRate,
-        course.ratePerKm,
-        durationMin / 60,
-        modality === 'presencial-estudiante' ? tutor.address?.coords : undefined,
-        modality === 'presencial-estudiante' ? user?.address?.coords : undefined
-      )
+    ? calculateTripPrice(course.baseRate, course.ratePerKm, durationMin / 60, distanceKm)
     : null;
+
+  let routeCaption = '';
+  if (routeLoading) routeCaption = 'Calculando ruta…';
+  else if (route?.source === 'osrm') {
+    routeCaption = `Ruta por calles: ${route.distanceKm} km${route.durationMin ? ` · aprox. ${route.durationMin} min en auto` : ''}`;
+  } else if (distanceKm !== undefined) {
+    routeCaption = `No se pudo obtener la ruta por calles; se muestra la línea recta (${Math.round(distanceKm * 100) / 100} km).`;
+  }
 
   const canSubmit = course && date && (isVirtual ? time : time !== '');
 
@@ -204,11 +222,22 @@ export const BookingWidget = ({ tutor, courses }: BookingWidgetProps) => {
         <p className={styles.hint}>El tutor no tiene disponibilidad los {dayOfWeekLabel(dayOfWeek).toLowerCase()}s (con esa duración).</p>
       )}
 
+      {needsRoute && !studentCoords && (
+        <p className={styles.hint}>Complete la dirección de su perfil para calcular el traslado a su domicilio.</p>
+      )}
+
+      {routeEnabled && tutorCoords && studentCoords && (
+        <div className={styles.routeBlock}>
+          <RouteMap tutor={tutorCoords} student={studentCoords} tutorName={tutor.name} route={route} />
+          <p className={styles.routeCaption} aria-live="polite">{routeCaption}</p>
+        </div>
+      )}
+
       {priceBreakdown && (
         <div className={styles.priceBreakdown}>
           <div><span>Tutoría ({durationMin} min)</span><span>{formatQ(priceBreakdown.baseAmount)}</span></div>
           {priceBreakdown.transportAmount > 0 && (
-            <div><span>Traslado ({priceBreakdown.distanceKm} km)</span><span>{formatQ(priceBreakdown.transportAmount)}</span></div>
+            <div><span>Traslado ({priceBreakdown.distanceKm} km{isEstimate ? ', estimado' : ''})</span><span>{formatQ(priceBreakdown.transportAmount)}</span></div>
           )}
           <div className={styles.priceTotal}><span>Total {repeatWeeks > 1 ? `× ${repeatWeeks} semanas` : ''}</span><span>{formatQ(priceBreakdown.total)}</span></div>
         </div>

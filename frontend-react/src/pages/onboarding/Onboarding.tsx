@@ -34,6 +34,10 @@ export const OnboardingPage = () => {
               gender={data.gender}
               onChangePhone={(value) => update('phone', value)}
               onChangeGender={(value) => update('gender', value)}
+              idType={data.idType}
+              idNumber={data.idNumber}
+              onChangeIdType={(value) => update('idType', value)}
+              onChangeIdNumber={(value) => update('idNumber', value)}
             />
           )}
 
