@@ -13,7 +13,7 @@ interface UseLoginFormResult {
   isLoading: boolean;
   expired: boolean;
   handleSubmit: (e: FormEvent) => Promise<void>;
-  handleGoogleStub: () => Promise<void>;
+  handleGoogleCredential: (credential: string) => Promise<void>;
 }
 
 export const useLoginForm = (): UseLoginFormResult => {
@@ -21,7 +21,7 @@ export const useLoginForm = (): UseLoginFormResult => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { googleStub } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,20 +56,20 @@ export const useLoginForm = (): UseLoginFormResult => {
     }
   };
 
-  const handleGoogleStub = async () => {
-    const stubEmail = prompt('Ingrese un email para el stub de Google:');
-    if (!stubEmail) return;
-    const name = stubEmail.split('@')[0];
+  const handleGoogleCredential = async (credential: string) => {
+    setError(null);
     setIsLoading(true);
     try {
-      await googleStub({ email: stubEmail, name, role: 'student' });
-      navigate('/');
+      await loginWithGoogle(credential);
+      // Una cuenta nueva (o sin perfil completo) pasa primero por el onboarding.
+      const completed = useAuthStore.getState().user?.onboardingCompleted;
+      navigate(completed ? from : '/onboarding', { replace: true });
     } catch (err) {
-      setError(getErrorMessage(err, 'Error en stub de Google.'));
+      setError(getErrorMessage(err, 'No se pudo iniciar sesión con Google.'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleStub };
+  return { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential };
 };
