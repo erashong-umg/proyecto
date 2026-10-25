@@ -2,15 +2,25 @@ import { Request, Response, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import { Course } from '../models/Course';
 import { Category } from '../models/Category';
+import { User } from '../models/User';
 import { Unauthorized, NotFound, BadRequest } from '../utils/errors';
 
 export const createCourse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     if (!req.user || req.user.role !== 'tutor') throw Unauthorized('Solo los tutores pueden crear cursos.');
-    const { categoryId, title, description, modalities, baseRate, ratePerKm } = req.body;
+    const { categoryId, title, description, modalities } = req.body;
 
     const cat = await Category.findById(categoryId).lean();
     if (!cat) throw BadRequest('La categoría no existe.');
+
+    // Las tarifas se piden una sola vez, en el perfil del tutor: el curso las
+    // hereda salvo que se envíe una tarifa propia para ese curso.
+    const profile = await User.findById(req.user.id).select('tutorData').lean();
+    const baseRate = req.body.baseRate ?? profile?.tutorData?.baseRate;
+    const ratePerKm = req.body.ratePerKm ?? profile?.tutorData?.ratePerKm ?? 0;
+    if (baseRate === undefined) {
+      throw BadRequest('Indique la tarifa base del curso o complete la de su perfil.');
+    }
 
     const course = await Course.create({
       tutorId: new Types.ObjectId(req.user.id),
@@ -19,7 +29,7 @@ export const createCourse = async (req: Request, res: Response, next: NextFuncti
       description,
       modalities,
       baseRate,
-      ratePerKm: ratePerKm ?? 0,
+      ratePerKm,
     });
     res.status(201).json({ course });
   } catch (error) { next(error); }

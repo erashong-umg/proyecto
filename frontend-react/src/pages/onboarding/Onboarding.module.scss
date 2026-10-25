@@ -148,8 +148,15 @@
   margin-bottom: $space-4;
 }
 
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
 .step {
   h2 { margin-bottom: $space-4; }
+  h3 { margin-bottom: $space-2; }
 }
 
 .bullets {

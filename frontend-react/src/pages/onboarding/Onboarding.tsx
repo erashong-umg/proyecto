@@ -11,7 +11,7 @@ import styles from './Onboarding.module.scss';
 
 export const OnboardingPage = () => {
   const { user } = useAuth();
-  const { step, data, update, categories, error, isLoading, handleNext, handleBack, isTutor } = useOnboardingWizard();
+  const { step, data, update, categories, error, isLoading, handleNext, handleBack, isTutor, lastStep } = useOnboardingWizard();
 
   // El usuario ya completó su perfil — no tiene nada que hacer aquí.
   if (user?.onboardingCompleted) {
@@ -27,6 +27,7 @@ export const OnboardingPage = () => {
           {error && <div className={styles.errorMsg}>{error}</div>}
 
           {step === 1 && (
+            <div className={styles.stack}>
             <StepPersonalInfo
               userName={user?.name}
               isTutor={isTutor}
@@ -39,6 +40,18 @@ export const OnboardingPage = () => {
               onChangeIdType={(value) => update('idType', value)}
               onChangeIdNumber={(value) => update('idNumber', value)}
             />
+            <StepCategories
+              categories={categories}
+              selectedIds={data.categoryIds}
+              isTutor={isTutor}
+              onToggle={(categoryId) => {
+                const next = data.categoryIds.includes(categoryId)
+                  ? data.categoryIds.filter((id) => id !== categoryId)
+                  : [...data.categoryIds, categoryId];
+                update('categoryIds', next);
+              }}
+            />
+            </div>
           )}
 
           {step === 2 && (
@@ -65,20 +78,6 @@ export const OnboardingPage = () => {
             />
           )}
 
-          {step === 4 && (
-            <StepCategories
-              categories={categories}
-              selectedIds={data.categoryIds}
-              isTutor={isTutor}
-              onToggle={(categoryId) => {
-                const next = data.categoryIds.includes(categoryId)
-                  ? data.categoryIds.filter((id) => id !== categoryId)
-                  : [...data.categoryIds, categoryId];
-                update('categoryIds', next);
-              }}
-            />
-          )}
-
           <div className={styles.actions}>
             {step > 1 && (
               <Button variant="secondary" onClick={handleBack} disabled={isLoading}>
@@ -86,7 +85,7 @@ export const OnboardingPage = () => {
               </Button>
             )}
             <Button onClick={handleNext} isLoading={isLoading}>
-              {step === 4 ? 'Finalizar' : 'Siguiente'}
+              {step === lastStep ? 'Finalizar' : 'Siguiente'}
             </Button>
           </div>
         </div>

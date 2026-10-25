@@ -5,10 +5,12 @@ import { useCategories } from './useCategories';
 import api, { getErrorMessage } from '../services/api';
 import { normalizeIdNumber, validateIdNumber, type IdDocumentType } from '../services/idDocument';
 
-// 4 pasos: Datos personales (con saludo), Ubicación, Info profesional
-// (tutores), Intereses — sin un paso de "Bienvenida" separado que no
-// recolecta nada, para no exceder el máximo de 4 pasos por flujo.
-export type OnboardingStep = 1 | 2 | 3 | 4;
+// Estudiante: 2 pasos. Tutor: 3.
+//   1 · Sobre usted: contacto, género, documento y categorías.
+//   2 · Ubicación en el mapa.
+//   3 · Perfil profesional (solo tutores): biografía, CV y tarifas.
+// Son los mismos datos obligatorios que antes, en menos pantallas.
+export type OnboardingStep = 1 | 2 | 3;
 
 export interface OnboardingData {
   // Paso 1: datos comunes
@@ -16,6 +18,8 @@ export interface OnboardingData {
   gender: 'M' | 'F' | 'other' | '';
   idType: IdDocumentType;
   idNumber: string;
+  // Paso 1 (cont.): categorías de interés (estudiante) o que enseña (tutor)
+  categoryIds: string[];
   // Paso 2: dirección
   street: string;
   coords: { lat: number; lng: number };
@@ -25,8 +29,6 @@ export interface OnboardingData {
   portfolioUrl: string;
   baseRate: number;
   ratePerKm: number;
-  // Paso 4: categorías
-  categoryIds: string[];
 }
 
 const GUATEMALA_CENTER = { lat: 14.6349, lng: -90.5069 };
@@ -70,6 +72,8 @@ interface UseOnboardingWizardResult {
   handleNext: () => Promise<void>;
   handleBack: () => void;
   isTutor: boolean;
+  /** Número del último paso de ESTA persona (2 estudiante, 3 tutor). */
+  lastStep: OnboardingStep;
 }
 
 export const useOnboardingWizard = (): UseOnboardingWizardResult => {
@@ -123,27 +127,29 @@ export const useOnboardingWizard = (): UseOnboardingWizardResult => {
       if (!data.gender) { setError('Seleccione su género.'); return; }
       const idError = validateIdNumber(data.idType, data.idNumber);
       if (idError) { setError(idError); return; }
+      if (data.categoryIds.length === 0) {
+        setError(isTutor ? 'Seleccione al menos una categoría en la que ofrece clases.' : 'Seleccione al menos una categoría de interés.');
+        return;
+      }
       setStep(2);
     } else if (step === 2) {
       if (!data.street.trim()) { setError('Ingrese una descripción de su dirección.'); return; }
-      setStep(isTutor ? 3 : 4);
+      if (isTutor) setStep(3);
+      else await submit();
     } else if (step === 3) {
       if (!data.bio.trim()) { setError('La biografía es obligatoria para tutores.'); return; }
       if (!data.cvUrl.trim()) { setError('La URL de su CV/portafolio es obligatoria.'); return; }
       if (data.baseRate <= 0) { setError('La tarifa base debe ser mayor a 0.'); return; }
-      setStep(4);
-    } else if (step === 4) {
-      if (data.categoryIds.length === 0) { setError('Seleccione al menos una categoría de interés.'); return; }
       await submit();
     }
   };
 
   const handleBack = () => {
     setError(null);
-    // Estudiantes saltan el paso 3 (solo tutores) en ambas direcciones.
-    if (step === 4 && !isTutor) { setStep(2); return; }
     if (step > 1) setStep((step - 1) as OnboardingStep);
   };
 
-  return { step, data, update, categories, error, isLoading, handleNext, handleBack, isTutor };
+  const lastStep: OnboardingStep = isTutor ? 3 : 2;
+
+  return { step, data, update, categories, error, isLoading, handleNext, handleBack, isTutor, lastStep };
 };

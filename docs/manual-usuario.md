@@ -21,7 +21,8 @@
 11. [Reportes y denuncias](#11-reportes-y-denuncias)
 12. [Panel de administración](#12-panel-de-administración)
 13. [Suspensión de cuenta](#13-suspensión-de-cuenta)
-14. [Soporte y contacto](#14-soporte-y-contacto)
+14. [Guía rápida](#14-guía-rápida)
+15. [Soporte y contacto](#15-soporte-y-contacto)
 
 ---
 
@@ -79,14 +80,18 @@ Pasos:
 2. Elija su rol: **Estudiante** o **Tutor**. Esta elección es definitiva en
    este formulario — determina qué pasos del onboarding verá a
    continuación y no puede cambiarse después desde la interfaz.
-3. Complete los campos:
+3. **Registro rápido con Google:** si el servicio está habilitado, el botón de
+   Google aparece justo debajo del rol y crea la cuenta con ese rol (debajo del
+   botón se lee con cuál se creará). Con eso termina el registro y pasa al
+   onboarding. Si prefiere usar correo, pulse **"Registrarme con correo y
+   contraseña"** y complete los campos:
    - **Nombre completo.**
    - **Correo electrónico** (debe ser único; si ya existe una cuenta con ese
      correo, el sistema se lo indicará).
    - **Contraseña**: debe tener al menos 8 caracteres, al menos una letra
      mayúscula y al menos un número.
    - **Confirmar contraseña**: debe coincidir exactamente con la anterior.
-4. Presione **Crear cuenta**.
+4. Presione **Crear cuenta** (en el formulario de correo).
 5. Si el registro es exitoso, el sistema lo redirige automáticamente a
    `/onboarding` para completar su perfil — no podrá usar el resto de la
    plataforma hasta terminar ese proceso (vea la sección siguiente).
@@ -105,18 +110,24 @@ asistente de onboarding en `/onboarding`. Si su perfil ya fue completado
 anteriormente, el sistema lo redirige automáticamente al inicio y no podrá
 volver a ver este asistente.
 
-El asistente tiene **4 pasos** para un tutor y **3 pasos** para un
-estudiante (el estudiante no pasa por el paso de información profesional).
-En la parte superior se muestra un indicador de progreso con el paso actual.
+El asistente tiene **3 pasos** para un tutor y **2 pasos** para un
+estudiante (el estudiante no pasa por el perfil profesional). En la parte
+superior se muestra un indicador de progreso con el paso actual.
 
-### Paso 1 — Datos personales
+### Paso 1 — Sobre usted
 
-Se le saluda por su nombre y se le pide:
+Se le saluda por su nombre y se le pide, todo en una sola pantalla:
 
-- **Teléfono / WhatsApp** (campo obligatorio, ej. `+502 5555-1234`).
+- **Teléfono / WhatsApp** (obligatorio, ej. `+502 5555-1234`).
 - **Género**: Masculino, Femenino u Otro (selección única, obligatoria).
+- **Documento de identificación** (obligatorio): DPI (13 dígitos) o pasaporte.
+  Solo lo ve el equipo de administración, para verificar su identidad.
+- **Categorías**: chips que se activan o desactivan con un clic; debe elegir al
+  menos una. Si es **estudiante**, son las categorías en las que **desea
+  aprender**; si es **tutor**, en las que **ofrece clases** (ej. Matemática,
+  Inglés, Natación).
 
-![Onboarding — paso 1, datos personales](capturas/03-onboarding-datos.png)
+![Onboarding — paso 1, sobre usted](capturas/03-onboarding-datos.png)
 
 ### Paso 2 — Ubicación
 
@@ -142,7 +153,7 @@ que usted lo mueva o use la búsqueda.
 
 ![Onboarding — paso 2, ubicación en el mapa](capturas/04-onboarding-mapa.png)
 
-### Paso 3 — Información profesional (solo tutores)
+### Paso 3 — Perfil profesional (solo tutores)
 
 Este paso únicamente aparece si se registró con el rol de **Tutor**. Se le
 solicita:
@@ -157,33 +168,20 @@ solicita:
   solo se aplica cuando el tutor ofrece la modalidad "a domicilio del
   estudiante" (puede dejarse en 0 si no aplica).
 
+Estas tarifas se piden **una sola vez**: todos sus cursos las usan
+automáticamente. Al crear o editar un curso solo las vuelve a ver si marca
+**"Usar otra tarifa para este curso"**.
+
 Al final de este paso se le recuerda que su cuenta quedará en estado
 **"pendiente de aprobación"** hasta que un administrador valide su perfil
 (vea la sección 12, "Aprobación de tutores").
 
 ![Onboarding — paso 3, información profesional del tutor](capturas/05-onboarding-tutor.png)
 
-### Paso 4 — Categorías de interés
-
-El último paso es común a estudiantes y tutores, aunque el texto cambia
-según el rol:
-
-- Si es **tutor**, seleccione las categorías académicas en las que **ofrece
-  clases** (ej. Matemática, Inglés, Natación).
-- Si es **estudiante**, seleccione las categorías en las que **desea
-  aprender**.
-
-Las categorías se presentan como chips que se activan o desactivan con un
-clic; debe seleccionar al menos una para poder finalizar.
-
-![Onboarding — paso 4, selección de categorías](capturas/06-onboarding-categorias.png)
-
 Al presionar **Finalizar** en el último paso, el sistema guarda todo el
 perfil y lo redirige a la página de inicio (`/`), ya con acceso completo a
 la plataforma. En cualquier paso posterior al primero puede usar el botón
-**Atrás** para corregir información; si es estudiante, el botón **Atrás**
-en el paso 4 lo regresa directamente al paso 2 (el paso 3 se salta por no
-aplicarle).
+**Atrás** para corregir información.
 
 ---
 
@@ -192,9 +190,18 @@ aplicarle).
 El inicio de sesión se realiza en `/login`, accesible con el botón
 **"Iniciar sesión"** del encabezado.
 
-Pasos:
+**Acceso rápido:** si Google está habilitado, el botón de Google va arriba y es la
+entrada principal; el correo y la contraseña quedan plegados bajo **"Usar correo y
+contraseña"** para no sobrecargar la pantalla. Si Google no está habilitado, el
+formulario de correo se muestra abierto. Si es la **primera vez** que usa esa cuenta
+de Google, no se le muestra un error: la pantalla le dice "Es su primera vez aquí" y le
+pregunta si quiere unirse como **estudiante** o **tutor**; al elegir, crea la cuenta en
+el momento y pasa al onboarding, sin volver a pedir nada a Google.
 
-1. Ingrese su **correo electrónico** y **contraseña**.
+Pasos con correo:
+
+1. Pulse **Usar correo y contraseña** (si está plegado) e ingrese su **correo
+   electrónico** y **contraseña**.
 2. Presione **Iniciar sesión**.
 3. Si las credenciales son correctas, se le redirige a la página que
    intentaba visitar antes de que se le pidiera autenticarse (o a la página
@@ -213,13 +220,14 @@ automáticamente:
 También puede ingresar con el botón de **Google** (se muestra solo si el
 servicio está habilitado). Elija su cuenta de Google y el sistema inicia
 sesión si ya tiene cuenta (si usted se había registrado con ese mismo correo, el
-sistema la vincula). Para **crear** una cuenta con Google hay que hacerlo desde
-**Crear cuenta**: primero elija arriba si es estudiante o tutor, y luego pulse
-el botón de Google; se crea con el nombre, el correo y la foto de su cuenta de
-Google y pasa al registro de su perfil (onboarding). Si pulsa el botón desde
-**Iniciar sesión** y todavía no tiene cuenta, el sistema se lo indica y no crea
-nada, porque el rol no se puede cambiar después. Las cuentas creadas con Google
-no tienen contraseña: ingresan siempre con el botón de Google.
+sistema la vincula). Para **crear** una cuenta con Google puede hacerlo desde
+**Crear cuenta** (elija primero si es estudiante o tutor y luego pulse el botón de
+Google) o directamente desde **Iniciar sesión**: en ese caso, si todavía no tiene
+cuenta, el sistema le pregunta el rol en ese momento. Se crea con el nombre, el
+correo y la foto de su cuenta de Google y pasa al registro de su perfil
+(onboarding). Como el rol no se puede cambiar después, nunca se asigna uno sin que
+usted lo elija. Las cuentas creadas con Google no tienen contraseña: ingresan siempre
+con el botón de Google.
 
 El enlace **"¿Olvidó su contraseña?"** se muestra en el formulario, pero a
 la fecha de este manual la recuperación de contraseña no se encuentra
@@ -316,32 +324,26 @@ La reserva se realiza directamente desde el perfil del tutor
 disponible para usuarios con rol de estudiante. Si el tutor no tiene ningún
 curso publicado, esta sección no aparece.
 
-Pasos:
+La reserva es un asistente de **tres pasos**, con un indicador arriba:
 
-1. **Curso**: elija cuál de los cursos del tutor desea reservar.
-2. **Modalidad**: elija entre las modalidades que ese curso específico
-   ofrece (Virtual, En casa del tutor, o A domicilio del estudiante).
-3. **Duración**: 60, 90 o 120 minutos.
-4. **Fecha**: elija un día igual o posterior al día actual.
-5. **Hora**:
-   - Si la modalidad es **Virtual**, puede elegir cualquier hora libremente.
-   - Si la modalidad es **presencial** (en casa del tutor o a domicilio del
-     estudiante), la hora se limita a los bloques que el tutor marcó como
-     disponibles ese día de la semana, según la duración elegida. Si el
-     tutor no tiene disponibilidad configurada para ese día, se le avisa y
-     no podrá elegir una hora para esa fecha.
-6. **Repetir semanalmente** (opcional): puede elegir que la misma reserva se
-   repita automáticamente 2, 3, 4, 6, 8 o 12 semanas seguidas a la misma
-   hora, en vez de reservar "No repetir" (una sola sesión). Internamente
-   esto crea una reserva individual por cada semana — no es una
-   recurrencia que pueda editarse o cancelarse como un solo bloque después.
-7. Mientras completa el formulario, se muestra un **desglose de precio**:
-   el monto de la tutoría según duración y tarifa base, el costo de
-   traslado si aplica (calculado según la distancia entre las direcciones
-   del tutor y del estudiante, solo para la modalidad "a domicilio del
-   estudiante"), y el total — multiplicado por el número de semanas si
-   eligió repetir.
-8. Presione **Confirmar reserva**.
+1. **Qué**: elija el curso (si el tutor tiene más de uno), la **modalidad**
+   (Virtual, En casa del tutor o A domicilio del estudiante) y la **duración**
+   (60, 90 o 120 minutos).
+2. **Cuándo**: elija la **fecha** (de hoy en adelante) y si se **repite**:
+   una sola vez, o cada semana durante 4 u 8 semanas (suscripción). Debajo
+   aparecen solo las **horas realmente libres** de ese día, ya descontadas las
+   tutorías del tutor y las suyas, y dentro de los horarios que el tutor
+   publicó; esto vale igual para clases virtuales y presenciales. En una
+   suscripción solo se ofrecen horas libres **todas** las semanas. Si no hay
+   ninguna, se le indica y puede probar otra fecha. Elija una hora para continuar.
+3. **Confirmar**: un resumen con el curso, la modalidad, la fecha y hora, y la
+   repetición. Para "a domicilio del estudiante" se muestra el **mapa con la
+   ruta** y el costo de traslado. Debajo, el **desglose de precio** (tutoría,
+   traslado si aplica y total; en una suscripción, el total por sesión y el
+   total por todas las semanas). Presione **Confirmar reserva**.
+
+Cada semana de una suscripción queda como una reserva individual: no es un
+bloque que pueda editarse o cancelarse en conjunto.
 
 Si la reserva se crea correctamente, se muestra un mensaje de confirmación
 con un botón **"Ver mis reservas"** que lo lleva a `/mis-reservas`. Si el
@@ -396,7 +398,24 @@ nombre y una insignia de estado de aprobación:
 - **"Pendiente de aprobación"**: aún no aparece en las búsquedas, pero
   puede preparar sus cursos y horarios mientras espera la revisión.
 
-Desde aquí se accede, mediante tres tarjetas, a:
+**Lista de pasos para empezar.** Mientras la configuración no esté completa,
+arriba aparece "Para empezar a recibir reservas", con una barra de avance
+(por ejemplo "1 de 4") y cuatro pasos:
+
+1. **Complete su perfil**: biografía, CV y tarifas (ya hecho al terminar el
+   onboarding).
+2. **Publique sus horarios**: los estudiantes solo pueden reservar dentro de
+   los horarios que usted marque. Botón **Configurar horarios**.
+3. **Cree su primer curso**: usa las tarifas de su perfil. Botón **Crear curso**.
+4. **Aprobación de la administración**: no depende de usted; mientras se
+   revisa, aparece "en espera". Cuando se aprueba, ya aparece en las búsquedas.
+
+El primer paso que le toca se resalta con su botón. Al completar los cuatro, la
+lista se reemplaza por "Todo listo. Ya aparece en las búsquedas y puede recibir
+reservas."
+
+Debajo, tres tarjetas dan acceso directo a, con un dato útil en cada una (por
+ejemplo, cuántos cursos activos tiene o cuántas tutorías próximas):
 
 - **Mis cursos** (`/tutor/cursos`).
 - **Disponibilidad** (`/tutor/disponibilidad`).
@@ -454,10 +473,12 @@ estudiante correspondiente ("Estudiante: [nombre]").
 
 Desde aquí puede:
 
-- **Cancelar** una reserva en estado Pendiente o Confirmada.
-- **Marcar completada** una reserva en estado Confirmada, una vez que la
-  sesión ya se llevó a cabo. Marcar una reserva como completada es lo que
-  habilita al estudiante a dejarle una reseña.
+- **Cancelar** una reserva que todavía no ha comenzado.
+- **Reportar** al estudiante cuando la tutoría ya terminó (motivo y descripción;
+  lo revisa el administrador).
+
+No hay un botón para "marcar completada": una tutoría pasa sola a **Completada**
+cuando termina su horario, y entonces el estudiante puede calificarla.
 
 ![Reservas recibidas por el tutor](capturas/15-tutor-reservas.png)
 
@@ -655,7 +676,26 @@ esta misma pantalla, o cerrar sesión si lo desea.
 
 ---
 
-## 14. Soporte y contacto
+## 14. Guía rápida
+
+Para orientarle sin abrumarle, la aplicación incluye guías cortas de una a tres
+ventanas, página por página. Cada ventana señala un elemento de la pantalla y
+explica en una frase para qué sirve.
+
+- **Salen solas la primera vez** en las páginas clave: *Buscar tutores* y el
+  perfil de un tutor (estudiantes), y el *Panel del tutor* (tutores). Después de
+  verlas, cerrarlas u omitirlas, no vuelven a salir solas.
+- **Se pueden repetir** con el botón **?** del encabezado, que aparece en las
+  páginas que tienen guía (también *Mis reservas* y *Mensajes*).
+- **Controles:** **Siguiente** (con el avance, p. ej. "1 de 3"), **Atrás**,
+  **Omitir guía** y **Entendido** en el último paso. También se cierra con la
+  tecla Esc.
+- Se recuerdan por persona en este navegador; en otro navegador o en una ventana
+  privada volverán a salir.
+
+---
+
+## 15. Soporte y contacto
 
 Para cualquier duda, problema técnico, o para reportar una situación que
 todavía no tiene un formulario dedicado en la aplicación (vea la sección

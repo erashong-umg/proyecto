@@ -47,7 +47,7 @@ export const ChatPage = () => {
     <div className={styles.page}>
       <div className="container">
         <div className={styles.layout}>
-          <aside className={`${styles.sidebar} ${hasActiveThread ? styles.hiddenMobile : ''}`}>
+          <aside className={`${styles.sidebar} ${hasActiveThread ? styles.hiddenMobile : ''}`} data-tour="chat-bandeja">
             <h1 className={styles.sidebarTitle}>Mensajes</h1>
             {threadsLoading ? (
               <p className={styles.status}>Cargando conversaciones…</p>
@@ -117,7 +117,7 @@ export const ChatPage = () => {
                   />
                 )}
 
-                <Composer onSend={sendMessage} onTyping={notifyTyping} />
+                <div data-tour="chat-redactor"><Composer onSend={sendMessage} onTyping={notifyTyping} /></div>
               </div>
             )}
           </section>

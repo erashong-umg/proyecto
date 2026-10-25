@@ -1,10 +1,10 @@
 import { ClipboardX } from 'lucide-react';
 import { useBookings } from '../../hooks';
-import { BookingCard } from '../../components/bookings/BookingCard';
+import { BookingList } from '../../components/bookings/BookingList';
 import styles from './Bookings.module.scss';
 
 export const TutorBookingsPage = () => {
-  const { bookings, isLoading, error, cancel, cancellingId, complete, completingId } = useBookings();
+  const { bookings, isLoading, error, cancel, cancellingId, reload } = useBookings();
 
   return (
     <div className={`${styles.page} container`}>
@@ -21,19 +21,14 @@ export const TutorBookingsPage = () => {
           <p>Todavía no tiene reservas.</p>
         </div>
       ) : (
-        <div className={styles.list}>
-          {bookings.map((b) => (
-            <BookingCard
-              key={b._id}
-              booking={b}
-              counterpartLabel={`Estudiante: ${b.studentId.name}`}
-              onCancel={() => cancel(b._id)}
-              isCancelling={cancellingId === b._id}
-              onComplete={() => complete(b._id)}
-              isCompleting={completingId === b._id}
-            />
-          ))}
-        </div>
+        <BookingList
+          className={styles.list}
+          bookings={bookings}
+          viewer="tutor"
+          onCancel={cancel}
+          cancellingId={cancellingId}
+          onReviewed={reload}
+        />
       )}
     </div>
   );

@@ -67,12 +67,12 @@ export const TutorSearchPage = () => {
 
   return (
     <div className={styles.page}>
-      <div className={styles.mapArea}>
+      <div className={styles.mapArea} data-tour="buscar-mapa">
         <SearchMap userCoords={coords} tutors={tutors} selectedTutorId={selectedId} onSelectTutor={setSelectedId} />
       </div>
 
       <div className={styles.panel}>
-        <form className={styles.searchBar} onSubmit={handleSearch}>
+        <form className={styles.searchBar} onSubmit={handleSearch} data-tour="buscar-barra">
           <Search aria-hidden="true" className={styles.searchIcon} />
           <input
             type="text"
@@ -104,7 +104,7 @@ export const TutorSearchPage = () => {
         )}
         {searchError && <p className={styles.error}>{searchError}</p>}
 
-        <div className={styles.results}>
+        <div className={styles.results} data-tour="buscar-resultados">
           {isLoading ? (
             <p className={styles.status}>Buscando cerca de usted…</p>
           ) : tutors.length === 0 ? (

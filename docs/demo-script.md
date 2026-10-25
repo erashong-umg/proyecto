@@ -99,20 +99,26 @@ En el navegador principal (perfil de "estudiante"):
    `/onboarding`, sin permitir el uso del resto de la plataforma hasta
    completarlo.
 
+> **Guía rápida:** la primera vez que una persona entra a *Buscar tutores*, al perfil
+> de un tutor o al panel del tutor, aparece una guía corta de 1 a 3 ventanas (React
+> Joyride). Puede mostrarse en vivo o repetirse con el botón **?** del encabezado. Para
+> volver a ver las guías en una demo: borrar `educaspot_tours_vistos` del almacenamiento
+> local del navegador.
+
 ### Acto 3 — Onboarding paso a paso [2 min]
 
-Continuando con la cuenta recién creada, recorrer los 3 pasos que le
-corresponden a un estudiante (mencionar que un tutor vería un cuarto paso
-adicional — información profesional — que se omite aquí por tiempo):
+Continuando con la cuenta recién creada, recorrer los 2 pasos que le
+corresponden a un estudiante (mencionar que un tutor vería un tercer paso,
+su perfil profesional, que se omite aquí por tiempo):
 
-1. **Datos personales**: teléfono/WhatsApp y género.
+1. **Sobre usted**: teléfono/WhatsApp, género, documento de identificación
+   (DPI) y al menos una categoría de interés (ej. Idiomas) como chip — todo en
+   una sola pantalla.
 2. **Ubicación**: escribir una dirección (ej. "Zona 10, Ciudad de
    Guatemala") y presionar **Ubicar en el mapa**, o arrastrar el pin
    directamente — mencionar que esta dirección es la que luego alimenta el
    cálculo de distancia a los tutores.
-3. **Categorías de interés**: seleccionar al menos una categoría (ej.
-   Idiomas) como chip.
-4. Presionar **Finalizar** → redirige a `/` con la cuenta ya lista para
+3. Presionar **Finalizar** → redirige a `/` con la cuenta ya lista para
    usarse.
 
 ### Acto 4 — Login como estudiante, búsqueda de tutores y perfil [2.5 min]
@@ -137,17 +143,20 @@ demo ya poblada por el seed, que tiene historial:
 
 Seguir en el perfil de María López, sección **"Reservar una tutoría"**:
 
-1. Elegir el curso "Inglés conversacional para profesionales", modalidad
-   **Virtual**, duración **60 minutos**, una fecha futura cercana (ej.
-   mañana) y una hora cualquiera (ej. 10:00 a.m.) — recordar que en
-   modalidad virtual la hora es libre, no depende de la disponibilidad
-   semanal del tutor.
-2. Mostrar el desglose de precio (sin costo de traslado, por ser virtual)
-   y presionar **Confirmar reserva** → mensaje de éxito.
-3. **Demostración del anti-traslape**: repetir el mismo formulario con
-   María, mismo curso, misma fecha, pero una hora que se traslape con la
-   reserva recién creada (ej. 10:30 a.m., que choca con el bloque de
-   10:00–11:00 ya reservado). Presionar **Confirmar reserva** de nuevo.
+1. **Paso 1 (Qué):** elegir el curso "Inglés conversacional para
+   profesionales", modalidad **Virtual** y duración **60 minutos**.
+2. **Paso 2 (Cuándo):** elegir una fecha futura en que María atienda (miércoles
+   o lunes) y una hora de las que aparecen: solo se muestran las **realmente
+   libres**, dentro del horario que ella publicó (igual para virtual y
+   presencial).
+3. **Paso 3 (Confirmar):** mostrar el resumen y el desglose de precio (sin
+   costo de traslado, por ser virtual) y presionar **Confirmar reserva** →
+   mensaje de éxito.
+4. **Demostración del anti-traslape:** volver a abrir el asistente con María, mismo
+   curso y misma fecha: la hora recién reservada **ya no aparece** (y tampoco las
+   que chocarían con ella, como 10:30 si reservó 10:00–11:00). Es el anti-traslape
+   visible para el usuario; el backend lo vuelve a validar y, si se fuerza, responde
+   409. Presionar **Confirmar reserva** de nuevo solo es posible si queda otra hora.
    - El sistema debe rechazarla mostrando el motivo del conflicto
      (internamente, el backend responde 409 con un mensaje del tipo
      "Usted ya tiene una tutoría en la semana 1 (...)"). Ver la respuesta
@@ -235,9 +244,10 @@ las claves públicas de Google, vigencia, que el token fue emitido para
 **nuestro** Client ID y que el correo esté verificado. Con eso extrae nombre,
 correo y foto y emite el JWT propio del sistema, igual que en el login con
 contraseña. Si el correo ya tenía cuenta se vincula; si no, solo se crea desde "Crear
-cuenta", con el rol elegido ahí (estudiante o tutor), y pasa al onboarding;
-desde "Iniciar sesión" nunca se crea una cuenta, porque el rol no se puede
-cambiar después y no se debe asignar uno por defecto. Los
+cuenta" (con el rol elegido ahí) o desde "Iniciar sesión": en ese caso el backend
+responde 404 con el código `GOOGLE_ACCOUNT_NOT_FOUND` y la pantalla le pregunta el rol
+a la persona ("Es su primera vez aquí") y reenvía la misma credencial con el rol
+elegido. Nunca se asigna un rol por defecto, porque no se puede cambiar después. Los
 administradores no entran por aquí: tienen su propio acceso en `/admin/login`.
 El Client ID es público; no hay ningún secreto de Google en el repositorio.
 
@@ -273,11 +283,11 @@ hace **dos veces, por separado**: una filtrando por `tutorId` (¿el tutor ya
 tiene algo que choca?) y otra filtrando por `studentId` (¿el estudiante ya
 tiene algo que choca?). Si cualquiera de las dos encuentra una coincidencia,
 `createBooking` lanza un error `Conflict` (HTTP 409) con un mensaje que cita
-la semana del conflicto (relevante cuando se usa la opción "Repetir N
-semanas", que valida el traslape de cada ocurrencia semanal por separado
-antes de crear ninguna). Antes de llegar a esa validación también se
-confirma, si la modalidad no es virtual, que el horario cae dentro de los
-bloques de disponibilidad semanal que el tutor configuró
+la semana del conflicto (relevante en la suscripción de 4 u 8 semanas, que
+valida el traslape de cada ocurrencia semanal por separado antes de crear
+ninguna). Antes de llegar a esa validación también se confirma, para cualquier
+modalidad, que el horario cae dentro de los bloques de disponibilidad semanal
+que el tutor configuró
 (`tutorIsAvailable`); si el tutor no tiene ningún documento de
 disponibilidad registrado, no se aplica ninguna restricción — eso es
 intencional, no un bug.

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import { Availability } from '../models/Availability';
 import { Unauthorized, BadRequest } from '../utils/errors';
+import { getFreeSlots } from '../services/booking.service';
 
 const validateSlots = (slots: { dayOfWeek: number; startMinute: number; endMinute: number }[]): void => {
   for (const s of slots) {
@@ -41,5 +42,22 @@ export const getTutorAvailability = async (req: Request, res: Response, next: Ne
   try {
     const availability = await Availability.findOne({ tutorId: req.params.tutorId }).lean();
     res.json({ availability: availability ?? { slots: [] } });
+  } catch (error) { next(error); }
+};
+
+// GET /api/availability/:tutorId/slots?date=2026-11-09&durationMin=60&repeatWeeks=4
+// Horas de inicio que se pueden reservar ese día (ya descontadas las tutorías
+// del tutor y del estudiante, y todas las semanas si es una suscripción).
+export const getTutorFreeSlots = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.user) throw Unauthorized('No autenticado.');
+    const slots = await getFreeSlots({
+      tutorId: String(req.params.tutorId),
+      studentId: new Types.ObjectId(req.user.id),
+      date: String(req.query.date ?? ''),
+      durationMin: Number(req.query.durationMin ?? 60),
+      repeatWeeks: Number(req.query.repeatWeeks ?? 1),
+    });
+    res.json({ slots });
   } catch (error) { next(error); }
 };

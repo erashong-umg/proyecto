@@ -144,3 +144,58 @@
   color: $color-text-muted;
   font-size: $font-size-sm;
 }
+
+// Acceso rápido: el correo y la contraseña quedan plegados bajo este botón.
+.emailToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  padding: $space-3;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover { background: $color-surface-alt; }
+
+  svg { width: 16px; height: 16px; transition: transform $transition-fast; }
+}
+
+.chevronOpen { transform: rotate(180deg); }
+
+.emailForm { margin-top: $space-4; }
+
+// Primera vez con Google: se pregunta el rol aquí mismo en vez de mostrar un error.
+.firstTime {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4;
+  border: 1px solid $color-primary;
+  border-radius: $radius-lg;
+  background: color-mix(in srgb, $color-primary 6%, transparent);
+
+  h2 { margin: 0; font-size: $font-size-lg; }
+  p { margin: 0; color: $color-text-muted; font-size: $font-size-sm; }
+}
+
+.linkButton {
+  align-self: center;
+  background: none;
+  border: 0;
+  padding: $space-1;
+  color: $color-text-muted;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover { color: $color-text; }
+}

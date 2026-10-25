@@ -19,7 +19,7 @@ export const StepTutorInfo = ({
   onChangeBio, onChangeCvUrl, onChangePortfolioUrl, onChangeBaseRate, onChangeRatePerKm,
 }: StepTutorInfoProps) => (
   <div className={styles.step}>
-    <h2>Información profesional</h2>
+    <h2>Su perfil profesional</h2>
     <div className={styles.field}>
       <label className={styles.label}>Biografía profesional</label>
       <textarea
@@ -46,6 +46,7 @@ export const StepTutorInfo = ({
     />
     <div className={styles.field}>
       <label className={styles.label}>Tarifa base por hora (Q)</label>
+      <span className={styles.hint}>Se usará en todos sus cursos; podrá cambiarla en un curso concreto si lo necesita.</span>
       <input
         type="number"
         value={baseRate}
