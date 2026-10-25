@@ -10,8 +10,8 @@ interface StepCategoriesProps {
 
 export const StepCategories = ({ categories, selectedIds, isTutor, onToggle }: StepCategoriesProps) => (
   <div className={styles.step}>
-    <h2>Sus intereses</h2>
-    <p>Seleccione las categorías en las que {isTutor ? 'ofrece clases' : 'desea aprender'}:</p>
+    <h3>{isTutor ? '¿Qué enseña?' : 'Sus intereses'}</h3>
+    <p className={styles.hint}>Seleccione las categorías en las que {isTutor ? 'ofrece clases' : 'desea aprender'}:</p>
     <div className={styles.categoryGrid}>
       {categories.map((c) => (
         <button

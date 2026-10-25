@@ -7,7 +7,6 @@ export const useBookings = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
-  const [completingId, setCompletingId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setIsLoading(true);
@@ -33,17 +32,5 @@ export const useBookings = () => {
     }
   };
 
-  const complete = async (bookingId: string) => {
-    setCompletingId(bookingId);
-    try {
-      await api.patch(`/bookings/${bookingId}/complete`);
-      load();
-    } catch (err) {
-      setError(getErrorMessage(err, 'No se pudo completar la reserva.'));
-    } finally {
-      setCompletingId(null);
-    }
-  };
-
-  return { bookings, isLoading, error, cancel, cancellingId, complete, completingId, reload: load };
+  return { bookings, isLoading, error, cancel, cancellingId, reload: load };
 };

@@ -4,6 +4,7 @@ import { Search, ClipboardList, LayoutDashboard, MessageCircle, ChevronDown, Log
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
 import { ThemeToggle } from './ThemeToggle';
+import { TourHelpButton } from '../tour/TourHelpButton';
 import { getInitials } from '../../services/formatters';
 import type { UserRole } from '../../types/user';
 import styles from './Header.module.scss';
@@ -85,6 +86,7 @@ export const Header = () => {
         <nav className={styles.nav} aria-label="Principal">{navLinks}</nav>
 
         <div className={styles.actions}>
+          <TourHelpButton />
           <ThemeToggle />
 
           {isAuthenticated && user ? (

@@ -3,13 +3,14 @@ import { authMiddleware } from '@middleware/auth';
 import { roleMiddleware } from '@middleware/role';
 import { statusMiddleware } from '@middleware/status';
 import {
-  setMyAvailability, getMyAvailability, getTutorAvailability,
+  setMyAvailability, getMyAvailability, getTutorAvailability, getTutorFreeSlots,
 } from '@controllers/availability.controller';
 
 const router = Router();
 
 router.get('/me', authMiddleware, statusMiddleware, roleMiddleware('tutor'), getMyAvailability);
 router.put('/me', authMiddleware, statusMiddleware, roleMiddleware('tutor'), setMyAvailability);
+router.get('/:tutorId/slots', authMiddleware, statusMiddleware, getTutorFreeSlots);
 router.get('/:tutorId', getTutorAvailability);
 
 export default router;

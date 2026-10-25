@@ -15,6 +15,9 @@ const envSchema = z.object({
   // público, no un secreto. Vacío = el inicio de sesión con Google queda
   // deshabilitado (el endpoint responde 503).
   GOOGLE_CLIENT_ID: z.string().default(''),
+  // Zona horaria en la que los tutores definen sus horarios (el servidor puede
+  // correr en UTC). Ver src/utils/time.ts.
+  APP_TIMEZONE: z.string().default('America/Guatemala'),
   // Metadatos de la compilación (los fija el workflow de despliegue al construir
   // la imagen). Sin ellos: ejecución local.
   APP_VERSION: z.string().default('dev'),

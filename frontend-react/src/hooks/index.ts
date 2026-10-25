@@ -26,3 +26,4 @@ export { useChatMessages } from './useChatMessages';
 export { useChatPeer } from './useChatPeer';
 export { useApplyCustomTheme } from './useApplyCustomTheme';
 export { useAdminTheme } from './useAdminTheme';
+export { useTutorSetup } from './useTutorSetup';

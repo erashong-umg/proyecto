@@ -5,7 +5,7 @@ import { signToken } from '../utils/jwt';
 import { env } from '../config/env';
 import { verifyGoogleCredential } from '../services/google.service';
 import {
-  BadRequest, Unauthorized, Forbidden, NotFound, Conflict, ServiceUnavailable,
+  ApiError, BadRequest, Unauthorized, Forbidden, NotFound, Conflict, ServiceUnavailable,
 } from '../utils/errors';
 import type {
   RegisterInput, LoginInput, GoogleAuthInput,
@@ -116,7 +116,11 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
       // Crear una cuenta exige haber elegido el rol (pantalla "Crear cuenta"):
       // el rol no se puede cambiar después, así que nunca se asigna uno por defecto.
       if (!role) {
-        throw NotFound('No existe una cuenta con esa cuenta de Google. Cree una desde "Crear cuenta" y elija si es estudiante o tutor.');
+        // El frontend reconoce este código y le pregunta el rol a la persona en el mismo
+        // lugar (en vez de mostrarle un error), y reenvía la misma credencial con el rol.
+        throw new ApiError(404, 'Esta cuenta de Google todavía no tiene cuenta en EducaSpot. Elija si es estudiante o tutor para crearla.', {
+          code: 'GOOGLE_ACCOUNT_NOT_FOUND',
+        });
       }
       user = await User.create({
         email: profile.email,

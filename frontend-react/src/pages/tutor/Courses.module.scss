@@ -140,3 +140,18 @@
   justify-content: flex-end;
   gap: $space-3;
 }
+
+.rateToggle {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rateNote {
+  margin: 0 0 $space-4;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+}

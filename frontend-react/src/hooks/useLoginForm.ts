@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { isAxiosError } from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useAuthStore } from '../store/authStore';
@@ -14,6 +15,10 @@ interface UseLoginFormResult {
   expired: boolean;
   handleSubmit: (e: FormEvent) => Promise<void>;
   handleGoogleCredential: (credential: string) => Promise<void>;
+  /** Credencial de Google de alguien que aún no tiene cuenta: falta que elija su rol. */
+  pendingGoogle: string | null;
+  completeGoogleSignup: (role: 'student' | 'tutor') => Promise<void>;
+  cancelGoogleSignup: () => void;
 }
 
 export const useLoginForm = (): UseLoginFormResult => {
@@ -21,6 +26,7 @@ export const useLoginForm = (): UseLoginFormResult => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingGoogle, setPendingGoogle] = useState<string | null>(null);
   const { loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,20 +62,50 @@ export const useLoginForm = (): UseLoginFormResult => {
     }
   };
 
+  const finishGoogle = async (credential: string, role?: 'student' | 'tutor') => {
+    await loginWithGoogle(credential, role);
+    setPendingGoogle(null);
+    // Una cuenta nueva (o sin perfil completo) pasa primero por el onboarding.
+    const completed = useAuthStore.getState().user?.onboardingCompleted;
+    navigate(completed ? from : '/onboarding', { replace: true });
+  };
+
   const handleGoogleCredential = async (credential: string) => {
     setError(null);
     setIsLoading(true);
     try {
-      await loginWithGoogle(credential);
-      // Una cuenta nueva (o sin perfil completo) pasa primero por el onboarding.
-      const completed = useAuthStore.getState().user?.onboardingCompleted;
-      navigate(completed ? from : '/onboarding', { replace: true });
+      await finishGoogle(credential);
     } catch (err) {
-      setError(getErrorMessage(err, 'No se pudo iniciar sesión con Google.'));
+      // Primera vez con esta cuenta de Google: no es un error, solo falta el rol.
+      // Se conserva la misma credencial para crearla sin pedirle a Google otra vez.
+      if (isAxiosError(err) && err.response?.data?.details?.code === 'GOOGLE_ACCOUNT_NOT_FOUND') {
+        setPendingGoogle(credential);
+      } else {
+        setError(getErrorMessage(err, 'No se pudo iniciar sesión con Google.'));
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential };
+  const completeGoogleSignup = async (role: 'student' | 'tutor') => {
+    if (!pendingGoogle) return;
+    setError(null);
+    setIsLoading(true);
+    try {
+      await finishGoogle(pendingGoogle, role);
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo crear la cuenta con Google.'));
+      setPendingGoogle(null);   // la credencial puede haber vencido: que vuelva a pulsar el botón
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cancelGoogleSignup = () => {
+    setPendingGoogle(null);
+    setError(null);
+  };
+
+  return { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential, pendingGoogle, completeGoogleSignup, cancelGoogleSignup };
 };

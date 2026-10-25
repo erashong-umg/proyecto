@@ -102,8 +102,18 @@ describe('POST /api/auth/google', () => {
     const res = await loginGoogle();
 
     expect(res.status).toBe(404);
-    expect(res.body.error).toMatch(/Crear cuenta/);
+    expect(res.body.details).toEqual({ code: 'GOOGLE_ACCOUNT_NOT_FOUND' });   // el frontend pregunta el rol con este código
     expect(await User.countDocuments()).toBe(0);
+  });
+
+  it('la misma credencial, esta vez con rol, crea la cuenta (segundo paso del primer ingreso)', async () => {
+    expect((await loginGoogle()).status).toBe(404);
+
+    const res = await loginGoogle({ role: 'tutor' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ isNewUser: true, user: { role: 'tutor', email: 'ana@gmail.com' } });
+    expect(await User.countDocuments()).toBe(1);
   });
 
   it('un segundo ingreso reutiliza la cuenta, sin pedir rol, y no la marca como nueva', async () => {

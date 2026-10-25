@@ -3,10 +3,9 @@ import type { OnboardingStep } from '../../hooks/useOnboardingWizard';
 import styles from '../../pages/onboarding/Onboarding.module.scss';
 
 const ALL_STEPS: { n: OnboardingStep; label: string; tutorOnly?: boolean }[] = [
-  { n: 1, label: 'Datos personales' },
+  { n: 1, label: 'Sobre usted' },
   { n: 2, label: 'Ubicación' },
-  { n: 3, label: 'Info. profesional', tutorOnly: true },
-  { n: 4, label: 'Intereses' },
+  { n: 3, label: 'Perfil profesional', tutorOnly: true },
 ];
 
 interface OnboardingProgressProps {
