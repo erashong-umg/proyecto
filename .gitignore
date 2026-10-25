@@ -16,3 +16,6 @@ logs/
 # Variables de entorno con secretos (los .env.example sí se versionan)
 .env
 .env.local
+cliente de OAuth.txt
+
+client_secret_519862388519-02hn9hbr4novio530kuvfr5hcn90cvo9.apps.googleusercontent.com.json
