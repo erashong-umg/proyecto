@@ -19,9 +19,13 @@ export const PublicShell = () => {
     return <Navigate to="/admin" replace />;
   }
 
+  // Login y registro llevan su propio encabezado de marca: el Header del sitio
+  // solo repetiría "Iniciar sesión" / "Crear cuenta" sobre la misma pantalla.
+  const hideHeader = !isAuthenticated && (pathname === '/login' || pathname === '/register');
+
   return (
     <>
-      <Header />
+      {!hideHeader && <Header />}
       <main>
         <Outlet />
       </main>
