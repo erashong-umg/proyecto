@@ -54,7 +54,7 @@ const seed = async (): Promise<void> => {
     idDocument: { type: 'dpi', number: '2456712340101' },
     phone: '+502 5555-1001',
     address: { street: 'Zona 10, Guatemala', coords: { lat: 14.5905, lng: -90.5155 } },
-    photoUrl: '/tutores/maria-lopez.png',
+    photoUrl: '/personas/maria-lopez.png',
     categoryIds: [cats[0]._id, cats[3]._id],
     tutorData: {
       bio: 'Profesora bilingüe con 8 años de experiencia enseñando inglés conversacional y desarrollo web.',
@@ -79,7 +79,7 @@ const seed = async (): Promise<void> => {
     idDocument: { type: 'dpi', number: '1987654320101' },
     phone: '+502 5555-1002',
     address: { street: 'Zona 14, Guatemala', coords: { lat: 14.5845, lng: -90.5155 } },
-    photoUrl: '/tutores/juan-perez.png',
+    photoUrl: '/personas/juan-perez.png',
     categoryIds: [cats[1]._id],
     tutorData: {
       bio: 'Entrenador personal certificado, especializado en natación y crossfit.',
@@ -102,7 +102,7 @@ const seed = async (): Promise<void> => {
     onboardingCompleted: true,
     idDocument: { type: 'dpi', number: '3012456780101' },
     address: { street: 'Mixco', coords: { lat: 14.6333, lng: -90.6067 } },
-    photoUrl: '/tutores/carlos-mendoza.png',
+    photoUrl: '/personas/carlos-mendoza.png',
     categoryIds: [cats[2]._id],
     tutorData: {
       bio: 'Doctor en Física, ofrece tutorías universitarias de cálculo y álgebra.',
@@ -192,29 +192,29 @@ const seed = async (): Promise<void> => {
   ]);
 
   console.log('[Seed] Creando más tutores y cursos de ejemplo...');
-  // Cada tutor aprobado trae un curso. Las fotos viven en frontend-react/public/tutores;
+  // Cada tutor aprobado trae un curso. Las fotos viven en frontend-react/public/personas;
   // los que tienen `photo: ''` se muestran con sus iniciales hasta tener su retrato.
   const demoTutors = [
     {
-      key: 'laura', name: 'Laura Sandoval', photo: '/tutores/laura-sandoval.png', cat: 2, dpi: '2345098760101', phone: '+502 5555-1004',
+      key: 'laura', name: 'Laura Sandoval', photo: '/personas/laura-sandoval.png', cat: 2, dpi: '2345098760101', phone: '+502 5555-1004',
       street: 'Zona 11, Guatemala', coords: { lat: 14.6000, lng: -90.5400 }, baseRate: 130, ratePerKm: 6, avgRating: 4.9, reviewCount: 21,
       bio: 'Licenciada en Matemática con 15 años de experiencia preparando estudiantes de bachillerato y primer año universitario.',
       course: { title: 'Cálculo y álgebra para primer año de universidad', description: 'Refuerzo de límites, derivadas y álgebra con ejercicios resueltos paso a paso.', modalities: ['virtual', 'presencial-tutor', 'presencial-estudiante'] },
     },
     {
-      key: 'diego', name: 'Diego Morales', photo: '/tutores/diego-morales.png', cat: 3, dpi: '2890123450101', phone: '+502 5555-1005',
+      key: 'diego', name: 'Diego Morales', photo: '/personas/diego-morales.png', cat: 3, dpi: '2890123450101', phone: '+502 5555-1005',
       street: 'Zona 4, Guatemala', coords: { lat: 14.6220, lng: -90.5160 }, baseRate: 110, ratePerKm: 4, avgRating: 4.6, reviewCount: 14,
       bio: 'Desarrollador de software que enseña programación desde cero con proyectos pequeños y prácticos.',
       course: { title: 'Programación con Python desde cero', description: 'Variables, funciones y un primer proyecto real, sin experiencia previa.', modalities: ['virtual', 'presencial-estudiante'] },
     },
     {
-      key: 'patricia', name: 'Patricia Fuentes', photo: '/tutores/patricia-fuentes.png', cat: 4, dpi: '2567890120101', phone: '+502 5555-1006',
+      key: 'patricia', name: 'Patricia Fuentes', photo: '/personas/patricia-fuentes.png', cat: 4, dpi: '2567890120101', phone: '+502 5555-1006',
       street: 'Zona 15, Guatemala', coords: { lat: 14.6050, lng: -90.4900 }, baseRate: 220, ratePerKm: 8, avgRating: 4.9, reviewCount: 9,
       bio: 'Maestra en Investigación Educativa. Acompaña a estudiantes de posgrado en el diseño y la redacción de su tesis.',
       course: { title: 'Asesoría de tesis y metodología de investigación', description: 'Planteamiento del problema, marco teórico, método y revisión de avances.', modalities: ['virtual', 'presencial-estudiante'] },
     },
     {
-      key: 'ricardo', name: 'Ricardo Alvarado', photo: '/tutores/ricardo-alvarado.png', cat: 0, dpi: '1764532980101', phone: '+502 5555-1007',
+      key: 'ricardo', name: 'Ricardo Alvarado', photo: '/personas/ricardo-alvarado.png', cat: 0, dpi: '1764532980101', phone: '+502 5555-1007',
       street: 'Zona 9, Guatemala', coords: { lat: 14.6040, lng: -90.5110 }, baseRate: 100, ratePerKm: 5, avgRating: 4.4, reviewCount: 6,
       bio: 'Profesor de francés y portugués con residencia en Francia y Brasil. Clases conversacionales para viajeros.',
       course: { title: 'Francés para viajeros', description: 'Frases y vocabulario útiles para viajar, con práctica de pronunciación.', modalities: ['virtual', 'presencial-tutor'] },

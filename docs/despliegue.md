@@ -284,6 +284,22 @@ si no, usa `mongodb://admin:<password>@localhost:27017/educaspot?authSource=admi
      valor en ambos; `.env.local` no se versiona).
    - Producción: secret `GOOGLE_CLIENT_ID` del entorno `DEPLOY_PRD` (ver sección 4).
 
+## Caché de los clientes
+
+Para que nadie vea una versión vieja tras publicar:
+
+- `frontend-react/nginx.conf`: los archivos de `/assets/` llevan un hash en el nombre y se
+  guardan un año; todo lo demás (`index.html`, el favicon, `/personas/…`) lleva
+  `Cache-Control: no-cache`, es decir, el navegador pregunta si cambió y solo lo descarga de
+  nuevo si cambió.
+- `backend-express/src/server.ts`: toda la API responde `Cache-Control: no-store`.
+- Pestañas ya abiertas: `UpdateBanner` compara el commit con el que se compiló la página con el
+  de `GET /api/version` al volver a la pestaña y cada 10 minutos; si difieren, avisa «Hay una
+  versión nueva» con un botón para recargar. En desarrollo local no actúa (no hay commit).
+- Las carpetas de `frontend-react/public/` no deben llamarse igual que una ruta de la app
+  (por eso las fotos están en `/personas` y no en `/tutores`): nginx serviría el directorio en
+  lugar de caer en `index.html`.
+
 ## Troubleshooting
 
 - **Los contenedores quedaron "Exited" después de un reinicio del

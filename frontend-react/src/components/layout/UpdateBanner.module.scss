@@ -1,0 +1,52 @@
+@use '../../styles/variables' as *;
+
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: $space-4;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  max-width: calc(100% - #{$space-8});
+  padding: $space-3 $space-4;
+  background: $color-surface;
+  color: $color-text;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  font-size: $font-size-sm;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.update,
+.later {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  height: 32px;
+  padding: 0 $space-3;
+  border-radius: $radius-md;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg { width: 14px; height: 14px; }
+}
+
+.update {
+  background: $color-primary;
+  border: 1px solid $color-primary;
+  color: $on-accent-text;
+}
+
+.later {
+  background: none;
+  border: 1px solid transparent;
+  color: $color-text-muted;
+
+  &:hover { color: $color-text; }
+}
