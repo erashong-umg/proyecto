@@ -14,12 +14,12 @@ interface Teacher {
 
 // Personas de ejemplo de la demo (las mismas del seed). Las fotos viven en public/tutores.
 const TEACHERS: Teacher[] = [
-  { name: 'María López', subject: 'Inglés y desarrollo web', line: 'Ocho años enseñando inglés conversacional a profesionales.', photo: '/tutores/maria-lopez.png', rating: '4.8' },
-  { name: 'Juan Pérez', subject: 'Natación y crossfit', line: 'Entrenador certificado: técnica de nado y resistencia.', photo: '/tutores/juan-perez.png', rating: '4.5' },
-  { name: 'Laura Sandoval', subject: 'Matemática', line: 'Cálculo y álgebra explicados paso a paso, sin prisa.', photo: '/tutores/laura-sandoval.png', rating: '4.9' },
-  { name: 'Diego Morales', subject: 'Programación', line: 'Aprenda Python con proyectos pequeños y prácticos.', photo: '/tutores/diego-morales.png', rating: '4.6' },
-  { name: 'Patricia Fuentes', subject: 'Asesoría de tesis', line: 'Acompaña a estudiantes de posgrado desde la idea hasta la defensa.', photo: '/tutores/patricia-fuentes.png', rating: '4.9' },
-  { name: 'Ricardo Alvarado', subject: 'Francés y portugués', line: 'Clases conversacionales para viajeros.', photo: '/tutores/ricardo-alvarado.png', rating: '4.4' },
+  { name: 'María López', subject: 'Inglés y desarrollo web', line: 'Ocho años enseñando inglés conversacional a profesionales.', photo: '/personas/maria-lopez.png', rating: '4.8' },
+  { name: 'Juan Pérez', subject: 'Natación y crossfit', line: 'Entrenador certificado: técnica de nado y resistencia.', photo: '/personas/juan-perez.png', rating: '4.5' },
+  { name: 'Laura Sandoval', subject: 'Matemática', line: 'Cálculo y álgebra explicados paso a paso, sin prisa.', photo: '/personas/laura-sandoval.png', rating: '4.9' },
+  { name: 'Diego Morales', subject: 'Programación', line: 'Aprenda Python con proyectos pequeños y prácticos.', photo: '/personas/diego-morales.png', rating: '4.6' },
+  { name: 'Patricia Fuentes', subject: 'Asesoría de tesis', line: 'Acompaña a estudiantes de posgrado desde la idea hasta la defensa.', photo: '/personas/patricia-fuentes.png', rating: '4.9' },
+  { name: 'Ricardo Alvarado', subject: 'Francés y portugués', line: 'Clases conversacionales para viajeros.', photo: '/personas/ricardo-alvarado.png', rating: '4.4' },
 ];
 
 const HERO_TEACHERS = [TEACHERS[0], TEACHERS[1], TEACHERS[2]];

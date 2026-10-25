@@ -44,6 +44,12 @@ app.use(express.json());
 app.use(morgan(env.LOG_LEVEL));
 
 // Rutas de la API
+// La API nunca se guarda en caché del navegador ni de proxys intermedios: son datos vivos
+// (reservas, mensajes, sesión) y una copia vieja se vería como un error.
+app.use('/api', (_req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 app.use('/api', metaRoutes);   // /api/health y /api/version
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

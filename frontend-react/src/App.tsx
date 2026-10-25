@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from './store/authStore';
 import { AppRouter } from './router';
 import { VersionBadge } from './components/layout/VersionBadge';
+import { UpdateBanner } from './components/layout/UpdateBanner';
 import { GuidedTour } from './components/tour/GuidedTour';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <AppRouter />
       <GuidedTour />
       <VersionBadge />
+      <UpdateBanner />
     </>
   );
 }
