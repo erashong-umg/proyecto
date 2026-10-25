@@ -347,6 +347,8 @@ render con un "Cargando…" mientras `useAuth().isLoading` es `true`, para no
 parpadear contenido protegido antes de que `authStore.initialize()`
 resuelva.
 
+Cada rol ve solo lo suyo: la búsqueda y el perfil de tutores (`/tutores`, `/tutores/:id`) son del estudiante, el tutor entra por su panel (`/tutor/*`) y el administrador por `/admin`. El encabezado y el botón del inicio se adaptan al rol.
+
 ### Capa de API (`src/services/api.ts`)
 
 Instancia única de Axios (`baseURL: '/api'`). Un interceptor de request
