@@ -193,8 +193,10 @@ El inicio de sesión se realiza en `/login`, accesible con el botón
 **Acceso rápido:** si Google está habilitado, el botón de Google va arriba y es la
 entrada principal; el correo y la contraseña quedan plegados bajo **"Usar correo y
 contraseña"** para no sobrecargar la pantalla. Si Google no está habilitado, el
-formulario de correo se muestra abierto. Desde el login, Google solo entra a
-cuentas que ya existen: para crear una hay que usar **Crear cuenta** y elegir el rol.
+formulario de correo se muestra abierto. Si es la **primera vez** que usa esa cuenta
+de Google, no se le muestra un error: la pantalla le dice "Es su primera vez aquí" y le
+pregunta si quiere unirse como **estudiante** o **tutor**; al elegir, crea la cuenta en
+el momento y pasa al onboarding, sin volver a pedir nada a Google.
 
 Pasos con correo:
 
@@ -218,13 +220,14 @@ automáticamente:
 También puede ingresar con el botón de **Google** (se muestra solo si el
 servicio está habilitado). Elija su cuenta de Google y el sistema inicia
 sesión si ya tiene cuenta (si usted se había registrado con ese mismo correo, el
-sistema la vincula). Para **crear** una cuenta con Google hay que hacerlo desde
-**Crear cuenta**: primero elija arriba si es estudiante o tutor, y luego pulse
-el botón de Google; se crea con el nombre, el correo y la foto de su cuenta de
-Google y pasa al registro de su perfil (onboarding). Si pulsa el botón desde
-**Iniciar sesión** y todavía no tiene cuenta, el sistema se lo indica y no crea
-nada, porque el rol no se puede cambiar después. Las cuentas creadas con Google
-no tienen contraseña: ingresan siempre con el botón de Google.
+sistema la vincula). Para **crear** una cuenta con Google puede hacerlo desde
+**Crear cuenta** (elija primero si es estudiante o tutor y luego pulse el botón de
+Google) o directamente desde **Iniciar sesión**: en ese caso, si todavía no tiene
+cuenta, el sistema le pregunta el rol en ese momento. Se crea con el nombre, el
+correo y la foto de su cuenta de Google y pasa al registro de su perfil
+(onboarding). Como el rol no se puede cambiar después, nunca se asigna uno sin que
+usted lo elija. Las cuentas creadas con Google no tienen contraseña: ingresan siempre
+con el botón de Google.
 
 El enlace **"¿Olvidó su contraseña?"** se muestra en el formulario, pero a
 la fecha de este manual la recuperación de contraseña no se encuentra

@@ -899,3 +899,7 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
 - **Acceso rápido:** en `/login` y `/register`, con Google habilitado, el botón de
   Google es la entrada principal y el formulario de correo queda plegado; sin
   `VITE_GOOGLE_CLIENT_ID` se muestra abierto.
+- **Primer ingreso con Google desde el login:** `POST /api/auth/google` sin `role` y sin
+  cuenta responde 404 con `details.code = 'GOOGLE_ACCOUNT_NOT_FOUND'`; `useLoginForm` lo
+  reconoce, guarda la credencial y muestra "Es su primera vez aquí" con el selector de rol, y
+  reenvía la misma credencial con el rol elegido (`completeGoogleSignup`).
