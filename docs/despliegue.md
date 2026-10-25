@@ -182,8 +182,14 @@ A partir de aquí, cada push/merge a `main` dispara
 
 1. Construye y publica `ghcr.io/erashong-umg/proyecto-backend` y
    `...-frontend` (tags `latest` y el SHA del commit).
-2. Se conecta por SSH y corre `podman-compose pull && up -d` en
-   `~/apps/educaspot`.
+2. Se conecta por SSH y, en `~/apps/educaspot`, corre `podman-compose pull`,
+   elimina los contenedores `educaspot_backend_1` y `educaspot_frontend_1` y
+   corre `podman-compose up -d`. Los elimina a propósito: `podman-compose up -d`
+   no recrea un contenedor ya existente aunque haya una imagen nueva ni aplica
+   un `.env` distinto (solo lo vuelve a arrancar), y el servidor se quedaba con
+   el código anterior. Mongo no se toca; sus datos están en el volumen.
+3. Verifica que el backend (`:4000/api/health`) y el frontend (`:8080`)
+   respondan; si no, el job falla y muestra el log del backend.
 
 ### Desplegar una rama a mano (lista de ramas)
 
