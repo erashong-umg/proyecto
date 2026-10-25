@@ -61,10 +61,14 @@ Los tests de integración requieren que el contenedor de MongoDB esté corriendo
 
 ## Despliegue
 
-El repositorio incluye `backend-express/Dockerfile` y `backend-express/render.yaml` como evidencia de portabilidad (build multi-stage, listo para un proveedor tipo Render). El despliegue real del proyecto, sin embargo, es **local** (`npm run dev` en ambos proyectos) por restricciones de tiempo del curso.
+La aplicación se publica en un servidor propio con **GitHub Actions + Podman + nginx**: cada integración en `main` construye las imágenes del backend y del frontend y las despliega por SSH. También se puede desplegar a mano cualquier rama (`main`, `release` o `develop`) desde *Actions → Deploy → Run workflow*. La versión que corre se ve en el badge de la esquina inferior izquierda y en `/api/version`.
+
+Guía completa en [docs/despliegue.md](docs/despliegue.md); cómo llega un cambio a producción, en [docs/flujo-de-ramas.md](docs/flujo-de-ramas.md). Para desarrollo local: `npm run dev` en ambos proyectos (ver *Arranque rápido*). `backend-express/render.yaml` se conserva como evidencia de portabilidad a otro proveedor.
 
 ## Documentación
 
+- [Flujo de ramas y publicación](docs/flujo-de-ramas.md) — `develop` → `release` → `main`
+- [Despliegue](docs/despliegue.md)
 - [Manual técnico](docs/manual-tecnico.md)
 - [Manual de usuario](docs/manual-usuario.md)
 
