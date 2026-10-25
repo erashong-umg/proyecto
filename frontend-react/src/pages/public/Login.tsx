@@ -3,11 +3,13 @@ import { useLoginForm } from '../../hooks/useLoginForm';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { AuthBrandPanel } from '../../components/auth/AuthBrandPanel';
+import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
+import { isGoogleEnabled } from '../../services/google';
 import { AuthBrandLink } from '../../components/auth/AuthBrandLink';
 import styles from './Auth.module.scss';
 
 export const LoginPage = () => {
-  const { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleStub } = useLoginForm();
+  const { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential } = useLoginForm();
 
   return (
     <div className={styles.auth}>
@@ -44,11 +46,12 @@ export const LoginPage = () => {
             Iniciar sesión
           </Button>
 
-          <div className={styles.divider}>o</div>
-
-          <Button type="button" variant="secondary" size="lg" onClick={handleGoogleStub}>
-            Continuar con Google (stub)
-          </Button>
+          {isGoogleEnabled && (
+            <>
+              <div className={styles.divider}>o</div>
+              <GoogleSignInButton text="signin_with" onCredential={handleGoogleCredential} />
+            </>
+          )}
 
           <p className={styles.footer}>
             ¿No tiene cuenta? <Link to="/register">Crear cuenta</Link>

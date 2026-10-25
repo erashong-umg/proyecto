@@ -4,11 +4,13 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { RoleSelector } from '../../components/auth/RoleSelector';
 import { AuthBrandPanel } from '../../components/auth/AuthBrandPanel';
+import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
+import { isGoogleEnabled } from '../../services/google';
 import { AuthBrandLink } from '../../components/auth/AuthBrandLink';
 import styles from './Auth.module.scss';
 
 export const RegisterPage = () => {
-  const { form, setRole, handleChange, error, isLoading, handleSubmit } = useRegisterForm();
+  const { form, setRole, handleChange, error, isLoading, handleSubmit, handleGoogleCredential } = useRegisterForm();
 
   return (
     <div className={styles.auth}>
@@ -31,6 +33,13 @@ export const RegisterPage = () => {
           <Button type="submit" isLoading={isLoading} size="lg" className={styles.submit}>
             Crear cuenta
           </Button>
+
+          {isGoogleEnabled && (
+            <>
+              <div className={styles.divider}>o</div>
+              <GoogleSignInButton text="signup_with" onCredential={handleGoogleCredential} />
+            </>
+          )}
 
           <p className={styles.footer}>
             ¿Ya tiene cuenta? <Link to="/login">Iniciar sesión</Link>
