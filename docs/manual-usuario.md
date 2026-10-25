@@ -373,8 +373,24 @@ Esta es la vista del **estudiante** en `/mis-reservas`, accesible desde
 **"Mis reservas"** en el encabezado (solo visible para estudiantes
 autenticados).
 
-Muestra todas sus tutorías reservadas — pasadas y futuras — como una lista
-de tarjetas, cada una con:
+**Dos formas de verlas:** arriba hay un selector **Lista | Calendario** (la elección se
+recuerda en su navegador). Con **Calendario** ve su agenda en tres vistas, que se
+cambian con los botones **Día**, **Semana** y **Mes**:
+
+- **Semana** (la de inicio): siete columnas con las horas del día; cada reserva ocupa su
+  hora y su duración.
+- **Día**: una sola columna del día elegido.
+- **Mes**: la cuadrícula del mes con las reservas de cada día (hasta tres, y "+N más"
+  para abrir ese día).
+
+Los botones **‹ ›** y **Hoy** mueven la fecha; pulsar el número de un día abre su vista
+de **Día**. Los colores indican el estado (confirmada, completada; las canceladas se
+muestran, tachadas, solo si marca **Mostrar canceladas**). Al elegir una reserva en el
+calendario, debajo aparece su tarjeta con las mismas acciones que en la lista
+(cancelar, calificar, reportar).
+
+En la **lista**, todas sus tutorías reservadas — pasadas y futuras — salen como tarjetas,
+cada una con:
 
 - Título del curso y nombre del tutor ("con [nombre del tutor]").
 - Estado de la reserva: **Pendiente**, **Confirmada**, **Completada** o
@@ -480,9 +496,10 @@ modalidad presencial.
 
 ### 9.4 Reservas recibidas (`/tutor/reservas`)
 
-Lista, con el mismo formato de tarjetas que "Mis reservas" del estudiante,
-todas las tutorías que le agendaron, identificando en cada una al
-estudiante correspondiente ("Estudiante: [nombre]").
+Igual que "Mis reservas" del estudiante, con el selector **Lista | Calendario** (vistas
+de **Día**, **Semana** y **Mes**; vea la sección 8): todas las tutorías que le agendaron,
+identificando en cada una al estudiante correspondiente ("Estudiante: [nombre]"). En el
+calendario se ve de un vistazo la agenda de la semana y los huecos libres.
 
 Desde aquí puede:
 

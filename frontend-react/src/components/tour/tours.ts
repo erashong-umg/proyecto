@@ -62,7 +62,7 @@ export const TOURS: Record<TourId, TourDef> = {
       {
         target: '[data-tour="reservas-lista"]',
         title: 'Sus tutorías',
-        content: 'Aquí están sus reservas. Las tutorías se marcan como completadas solas al terminar; entonces podrá calificarlas o reportar un problema.',
+        content: 'Aquí están sus reservas, en lista o en calendario (día, semana y mes). Las tutorías se marcan como completadas solas al terminar; entonces podrá calificarlas o reportar un problema.',
         placement: 'top',
       },
     ],
