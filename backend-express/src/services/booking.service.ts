@@ -6,6 +6,10 @@ import { quoteTrip, type LatLng } from './geo.service';
 import { Conflict, BadRequest, NotFound } from '../utils/errors';
 import type { Modality } from '../models/Course';
 import { Availability } from '../models/Availability';
+import { dayOfWeekOfKey, formatHHMM, isDateKey, zonedParts, zonedTimeToUtc } from '../utils/time';
+
+// Una sola vez, o suscripción semanal de 4 u 8 semanas.
+export const REPEAT_OPTIONS = [1, 4, 8];
 
 export interface CreateBookingInput {
   tutorId: string;
@@ -21,9 +25,11 @@ export interface CreateBookingInput {
  * Verifica que el slot cae dentro de la disponibilidad del tutor.
  */
 const tutorIsAvailable = (availability: { slots: { dayOfWeek: number; startMinute: number; endMinute: number }[] }, startsAt: Date, endsAt: Date): boolean => {
-  const startMin = startsAt.getHours() * 60 + startsAt.getMinutes();
-  const endMin = endsAt.getHours() * 60 + endsAt.getMinutes();
-  const dow = startsAt.getDay();              // 0=Dom, 6=Sáb
+  // Hora local de la academia (no la del servidor, que en Docker es UTC).
+  const start = zonedParts(startsAt);
+  const startMin = start.minuteOfDay;
+  const endMin = startMin + Math.round((endsAt.getTime() - startsAt.getTime()) / 60000);
+  const dow = start.dayOfWeek;                // 0=Dom, 6=Sáb
 
   return availability.slots.some(
     (slot) =>
@@ -67,7 +73,10 @@ export const createBooking = async (
   const { tutorId, courseId, startsAt, durationMin, modality, repeatWeeks = 1 } = input;
 
   if (durationMin < 15) throw BadRequest('La duración mínima es 15 minutos.');
-  if (repeatWeeks < 1 || repeatWeeks > 12) throw BadRequest('Las repeticiones deben estar entre 1 y 12.');
+  if (!REPEAT_OPTIONS.includes(repeatWeeks)) {
+    throw BadRequest('La suscripción periódica es de 4 u 8 semanas (o una sola vez).');
+  }
+  if (startsAt.getTime() <= Date.now()) throw BadRequest('No se puede reservar en el pasado.');
 
   const tutor = await User.findById(tutorId).select('role tutorData address').lean();
   if (!tutor || tutor.role !== 'tutor') throw NotFound('Tutor no encontrado.');
@@ -100,13 +109,12 @@ export const createBooking = async (
     priceBreakdown = { distanceKm: undefined, baseAmount, transportAmount: 0, total: baseAmount };
   }
 
-  // Disponibilidad del tutor (solo si no es virtual)
+  // Disponibilidad del tutor: una sola regla para todas las modalidades (también
+  // las virtuales se reservan dentro de los horarios que el tutor publicó).
   const availability = await Availability.findOne({ tutorId }).lean();
-  if (availability && modality !== 'virtual') {
-    const endsAt = new Date(startsAt.getTime() + durationMin * 60 * 1000);
-    if (!tutorIsAvailable(availability, startsAt, endsAt)) {
-      throw BadRequest('El horario seleccionado no está dentro de la disponibilidad del tutor.');
-    }
+  const firstEnd = new Date(startsAt.getTime() + durationMin * 60 * 1000);
+  if (!availability || !tutorIsAvailable(availability, startsAt, firstEnd)) {
+    throw BadRequest('El horario seleccionado no está dentro de la disponibilidad del tutor.');
   }
 
   // Generar N bookings (1 por semana)
@@ -154,21 +162,92 @@ export const cancelBooking = async (userId: Types.ObjectId, bookingId: string): 
 
   if (booking.status === 'cancelled') return booking;
   if (booking.status === 'completed') throw BadRequest('No se puede cancelar una tutoría ya completada.');
+  if (booking.startsAt.getTime() <= Date.now()) throw BadRequest('La tutoría ya comenzó y no se puede cancelar.');
 
   booking.status = 'cancelled';
   await booking.save();
   return booking;
 };
 
-export const completeBooking = async (userId: Types.ObjectId, bookingId: string): Promise<IBooking> => {
-  const booking = await Booking.findById(bookingId);
-  if (!booking) throw NotFound('Reserva no encontrada.');
+/**
+ * Las tutorías se completan solas: una reserva confirmada cuyo horario ya terminó
+ * pasa a "completada" (no hay botón manual). Se aplica al consultar las reservas y
+ * antes de calificar, sin tarea programada.
+ */
+export const syncCompletedBookings = async (filter: Record<string, unknown> = {}): Promise<void> => {
+  await Booking.updateMany(
+    { ...filter, status: 'confirmed', endsAt: { $lt: new Date() } },
+    { $set: { status: 'completed' } }
+  );
+};
 
-  // Solo el tutor o el estudiante dueño pueden marcarla como completed
-  const isOwner = booking.studentId.equals(userId) || booking.tutorId.equals(userId);
-  if (!isOwner) throw NotFound('Reserva no encontrada.');
+export interface FreeSlot {
+  startsAt: string;   // ISO UTC: lo que se envía al reservar
+  label: string;      // "09:30" en hora de la academia: lo que se muestra
+}
 
-  booking.status = 'completed';
-  await booking.save();
-  return booking;
+const SLOT_STEP_MIN = 30;
+
+/**
+ * Horas de inicio posibles de un tutor en una fecha: dentro de sus horarios
+ * publicados, sin chocar con otras tutorías del tutor ni del estudiante, y — si es
+ * una suscripción de 4 u 8 semanas — libres todas las semanas. Así el estudiante
+ * solo ve opciones que de verdad se pueden reservar.
+ */
+export const getFreeSlots = async (input: {
+  tutorId: string;
+  studentId: Types.ObjectId;
+  date: string;          // "YYYY-MM-DD" (fecha local de la academia)
+  durationMin: number;
+  repeatWeeks?: number;
+}): Promise<FreeSlot[]> => {
+  const { tutorId, studentId, date, durationMin, repeatWeeks = 1 } = input;
+
+  if (!isDateKey(date)) throw BadRequest('La fecha debe tener el formato AAAA-MM-DD.');
+  if (!Number.isInteger(durationMin) || durationMin < 15 || durationMin > 240) {
+    throw BadRequest('La duración debe estar entre 15 y 240 minutos.');
+  }
+  if (!REPEAT_OPTIONS.includes(repeatWeeks)) {
+    throw BadRequest('La suscripción periódica es de 4 u 8 semanas (o una sola vez).');
+  }
+
+  const availability = await Availability.findOne({ tutorId }).lean();
+  if (!availability) return [];
+
+  const dow = dayOfWeekOfKey(date);
+  const candidates: Date[] = [];
+  for (const slot of availability.slots.filter((s) => s.dayOfWeek === dow)) {
+    for (let m = slot.startMinute; m + durationMin <= slot.endMinute; m += SLOT_STEP_MIN) {
+      candidates.push(zonedTimeToUtc(date, m));
+    }
+  }
+
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const durationMs = durationMin * 60 * 1000;
+  const now = Date.now();
+  const future = candidates.filter((c) => c.getTime() > now);
+  if (future.length === 0) return [];
+
+  // Una sola consulta con todo lo que pueda chocar, y los cruces se calculan en memoria.
+  const rangeStart = new Date(Math.min(...future.map((c) => c.getTime())));
+  const rangeEnd = new Date(Math.max(...future.map((c) => c.getTime())) + (repeatWeeks - 1) * WEEK_MS + durationMs);
+  const busy = await Booking.find({
+    status: { $in: ['pending', 'confirmed'] },
+    startsAt: { $lt: rangeEnd },
+    endsAt: { $gt: rangeStart },
+    $or: [{ tutorId: new Types.ObjectId(tutorId) }, { studentId }],
+  }).select('startsAt endsAt').lean();
+
+  const isFree = (start: number): boolean => {
+    for (let w = 0; w < repeatWeeks; w++) {
+      const s = start + w * WEEK_MS;
+      const e = s + durationMs;
+      if (busy.some((b) => b.startsAt.getTime() < e && b.endsAt.getTime() > s)) return false;
+    }
+    return true;
+  };
+
+  return future
+    .filter((c) => isFree(c.getTime()))
+    .map((c) => ({ startsAt: c.toISOString(), label: formatHHMM(zonedParts(c).minuteOfDay) }));
 };
