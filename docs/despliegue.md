@@ -161,6 +161,17 @@ mano ya no tiene efecto después del siguiente push a `main`.
 `GITHUB_TOKEN` (usado para publicar en GHCR) es automático, no hay que
 crearlo.
 
+### Variable `GOOGLE_CLIENT_ID` (inicio de sesión con Google)
+
+A diferencia de los secrets anteriores, el Client ID de Google **no es un
+secreto**: se carga como *variable* de Actions (Settings → Secrets and
+variables → Actions → pestaña **Variables** → `GOOGLE_CLIENT_ID`). El workflow
+la usa en dos lugares: como argumento de build del frontend
+(`VITE_GOOGLE_CLIENT_ID`, se compila dentro del SPA) y escrita en el `.env`
+del servidor para el backend. Si no está definida, el botón de Google
+simplemente no aparece y `POST /api/auth/google` responde 503. Cómo obtener el
+Client ID: sección 7.
+
 ## 5. Uso diario
 
 A partir de aquí, cada push/merge a `main` dispara
@@ -195,6 +206,27 @@ servidor — no el placeholder de `.env.example`). El host/puerto locales
 (`localhost:27017`) los resuelve el túnel, no hace falta ponerlos en la
 cadena de conexión si tu cliente ya asume `localhost:27017` por defecto;
 si no, usa `mongodb://admin:<password>@localhost:27017/educaspot?authSource=admin`.
+
+## 7. Inicio de sesión con Google (Google Cloud)
+
+1. En [Google Cloud Console](https://console.cloud.google.com/) cree (o elija)
+   un proyecto → **APIs y servicios → Pantalla de consentimiento de OAuth**:
+   tipo *Externo*, nombre de la app, correo de soporte. Mientras esté en
+   modo *Prueba*, solo pueden ingresar los correos que agregue como
+   *usuarios de prueba*; para abrirlo a cualquiera hay que publicarla.
+2. **Credenciales → Crear credenciales → ID de cliente de OAuth** → tipo
+   *Aplicación web*.
+3. **Orígenes de JavaScript autorizados** (sin barra final ni ruta):
+   - `http://localhost:5173` (desarrollo)
+   - `https://<DOMAIN>` (producción, p. ej. `https://educaspot.yettotools.com`)
+
+   No hace falta URI de redireccionamiento: se usa el botón de Google
+   Identity Services, no un redirect.
+4. Copie el **ID de cliente** (`xxxx.apps.googleusercontent.com`):
+   - Desarrollo: `backend-express/.env` → `GOOGLE_CLIENT_ID=...` y
+     `frontend-react/.env.local` → `VITE_GOOGLE_CLIENT_ID=...` (el mismo
+     valor en ambos; `.env.local` no se versiona).
+   - Producción: variable de Actions `GOOGLE_CLIENT_ID` (ver sección 4).
 
 ## Troubleshooting
 
