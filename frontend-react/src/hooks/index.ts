@@ -23,6 +23,6 @@ export { useAdminAnalytics } from './useAdminAnalytics';
 export type { AdminAnalytics, AdminTopTutor, AdminCategoryDemand, AdminMonthlyStat } from './useAdminAnalytics';
 export { useChatThreads } from './useChatThreads';
 export { useChatMessages } from './useChatMessages';
-export { useSendMessage } from './useSendMessage';
+export { useChatPeer } from './useChatPeer';
 export { useApplyCustomTheme } from './useApplyCustomTheme';
 export { useAdminTheme } from './useAdminTheme';

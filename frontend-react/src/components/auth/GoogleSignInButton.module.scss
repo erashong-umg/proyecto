@@ -1,0 +1,15 @@
+@use '../../styles/variables' as *;
+
+.container {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  width: 100%;
+}
+
+.error {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  text-align: center;
+  margin: 0;
+}

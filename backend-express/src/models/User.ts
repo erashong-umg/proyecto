@@ -2,6 +2,13 @@ import mongoose, { Schema, model, Types, type Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import type { IAddress, ITutorData, UserRole, UserStatus } from '../types/express';
 
+export type IdDocumentType = 'dpi' | 'pasaporte';
+
+export interface IIdDocument {
+  type: IdDocumentType;
+  number: string;           // normalizado: sin espacios ni guiones, en mayúsculas
+}
+
 export interface IUser extends Document {
   _id: Types.ObjectId;
   email: string;
@@ -13,11 +20,13 @@ export interface IUser extends Document {
   suspensionReason?: string;
   suspensionDate?: Date;
   onboardingCompleted: boolean;
+  lastSeenAt?: Date;        // última desconexión del chat ("últ. vez")
 
   // Perfil
   photoUrl?: string;
   phone?: string;
   gender?: 'M' | 'F' | 'other';
+  idDocument?: IIdDocument;  // documento de identificación personal (dato sensible, select: false)
   address?: IAddress;
   categoryIds: Types.ObjectId[];
 
@@ -59,6 +68,14 @@ const tutorDataSchema = new Schema<ITutorData>(
   { _id: false }
 );
 
+const idDocumentSchema = new Schema<IIdDocument>(
+  {
+    type: { type: String, enum: ['dpi', 'pasaporte'], required: true },
+    number: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -70,10 +87,14 @@ const userSchema = new Schema<IUser>(
     suspensionReason: { type: String },
     suspensionDate: { type: Date },
     onboardingCompleted: { type: Boolean, default: false },
+    lastSeenAt: { type: Date },
 
     photoUrl: { type: String },
     phone: { type: String },
     gender: { type: String, enum: ['M', 'F', 'other'] },
+    // Dato sensible: no se devuelve en ninguna consulta salvo que se pida con
+    // .select('+idDocument') (hoy solo la revisión de tutores del admin).
+    idDocument: { type: idDocumentSchema, select: false },
     address: { type: addressSchema },
     categoryIds: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
 
@@ -83,6 +104,13 @@ const userSchema = new Schema<IUser>(
     resetPasswordExpires: { type: Date, select: false },
   },
   { timestamps: true }
+);
+
+// Un mismo documento no puede estar en dos cuentas. Parcial: las cuentas sin
+// documento (admin, Google sin onboarding) no entran en el índice.
+userSchema.index(
+  { 'idDocument.type': 1, 'idDocument.number': 1 },
+  { unique: true, partialFilterExpression: { 'idDocument.number': { $type: 'string' } } }
 );
 
 // Hash automático del password antes de guardar

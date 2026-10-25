@@ -1,0 +1,18 @@
+@use '../../styles/variables' as *;
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text;
+
+  &:hover { text-decoration: none; }
+}
+
+.mark {
+  color: $color-primary;
+  flex-shrink: 0;
+}

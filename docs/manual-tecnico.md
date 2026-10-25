@@ -113,7 +113,8 @@ servidor HTTP (`setupSockets(io)` en `server.ts`). El handshake de conexión
 exige el mismo JWT que REST, enviado como `auth.token` (no como header, por
 ser WebSocket) — ver `src/sockets/index.ts`. Cada socket se une a una room
 personal `user:<id>` para recibir mensajes dirigidos sin necesidad de salas
-por conversación.
+por conversación: un mensaje llega a todas las pestañas de ambos
+participantes aunque no tengan abierta esa conversación.
 
 ## 3. Componentes principales del backend
 
@@ -141,9 +142,16 @@ Cada uno expone funciones async `(req, res, next)` que **nunca** responden el
 error directamente — siempre `next(error)` hacia `errorMiddleware`:
 
 - `auth.controller.ts` — `register`, `login`, `logout` (no-op, token sin
-  estado), `me`, `googleStub` (D4, ver §10), `forgotPassword`/`resetPassword`.
+  estado), `me`, `googleLogin` (OAuth 2.0 con Google, D4 — ver §10), `forgotPassword`/`resetPassword`.
 - `user.controller.ts` — `getMe`, `updateMe`, `completeOnboarding` (marca
-  `onboardingCompleted` tras el wizard de 5 pasos del frontend).
+  `onboardingCompleted` tras el wizard de 5 pasos del frontend). El onboarding
+  exige el **documento de identificación** (`User.idDocument`): DPI de 13
+  dígitos o pasaporte de 6 a 20 caracteres, validado con `idDocumentSchema` y
+  guardado normalizado (sin espacios ni guiones). Es un dato sensible:
+  el campo es `select: false`, no sale en `/users/me` ni en ninguna respuesta
+  pública, y solo lo ve el administrador en la revisión de tutores pendientes
+  (`GET /api/admin/tutors/pending`). Un índice único parcial impide usar el
+  mismo documento en dos cuentas (responde 409).
 - `category.controller.ts` — `listCategories` (pública), `createCategory` /
   `deleteCategory` (exportadas pero **sin router propio montado** — ver
   nota de F4 abajo).
@@ -222,8 +230,21 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
 
 `index.ts` monta un middleware de autenticación de Socket.io (mismo JWT que
 REST, vía `socket.handshake.auth.token`) y une cada conexión a la room
-`user:<id>`. `chat.handler.ts` implementa el envío de mensajes y el
-acknowledge de lectura (✓ enviado → ✓ recibido, D7 — ver §10).
+`user:<id>`. `chat.handler.ts` implementa el chat estilo WhatsApp (D7 — ver §10);
+`presence.ts` lleva en memoria cuántos sockets tiene cada usuario.
+
+| Evento (cliente → servidor) | Efecto |
+|---|---|
+| `chat:join` / `chat:leave` | Abre/cierra una conversación: devuelve datos del contacto y su presencia, y suscribe a `presence:update` |
+| `chat:message` `{ otherUserId, content, clientId }` | Guarda y emite `chat:message` a ambos usuarios; `clientId` hace idempotente el reenvío |
+| `chat:read` `{ messageIds }` | Marca como leídos (solo mensajes ajenos de sus threads) y emite `chat:read` al remitente |
+| `chat:typing` `{ otherUserId, isTyping }` | Retransmite "escribiendo…" al otro usuario (efímero) |
+
+Eventos servidor → cliente: `chat:message`, `chat:delivered` (el destinatario
+recibió; también al conectarse tras estar offline), `chat:read`, `chat:typing`
+y `presence:update` (en línea / `lastSeenAt`). El estado de cada mensaje propio
+se deriva de `deliveredTo` / `readBy`: ✓ enviado, ✓✓ entregado, ✓✓ azul leído.
+La presencia en memoria es válida para una sola instancia del servidor.
 
 ### Rutas montadas en `server.ts`
 
@@ -290,7 +311,7 @@ D1). Se re-exportan todos desde `hooks/index.ts` como barrel file.
 - `authStore.ts` — `user`, `isAuthenticated`, `isLoading`, `isSuspended`;
   acciones `initialize` (lee el token de `localStorage` bajo la clave
   `edumarket_token` y llama a `/auth/me`), `login`, `register`,
-  `googleStub`, `logout`, `refreshUser`. Es el único lugar que escribe el
+  `loginWithGoogle`, `logout`, `refreshUser`. Es el único lugar que escribe el
   token en `localStorage` (`TOKEN_KEY` importado de `services/api.ts`).
 - `themeStore.ts` — `theme: 'light' | 'dark' | null` (`null` = sigue al
   S.O.); `setTheme`/`toggle`; persiste en `localStorage` (`edumarket_theme`)
@@ -353,13 +374,12 @@ de `baseUrl` — cada entrada usa una ruta explícita `./src/...`):
 Dos mecanismos distintos resuelven estos alias según cómo corre el código,
 y **ambos** son necesarios:
 
-- `tsconfig-paths/register` para `ts-node-dev` (scripts `dev`/`seed`) —
-  resuelve en tiempo de ejecución, requiere que `tsconfig.json` y el propio
-  paquete estén presentes.
+- `tsx` (scripts `dev`/`seed`) — lee `paths` de `tsconfig.json` y resuelve los
+  alias en tiempo de ejecución, sin plugins adicionales.
 - `tsc-alias` como paso de post-procesamiento de `npm run build` — reescribe
   los alias a rutas relativas `require(...)` dentro del `dist/*.js` emitido,
   así el output compilado no depende en tiempo de ejecución de
-  `tsconfig.json`/`tsconfig-paths`.
+  `tsconfig.json`.
 
 `vitest.config.mts` (nótese `.mts`, no `.ts`) replica el mismo mapa en
 `resolve.alias` a mano, porque Vite/Vitest no soporta de forma nativa los
@@ -525,7 +545,7 @@ el siguiente:
   `README.md` en la raíz) usaba cookies httpOnly. El enunciado exige
   explícitamente "Toda petición protegida al backend debe validar el Bearer
   Token en los headers" / "deberá ser enviado en los headers de cada
-  solicitud", así que se migró: `register`/`login`/`googleStub` devuelven
+  solicitud", así que se migró: `register`/`login`/`googleLogin` devuelven
   `{ user, token }` en el cuerpo JSON (no hay ningún `Set-Cookie` en la
   API), `authMiddleware` lee `req.headers.authorization`, y el paquete
   `cookie-parser` fue **desinstalado** del proyecto, no solo dejado sin
@@ -559,8 +579,7 @@ el siguiente:
   build` es `tsc && tsc-alias && node -e "...cpSync(...)"`, no un `tsc`
   simple: sin `tsc-alias`, el JS compilado conserva literalmente
   `require("@middleware/auth")`, que Node no resuelve en runtime (a
-  diferencia de `ts-node-dev`, que sí resuelve alias vía
-  `tsconfig-paths/register`); y `tsc` nunca copia archivos no-`.ts` (como
+  diferencia de `tsx`, que sí resuelve alias vía `tsconfig.json`); y `tsc` nunca copia archivos no-`.ts` (como
   `favicon.ico`) a `dist/`.
 - **Usuario no-root en Docker, pero con `logs/` pre-creado y con dueño
   correcto.** El `Dockerfile` corre como `USER node` por seguridad, pero
@@ -568,7 +587,7 @@ el siguiente:
   primera vez que se requiere, y `/app` es de `root` por defecto en la
   imagen — se agregó `RUN mkdir -p logs && chown -R node:node /app` **antes**
   de `USER node` para evitar `EACCES` al arrancar.
-- **`npm run dev` en Windows y procesos zombi.** `ts-node-dev --respawn`
+- **`npm run dev` en Windows y procesos zombi.** `tsx watch`
   vigila `src/**`; un `kill $PID` en PowerShell/Git Bash a menudo no mata el
   `node.exe` subyacente — sigue reteniendo el puerto 4000 y resucita en el
   siguiente guardado de archivo. Hay que ubicar el PID real con
@@ -644,11 +663,11 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 |---|---|---|---|
 | D1 | Vistas de calendario Diaria/Semanal/Mensual | Cuadrícula de 7 días × horas, interacción de "pintar" por clic-y-arrastre (`useMyAvailability`, `TutorAvailabilityPage`) — sin librería de calendario | `react-big-calendar` con las 3 vistas |
 | D2 | Suscripción periódica de 4 u 8 semanas | Checkbox "Repetir N semanas" que crea N documentos `Booking` individuales agrupados por `recurringGroupId` | Motor de recurrencia real con job programado |
-| D3 | Ruta trazada en el mapa | Línea recta Haversine entre tutor y estudiante (`geo.service.ts::haversineKm`, visualizada con React-Leaflet) | Integración con OSRM/GraphHopper para ruta real por calles |
-| D4 | OAuth 2.0 real con Google | `POST /api/auth/google` (`googleStub`) acepta un payload simulado (`{email, name, role}` o `photoUrl`) y emite un JWT real — **sin** verificación de identidad real contra Google | `passport-google-oauth20` con verificación de id_token |
+| D3 | Ruta trazada en el mapa | Ruta real por calles con OSRM (`geo.service.ts::getRoute`, `POST /api/geo/route`), dibujada con Leaflet en `RouteMap` dentro del formulario de reserva. La distancia de la ruta es la que se cobra (`quoteTrip`) y se guarda en la reserva. Si OSRM no responde o `OSRM_URL` está vacío, cae a línea recta Haversine (trazo punteado) para no bloquear reservas | Servidor OSRM propio: el demo público (`router.project-osrm.org`) es solo para desarrollo |
+| D4 | OAuth 2.0 real con Google | **Implementado.** El botón oficial de Google Identity Services entrega un ID token; `POST /api/auth/google` lo verifica con `google-auth-library` (`google.service.ts`: firma, vigencia, audiencia = `GOOGLE_CLIENT_ID` y correo verificado) y emite el JWT propio. Crea la cuenta con nombre, correo y foto de Google, o vincula la cuenta existente con el mismo correo. Los administradores quedan excluidos (tienen `/admin/login`). Sin `GOOGLE_CLIENT_ID` el endpoint responde 503 y el frontend no muestra el botón | — |
 | D5 | Hoja de vida en PDF | Campo `cvUrl` (string, URL a archivo externo/LinkedIn/portafolio) en `tutorData` | Subida real de archivo con `multer` + almacenamiento (S3/disco) |
 | D6 | Gráficos estadísticos dinámicos | `AdminAnalyticsPage` arma gráficos de barras/dona con CSS puro sobre los tokens del design system (clases `sliceA`…`sliceF`), sin librería de charting | Chart.js o Recharts con gráficos interactivos |
-| D7 | Confirmación de lectura en chat | Acknowledge de Socket.io (✓ enviado → ✓ recibido) gestionado en `chat.handler.ts`; `Message.readBy` sí persiste en Mongo | — (ya cumple el requisito, con mecanismo simplificado) |
+| D7 | Confirmación de lectura en chat | Checks estilo WhatsApp (✓ enviado → ✓✓ entregado → ✓✓ azul leído) vía eventos de Socket.io en `chat.handler.ts`; `Message.deliveredTo` y `Message.readBy` persisten en Mongo | — (ya cumple el requisito, con mecanismo simplificado) |
 | D8 | Búsqueda geoespacial con `$geoWithin` + índice `2dsphere` | Cálculo de distancia en memoria (Haversine) sobre los candidatos ya filtrados por categoría — ver bug/decisión documentada en §8 | Índice `2dsphere` real (exige migrar `address.coords` a GeoJSON) |
 | D9 | Políticas de convivencia editables | Página estática `/politicas` (`PoliciesPage`) con texto fijo en el componente | CMS editable desde el panel de administración |
 | D10 | Foto de perfil | Campo `photoUrl` (string, URL externa o vacío) en `User` | Subida real con `multer` |

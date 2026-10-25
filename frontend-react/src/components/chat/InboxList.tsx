@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { getDeliveryStatus } from '../../services/chat';
 import { getInitials, formatRelativeTime } from '../../services/formatters';
 import type { ChatThread } from '../../types/api';
+import { MessageStatus } from './MessageStatus';
 import styles from './InboxList.module.scss';
 
 interface InboxListProps {
@@ -44,7 +46,8 @@ export const InboxList = ({ threads, activeOtherUserId, currentUserId }: InboxLi
                 </div>
                 <div className={styles.bottomRow}>
                   <span className={styles.preview}>
-                    {isMine ? 'Usted: ' : ''}{thread.lastMessage.content}
+                    {isMine && <MessageStatus status={getDeliveryStatus(thread.lastMessage, thread.otherUser._id)} />}
+                    <span className={styles.previewText}>{thread.lastMessage.content}</span>
                   </span>
                   {thread.unreadCount > 0 && (
                     <span className={styles.badge} aria-label={`${thread.unreadCount} mensajes sin leer`}>

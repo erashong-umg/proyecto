@@ -1,0 +1,21 @@
+# Documentación y artefactos de agentes de IA: nunca se versionan
+.claude/
+.omo/
+.impeccable/
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+PRODUCT.md
+
+# Dependencias y artefactos de build
+node_modules/
+dist/
+logs/
+*.log
+
+# Variables de entorno con secretos (los .env.example sí se versionan)
+.env
+.env.local
+cliente de OAuth.txt
+
+client_secret_519862388519-02hn9hbr4novio530kuvfr5hcn90cvo9.apps.googleusercontent.com.json

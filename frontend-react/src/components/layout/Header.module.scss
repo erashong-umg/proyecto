@@ -14,6 +14,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  // Mismo alto que el nav de escritorio. No depender del padding vertical: el
+  // `.container` global (padding: 0 $space-4) lo pisa, y en móvil, donde el nav
+  // está oculto, el header colapsaba a ~37px.
+  min-height: 64px;
   padding: $space-3 $space-4;
   gap: $space-4;
 }
@@ -31,6 +35,11 @@
 }
 
 .brandMark { color: $color-primary; flex-shrink: 0; }
+
+// Teléfonos muy angostos: se deja solo el logo para que quepan tema + Ingresar + menú.
+.brandText {
+  @media (max-width: 359px) { display: none; }
+}
 
 // === Nav principal (desktop) ===
 
@@ -74,6 +83,14 @@
   align-items: center;
   gap: $space-3;
   flex-shrink: 0;
+}
+
+.mobileLogin {
+  display: none;
+
+  @include respond-below(lg) {
+    display: block;
+  }
 }
 
 .authActions {
@@ -246,8 +263,6 @@
   display: flex;
   flex-direction: column;
   gap: $space-3;
-
-  .navLink { padding: $space-3; font-size: $font-size-base; }
 }
 
 .mobileFullButton { width: 100%; }

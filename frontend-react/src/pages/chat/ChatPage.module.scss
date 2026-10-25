@@ -1,10 +1,25 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
+// Alto del Header sticky (min-height 64px + 1px de borde). En móvil el chat
+// ocupa todo el resto de la pantalla, como una app de mensajería.
+$header-height-mobile: 65px;
+
 .page {
   background: $color-bg;
   padding: $space-6 0 $space-10;
   min-height: calc(100vh - 130px);
+
+  @include respond-below(md) {
+    padding: 0;
+    min-height: 0;
+
+    // Sin márgenes laterales: la conversación va de borde a borde.
+    :global(.container) {
+      max-width: none;
+      padding: 0;
+    }
+  }
 }
 
 .layout {
@@ -16,7 +31,11 @@
 
   @include respond-below(md) {
     grid-template-columns: 1fr;
-    height: calc(100vh - 170px);
+    gap: 0;
+    min-height: 0;
+    height: calc(100vh - #{$header-height-mobile});
+    // dvh sigue a la barra del navegador y al teclado; vh queda de respaldo.
+    height: calc(100dvh - #{$header-height-mobile});
   }
 }
 
@@ -28,6 +47,9 @@
   overflow-y: auto;
 
   @include respond-below(md) {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
     &.hiddenMobile { display: none; }
   }
 }
@@ -47,6 +69,9 @@
   position: relative;
 
   @include respond-below(md) {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
     &.hiddenMobile { display: none; }
   }
 }
@@ -141,13 +166,23 @@
   @include flex-center;
 }
 
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .headerName {
   font-weight: 700;
 }
 
-.sendError {
-  color: $color-danger;
-  font-size: $font-size-sm;
-  padding: 0 $space-5;
-  margin: $space-2 0 0;
+.headerStatus {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+// "en línea" y "escribiendo…" resaltan frente a la última vez.
+.headerStatusLive {
+  color: $color-success-dark;
+  font-weight: 600;
 }

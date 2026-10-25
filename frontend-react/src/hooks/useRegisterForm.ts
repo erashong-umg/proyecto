@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
+import { useAuthStore } from '../store/authStore';
 import { getErrorMessage } from '../services/api';
 
 interface RegisterFormState {
@@ -18,6 +19,7 @@ interface UseRegisterFormResult {
   error: string | null;
   isLoading: boolean;
   handleSubmit: (e: FormEvent) => Promise<void>;
+  handleGoogleCredential: (credential: string) => Promise<void>;
 }
 
 export const useRegisterForm = (): UseRegisterFormResult => {
@@ -30,7 +32,7 @@ export const useRegisterForm = (): UseRegisterFormResult => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const setRole = (role: 'student' | 'tutor') => setForm((f) => ({ ...f, role }));
@@ -68,5 +70,20 @@ export const useRegisterForm = (): UseRegisterFormResult => {
     }
   };
 
-  return { form, setRole, handleChange, error, isLoading, handleSubmit };
+  // Registro con Google: el rol elegido en el formulario se aplica si la cuenta es nueva.
+  const handleGoogleCredential = async (credential: string) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await loginWithGoogle(credential, form.role);
+      const completed = useAuthStore.getState().user?.onboardingCompleted;
+      navigate(completed ? '/' : '/onboarding', { replace: true });
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo registrar con Google.'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { form, setRole, handleChange, error, isLoading, handleSubmit, handleGoogleCredential };
 };

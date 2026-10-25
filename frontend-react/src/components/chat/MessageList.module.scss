@@ -78,6 +78,8 @@
 .bubbleMine {
   background: $color-primary;
   color: $on-accent-text;
+  // Azul claro: el azul de info casi no se distingue sobre el naranja de la burbuja.
+  --tick-read: #a8e1ff;
   border-bottom-right-radius: $radius-sm;
 }
 
@@ -94,9 +96,26 @@
   font-size: $font-size-sm;
 }
 
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-1;
+}
+
 .time {
-  display: block;
   font-size: 11px;
   opacity: 0.75;
-  text-align: right;
+}
+
+.retry {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
