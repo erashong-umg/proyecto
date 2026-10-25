@@ -41,6 +41,16 @@
   margin: 0 0 $space-4;
 }
 
+.routeBlock {
+  margin-bottom: $space-4;
+}
+
+.routeCaption {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin: $space-2 0 0;
+}
+
 .priceBreakdown {
   background: $color-surface-alt;
   border-radius: $radius-md;

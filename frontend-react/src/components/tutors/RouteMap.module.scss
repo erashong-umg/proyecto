@@ -1,0 +1,30 @@
+@use '../../styles/variables' as *;
+
+.map {
+  width: 100%;
+  height: 260px;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  // Leaflet usa z-index altos; sin esto el mapa queda por encima del Header sticky.
+  position: relative;
+  z-index: 0;
+}
+
+.pinTutor,
+.pinStudent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid $color-surface;
+  box-shadow: $shadow-md;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  color: $on-accent-text;
+}
+
+.pinTutor { background: $color-primary; }
+.pinStudent { background: $color-text; color: $color-surface; }

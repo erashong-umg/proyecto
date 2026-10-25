@@ -84,6 +84,15 @@ export interface Availability {
 
 export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
+// Ruta tutor → domicilio (POST /api/geo/route). `source` indica si es por calles
+// (OSRM) o el respaldo en línea recta cuando el servicio de rutas no responde.
+export interface RouteInfo {
+  distanceKm: number;
+  durationMin: number | null;
+  path: [number, number][];
+  source: 'osrm' | 'straight-line';
+}
+
 export interface PriceBreakdown {
   baseAmount: number;
   distanceKm?: number;
