@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { TutorSummary } from '../../types/api';
+import { X } from 'lucide-react';
+import type { RouteInfo, TutorSummary } from '../../types/api';
 import styles from './SearchMap.module.scss';
 
 const TUTOR_PIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
@@ -28,11 +29,29 @@ interface SearchMapProps {
   tutors: TutorSummary[];
   selectedTutorId: string | null;
   onSelectTutor: (id: string) => void;
+  /** Quita la selección (y con ella la ruta dibujada). */
+  onDeselect?: () => void;
+  /** Ruta desde el usuario hasta el tutor seleccionado, si ya se calculó. */
+  route?: RouteInfo | null;
+  routeLoading?: boolean;
 }
 
-export const SearchMap = ({ userCoords, tutors, selectedTutorId, onSelectTutor }: SearchMapProps) => {
+// Padding para que lo dibujado no quede tapado por el panel flotante (a la izquierda en
+// escritorio, abajo en móvil).
+const fitPadding = () => {
+  const isDesktop = window.innerWidth >= 768;
+  return {
+    paddingTopLeft: [isDesktop ? 420 : 40, 60] as [number, number],
+    paddingBottomRight: [60, isDesktop ? 60 : 260] as [number, number],
+  };
+};
+
+export const SearchMap = ({
+  userCoords, tutors, selectedTutorId, onSelectTutor, onDeselect, route = null, routeLoading = false,
+}: SearchMapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const routeLayerRef = useRef<L.LayerGroup | null>(null);
   const tutorMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const onSelectRef = useRef(onSelectTutor);
   onSelectRef.current = onSelectTutor;
@@ -48,10 +67,12 @@ export const SearchMap = ({ userCoords, tutors, selectedTutorId, onSelectTutor }
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 19,
     }).addTo(map);
+    routeLayerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     return () => {
       map.remove();
       mapRef.current = null;
+      routeLayerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -97,12 +118,7 @@ export const SearchMap = ({ userCoords, tutors, selectedTutorId, onSelectTutor }
       // Padding asimétrico: el panel flotante ocupa la izquierda, así que
       // sin esto los puntos cercanos al borde izquierdo (a veces el propio
       // usuario) quedan tapados detrás del panel en vez de visibles.
-      const isDesktop = window.innerWidth >= 768;
-      map.fitBounds(bounds, {
-        paddingTopLeft: [isDesktop ? 420 : 40, 60],
-        paddingBottomRight: [60, isDesktop ? 60 : 260],
-        maxZoom: 15,
-      });
+      map.fitBounds(bounds, { ...fitPadding(), maxZoom: 15 });
     }
 
     return () => {
@@ -122,5 +138,49 @@ export const SearchMap = ({ userCoords, tutors, selectedTutorId, onSelectTutor }
     }
   }, [selectedTutorId]);
 
-  return <div ref={containerRef} className={styles.map} />;
+  // Línea de la ruta hasta el tutor seleccionado, como en Google Maps o InDrive: un trazo
+  // con contorno blanco para que se lea sobre cualquier mapa, continuo si es ruta por
+  // calles y punteado si solo hay línea recta. Al llegar la ruta, el mapa encuadra el trayecto.
+  useEffect(() => {
+    const map = mapRef.current;
+    const layer = routeLayerRef.current;
+    if (!map || !layer) return;
+    layer.clearLayers();
+    if (!route || !selectedTutorId) return;
+
+    const straight = route.source !== 'osrm';
+    L.polyline(route.path, { color: '#ffffff', weight: 10, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(layer);
+    const line = L.polyline(route.path, {
+      color: '#dc541a', weight: 5, opacity: 1, lineCap: 'round', lineJoin: 'round',
+      dashArray: straight ? '2 10' : undefined,
+    }).addTo(layer);
+    map.fitBounds(line.getBounds(), { ...fitPadding(), maxZoom: 16 });
+  }, [route, selectedTutorId]);
+
+  const selected = tutors.find((t) => t._id === selectedTutorId);
+
+  let summary: string | null = null;
+  if (selected && routeLoading) summary = 'Calculando ruta…';
+  else if (selected && route?.source === 'osrm') {
+    summary = `${route.distanceKm} km por calles${route.durationMin ? ` · aprox. ${route.durationMin} min en auto` : ''}`;
+  } else if (selected && route) summary = `Línea recta: ${route.distanceKm} km (sin ruta por calles)`;
+
+  return (
+    <div className={styles.mapWrap}>
+      <div ref={containerRef} className={styles.map} />
+      {selected && summary && (
+        <div className={styles.routeInfo} role="status" aria-live="polite">
+          <div>
+            <strong>{selected.name}</strong>
+            <span>{summary}</span>
+          </div>
+          {onDeselect && (
+            <button type="button" className={styles.routeClose} onClick={onDeselect} aria-label="Quitar la ruta">
+              <X aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };

@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useCategories } from '../../hooks/useCategories';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useNearbySearch } from '../../hooks/useNearbySearch';
+import { useTripRoute } from '../../hooks/useTripRoute';
 import { matchCategory } from '../../services/categoryMatch';
 import { SearchMap } from '../../components/tutors/SearchMap';
 import { TutorResultItem } from '../../components/tutors/TutorResultItem';
@@ -40,6 +41,15 @@ export const TutorSearchPage = () => {
   const [filterError, setFilterError] = useState<string | null>(null);
 
   const categoryMap = buildCategoryMap(categories);
+
+  // Al seleccionar un tutor se traza la ruta hasta él. Como la selección cambia al pasar el
+  // mouse por la lista, se espera a que se quede quieta antes de pedirla.
+  const selectedTutor = tutors.find((t) => t._id === selectedId);
+  const { route, isLoading: routeLoading } = useTripRoute(
+    selectedTutor ? coords ?? undefined : undefined,
+    selectedTutor?.address?.coords,
+    { debounceMs: 350 }
+  );
 
   // Primera búsqueda automática apenas se conoce la ubicación: todos los
   // tutores cercanos, sin filtro de categoría.
@@ -94,7 +104,15 @@ export const TutorSearchPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.mapArea} data-tour="buscar-mapa">
-        <SearchMap userCoords={coords} tutors={tutors} selectedTutorId={selectedId} onSelectTutor={setSelectedId} />
+        <SearchMap
+          userCoords={coords}
+          tutors={tutors}
+          selectedTutorId={selectedId}
+          onSelectTutor={setSelectedId}
+          onDeselect={() => setSelectedId(null)}
+          route={route}
+          routeLoading={routeLoading}
+        />
       </div>
 
       <div className={styles.panel}>
@@ -159,6 +177,7 @@ export const TutorSearchPage = () => {
                     categoryMap={categoryMap}
                     isSelected={selectedId === tutor._id}
                     onSelect={() => setSelectedId(tutor._id)}
+                    roadDistanceKm={selectedId === tutor._id && route?.source === 'osrm' ? route.distanceKm : undefined}
                   />
                 ))}
               </div>

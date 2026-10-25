@@ -1,8 +1,57 @@
 @use '../../styles/variables' as *;
 
+.mapWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .map {
   width: 100%;
   height: 100%;
+}
+
+// Tarjeta con el destino, la distancia y el tiempo de la ruta dibujada. Arriba a la
+// derecha en escritorio (el panel de resultados ocupa la izquierda) y arriba en móvil
+// (el panel va abajo).
+.routeInfo {
+  position: absolute;
+  top: $space-4;
+  right: $space-4;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  max-width: min(340px, calc(100% - #{$space-8}));
+  padding: $space-3 $space-4;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+
+  div { display: flex; flex-direction: column; min-width: 0; }
+  strong { font-size: $font-size-sm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  span { font-size: $font-size-xs; color: $color-text-muted; }
+
+  @media (max-width: 767px) {
+    left: $space-3;
+    right: $space-3;
+    max-width: none;
+  }
+}
+
+.routeClose {
+  flex-shrink: 0;
+  display: inline-flex;
+  padding: $space-1;
+  background: none;
+  border: 0;
+  border-radius: $radius-md;
+  color: $color-text-muted;
+  cursor: pointer;
+
+  svg { width: 16px; height: 16px; }
+  &:hover { background: $color-surface-alt; color: $color-text; }
 }
 
 .userMarker {
