@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 // Formato de moneda Q (quetzal) — es-GT
@@ -63,4 +63,12 @@ export const formatRelativeTime = (iso: string | Date): string => {
   }
 
   return relativeTimeFormatter.format(Math.round(duration), 'years');
+};
+
+// "últ. vez hoy a las 15:30" / "últ. vez ayer a las 15:30" / "últ. vez el 05/10/2026"
+export const formatLastSeen = (iso: string | Date): string => {
+  const date = new Date(iso);
+  if (isToday(date)) return `últ. vez hoy a las ${formatTime(date)}`;
+  if (isYesterday(date)) return `últ. vez ayer a las ${formatTime(date)}`;
+  return `últ. vez el ${formatShortDate(date)}`;
 };

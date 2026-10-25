@@ -180,6 +180,8 @@ export interface ChatThreadLastMessage {
   content: string;
   createdAt: string;
   senderId: string;
+  readBy?: string[];
+  deliveredTo?: string[];
 }
 
 export interface ChatThread {
@@ -195,7 +197,26 @@ export interface ChatMessage {
   senderId: string;
   content: string;
   createdAt: string;
-  // Solo viene poblado en la respuesta REST (Message.find().lean()) — el
-  // payload que llega por socket ("chat:message") no lo incluye.
+  // Quiénes ya leyeron / recibieron el mensaje. Se actualizan en vivo con los
+  // eventos "chat:read" y "chat:delivered".
   readBy?: string[];
+  deliveredTo?: string[];
+  // Id generado por el cliente al enviar; permite reemplazar el mensaje
+  // optimista por el confirmado y reintentar sin duplicar.
+  clientId?: string;
+  // Solo existe en el cliente: mensaje aún sin confirmar por el servidor.
+  localStatus?: 'pending' | 'failed';
+}
+
+export type MessageDeliveryStatus = 'pending' | 'failed' | 'sent' | 'delivered' | 'read';
+
+export interface ChatContact {
+  _id: string;
+  name: string;
+  photoUrl?: string;
+}
+
+export interface ChatPresence {
+  online: boolean;
+  lastSeenAt: string | null;
 }

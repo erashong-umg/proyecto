@@ -13,6 +13,7 @@ export interface IUser extends Document {
   suspensionReason?: string;
   suspensionDate?: Date;
   onboardingCompleted: boolean;
+  lastSeenAt?: Date;        // última desconexión del chat ("últ. vez")
 
   // Perfil
   photoUrl?: string;
@@ -70,6 +71,7 @@ const userSchema = new Schema<IUser>(
     suspensionReason: { type: String },
     suspensionDate: { type: Date },
     onboardingCompleted: { type: Boolean, default: false },
+    lastSeenAt: { type: Date },
 
     photoUrl: { type: String },
     phone: { type: String },

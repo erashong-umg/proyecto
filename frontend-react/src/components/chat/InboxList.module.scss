@@ -87,8 +87,15 @@
 }
 
 .preview {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  min-width: 0;
   color: $color-text-muted;
   font-size: $font-size-sm;
+}
+
+.previewText {
   @include truncate;
 }
 

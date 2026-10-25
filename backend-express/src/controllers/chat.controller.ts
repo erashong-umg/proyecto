@@ -94,6 +94,8 @@ export const getChatThreads = async (req: Request, res: Response, next: NextFunc
             content: '$lastMessage.content',
             createdAt: '$lastMessage.createdAt',
             senderId: '$lastMessage.senderId',
+            readBy: '$lastMessage.readBy',
+            deliveredTo: '$lastMessage.deliveredTo',
           },
           unreadCount: 1,
         },

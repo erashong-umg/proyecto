@@ -113,7 +113,8 @@ servidor HTTP (`setupSockets(io)` en `server.ts`). El handshake de conexión
 exige el mismo JWT que REST, enviado como `auth.token` (no como header, por
 ser WebSocket) — ver `src/sockets/index.ts`. Cada socket se une a una room
 personal `user:<id>` para recibir mensajes dirigidos sin necesidad de salas
-por conversación.
+por conversación: un mensaje llega a todas las pestañas de ambos
+participantes aunque no tengan abierta esa conversación.
 
 ## 3. Componentes principales del backend
 
@@ -222,8 +223,21 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
 
 `index.ts` monta un middleware de autenticación de Socket.io (mismo JWT que
 REST, vía `socket.handshake.auth.token`) y une cada conexión a la room
-`user:<id>`. `chat.handler.ts` implementa el envío de mensajes y el
-acknowledge de lectura (✓ enviado → ✓ recibido, D7 — ver §10).
+`user:<id>`. `chat.handler.ts` implementa el chat estilo WhatsApp (D7 — ver §10);
+`presence.ts` lleva en memoria cuántos sockets tiene cada usuario.
+
+| Evento (cliente → servidor) | Efecto |
+|---|---|
+| `chat:join` / `chat:leave` | Abre/cierra una conversación: devuelve datos del contacto y su presencia, y suscribe a `presence:update` |
+| `chat:message` `{ otherUserId, content, clientId }` | Guarda y emite `chat:message` a ambos usuarios; `clientId` hace idempotente el reenvío |
+| `chat:read` `{ messageIds }` | Marca como leídos (solo mensajes ajenos de sus threads) y emite `chat:read` al remitente |
+| `chat:typing` `{ otherUserId, isTyping }` | Retransmite "escribiendo…" al otro usuario (efímero) |
+
+Eventos servidor → cliente: `chat:message`, `chat:delivered` (el destinatario
+recibió; también al conectarse tras estar offline), `chat:read`, `chat:typing`
+y `presence:update` (en línea / `lastSeenAt`). El estado de cada mensaje propio
+se deriva de `deliveredTo` / `readBy`: ✓ enviado, ✓✓ entregado, ✓✓ azul leído.
+La presencia en memoria es válida para una sola instancia del servidor.
 
 ### Rutas montadas en `server.ts`
 
@@ -648,7 +662,7 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 | D4 | OAuth 2.0 real con Google | `POST /api/auth/google` (`googleStub`) acepta un payload simulado (`{email, name, role}` o `photoUrl`) y emite un JWT real — **sin** verificación de identidad real contra Google | `passport-google-oauth20` con verificación de id_token |
 | D5 | Hoja de vida en PDF | Campo `cvUrl` (string, URL a archivo externo/LinkedIn/portafolio) en `tutorData` | Subida real de archivo con `multer` + almacenamiento (S3/disco) |
 | D6 | Gráficos estadísticos dinámicos | `AdminAnalyticsPage` arma gráficos de barras/dona con CSS puro sobre los tokens del design system (clases `sliceA`…`sliceF`), sin librería de charting | Chart.js o Recharts con gráficos interactivos |
-| D7 | Confirmación de lectura en chat | Acknowledge de Socket.io (✓ enviado → ✓ recibido) gestionado en `chat.handler.ts`; `Message.readBy` sí persiste en Mongo | — (ya cumple el requisito, con mecanismo simplificado) |
+| D7 | Confirmación de lectura en chat | Checks estilo WhatsApp (✓ enviado → ✓✓ entregado → ✓✓ azul leído) vía eventos de Socket.io en `chat.handler.ts`; `Message.deliveredTo` y `Message.readBy` persisten en Mongo | — (ya cumple el requisito, con mecanismo simplificado) |
 | D8 | Búsqueda geoespacial con `$geoWithin` + índice `2dsphere` | Cálculo de distancia en memoria (Haversine) sobre los candidatos ya filtrados por categoría — ver bug/decisión documentada en §8 | Índice `2dsphere` real (exige migrar `address.coords` a GeoJSON) |
 | D9 | Políticas de convivencia editables | Página estática `/politicas` (`PoliciesPage`) con texto fijo en el componente | CMS editable desde el panel de administración |
 | D10 | Foto de perfil | Campo `photoUrl` (string, URL externa o vacío) en `User` | Subida real con `multer` |

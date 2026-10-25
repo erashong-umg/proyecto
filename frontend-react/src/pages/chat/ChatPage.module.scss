@@ -141,13 +141,23 @@
   @include flex-center;
 }
 
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .headerName {
   font-weight: 700;
 }
 
-.sendError {
-  color: $color-danger;
-  font-size: $font-size-sm;
-  padding: 0 $space-5;
-  margin: $space-2 0 0;
+.headerStatus {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+// "en línea" y "escribiendo…" resaltan frente a la última vez.
+.headerStatusLive {
+  color: $color-success-dark;
+  font-weight: 600;
 }
