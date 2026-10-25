@@ -75,3 +75,14 @@
 
   svg { width: 15px; height: 15px; }
 }
+
+.reviewed {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  margin-right: auto;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+
+  svg { width: 14px; height: 14px; }
+}

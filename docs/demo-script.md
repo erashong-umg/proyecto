@@ -137,17 +137,20 @@ demo ya poblada por el seed, que tiene historial:
 
 Seguir en el perfil de María López, sección **"Reservar una tutoría"**:
 
-1. Elegir el curso "Inglés conversacional para profesionales", modalidad
-   **Virtual**, duración **60 minutos**, una fecha futura cercana (ej.
-   mañana) y una hora cualquiera (ej. 10:00 a.m.) — recordar que en
-   modalidad virtual la hora es libre, no depende de la disponibilidad
-   semanal del tutor.
-2. Mostrar el desglose de precio (sin costo de traslado, por ser virtual)
-   y presionar **Confirmar reserva** → mensaje de éxito.
-3. **Demostración del anti-traslape**: repetir el mismo formulario con
-   María, mismo curso, misma fecha, pero una hora que se traslape con la
-   reserva recién creada (ej. 10:30 a.m., que choca con el bloque de
-   10:00–11:00 ya reservado). Presionar **Confirmar reserva** de nuevo.
+1. **Paso 1 (Qué):** elegir el curso "Inglés conversacional para
+   profesionales", modalidad **Virtual** y duración **60 minutos**.
+2. **Paso 2 (Cuándo):** elegir una fecha futura en que María atienda (miércoles
+   o lunes) y una hora de las que aparecen: solo se muestran las **realmente
+   libres**, dentro del horario que ella publicó (igual para virtual y
+   presencial).
+3. **Paso 3 (Confirmar):** mostrar el resumen y el desglose de precio (sin
+   costo de traslado, por ser virtual) y presionar **Confirmar reserva** →
+   mensaje de éxito.
+4. **Demostración del anti-traslape:** volver a abrir el asistente con María, mismo
+   curso y misma fecha: la hora recién reservada **ya no aparece** (y tampoco las
+   que chocarían con ella, como 10:30 si reservó 10:00–11:00). Es el anti-traslape
+   visible para el usuario; el backend lo vuelve a validar y, si se fuerza, responde
+   409. Presionar **Confirmar reserva** de nuevo solo es posible si queda otra hora.
    - El sistema debe rechazarla mostrando el motivo del conflicto
      (internamente, el backend responde 409 con un mensaje del tipo
      "Usted ya tiene una tutoría en la semana 1 (...)"). Ver la respuesta
@@ -273,11 +276,11 @@ hace **dos veces, por separado**: una filtrando por `tutorId` (¿el tutor ya
 tiene algo que choca?) y otra filtrando por `studentId` (¿el estudiante ya
 tiene algo que choca?). Si cualquiera de las dos encuentra una coincidencia,
 `createBooking` lanza un error `Conflict` (HTTP 409) con un mensaje que cita
-la semana del conflicto (relevante cuando se usa la opción "Repetir N
-semanas", que valida el traslape de cada ocurrencia semanal por separado
-antes de crear ninguna). Antes de llegar a esa validación también se
-confirma, si la modalidad no es virtual, que el horario cae dentro de los
-bloques de disponibilidad semanal que el tutor configuró
+la semana del conflicto (relevante en la suscripción de 4 u 8 semanas, que
+valida el traslape de cada ocurrencia semanal por separado antes de crear
+ninguna). Antes de llegar a esa validación también se confirma, para cualquier
+modalidad, que el horario cae dentro de los bloques de disponibilidad semanal
+que el tutor configuró
 (`tutorIsAvailable`); si el tutor no tiene ningún documento de
 disponibilidad registrado, no se aplica ninguna restricción — eso es
 intencional, no un bug.

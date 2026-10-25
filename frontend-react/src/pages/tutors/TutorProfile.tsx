@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Star, ArrowLeft, Video, Home, MapPinned } from 'lucide-react';
 import { useTutorProfile } from '../../hooks/useTutorProfile';
 import { useAuth } from '../../hooks/useAuth';
-import { BookingWidget } from '../../components/tutors/BookingWidget';
+import { BookingWizard } from '../../components/tutors/BookingWizard';
 import { formatQ, formatShortDate, getInitials } from '../../services/formatters';
 import styles from './TutorProfile.module.scss';
 
@@ -111,7 +111,7 @@ export const TutorProfilePage = () => {
 
         {user?.role === 'student' ? (
           <section className={styles.section}>
-            <BookingWidget tutor={tutor} courses={courses} />
+            <BookingWizard tutor={tutor} courses={courses} />
           </section>
         ) : (
           <p className={styles.bookingNote}>Solo los estudiantes pueden reservar tutorías.</p>

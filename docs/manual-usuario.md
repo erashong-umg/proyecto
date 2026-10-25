@@ -316,32 +316,26 @@ La reserva se realiza directamente desde el perfil del tutor
 disponible para usuarios con rol de estudiante. Si el tutor no tiene ningún
 curso publicado, esta sección no aparece.
 
-Pasos:
+La reserva es un asistente de **tres pasos**, con un indicador arriba:
 
-1. **Curso**: elija cuál de los cursos del tutor desea reservar.
-2. **Modalidad**: elija entre las modalidades que ese curso específico
-   ofrece (Virtual, En casa del tutor, o A domicilio del estudiante).
-3. **Duración**: 60, 90 o 120 minutos.
-4. **Fecha**: elija un día igual o posterior al día actual.
-5. **Hora**:
-   - Si la modalidad es **Virtual**, puede elegir cualquier hora libremente.
-   - Si la modalidad es **presencial** (en casa del tutor o a domicilio del
-     estudiante), la hora se limita a los bloques que el tutor marcó como
-     disponibles ese día de la semana, según la duración elegida. Si el
-     tutor no tiene disponibilidad configurada para ese día, se le avisa y
-     no podrá elegir una hora para esa fecha.
-6. **Repetir semanalmente** (opcional): puede elegir que la misma reserva se
-   repita automáticamente 2, 3, 4, 6, 8 o 12 semanas seguidas a la misma
-   hora, en vez de reservar "No repetir" (una sola sesión). Internamente
-   esto crea una reserva individual por cada semana — no es una
-   recurrencia que pueda editarse o cancelarse como un solo bloque después.
-7. Mientras completa el formulario, se muestra un **desglose de precio**:
-   el monto de la tutoría según duración y tarifa base, el costo de
-   traslado si aplica (calculado según la distancia entre las direcciones
-   del tutor y del estudiante, solo para la modalidad "a domicilio del
-   estudiante"), y el total — multiplicado por el número de semanas si
-   eligió repetir.
-8. Presione **Confirmar reserva**.
+1. **Qué**: elija el curso (si el tutor tiene más de uno), la **modalidad**
+   (Virtual, En casa del tutor o A domicilio del estudiante) y la **duración**
+   (60, 90 o 120 minutos).
+2. **Cuándo**: elija la **fecha** (de hoy en adelante) y si se **repite**:
+   una sola vez, o cada semana durante 4 u 8 semanas (suscripción). Debajo
+   aparecen solo las **horas realmente libres** de ese día, ya descontadas las
+   tutorías del tutor y las suyas, y dentro de los horarios que el tutor
+   publicó; esto vale igual para clases virtuales y presenciales. En una
+   suscripción solo se ofrecen horas libres **todas** las semanas. Si no hay
+   ninguna, se le indica y puede probar otra fecha. Elija una hora para continuar.
+3. **Confirmar**: un resumen con el curso, la modalidad, la fecha y hora, y la
+   repetición. Para "a domicilio del estudiante" se muestra el **mapa con la
+   ruta** y el costo de traslado. Debajo, el **desglose de precio** (tutoría,
+   traslado si aplica y total; en una suscripción, el total por sesión y el
+   total por todas las semanas). Presione **Confirmar reserva**.
+
+Cada semana de una suscripción queda como una reserva individual: no es un
+bloque que pueda editarse o cancelarse en conjunto.
 
 Si la reserva se crea correctamente, se muestra un mensaje de confirmación
 con un botón **"Ver mis reservas"** que lo lleva a `/mis-reservas`. Si el
@@ -454,10 +448,12 @@ estudiante correspondiente ("Estudiante: [nombre]").
 
 Desde aquí puede:
 
-- **Cancelar** una reserva en estado Pendiente o Confirmada.
-- **Marcar completada** una reserva en estado Confirmada, una vez que la
-  sesión ya se llevó a cabo. Marcar una reserva como completada es lo que
-  habilita al estudiante a dejarle una reseña.
+- **Cancelar** una reserva que todavía no ha comenzado.
+- **Reportar** al estudiante cuando la tutoría ya terminó (motivo y descripción;
+  lo revisa el administrador).
+
+No hay un botón para "marcar completada": una tutoría pasa sola a **Completada**
+cuando termina su horario, y entonces el estudiante puede calificarla.
 
 ![Reservas recibidas por el tutor](capturas/15-tutor-reservas.png)
 

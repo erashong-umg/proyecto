@@ -1,0 +1,61 @@
+@use '../../styles/variables' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.intro {
+  margin: 0;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: 600;
+}
+
+.stars {
+  display: flex;
+  gap: $space-1;
+}
+
+.star {
+  display: inline-flex;
+  padding: $space-1;
+  background: none;
+  border: 0;
+  border-radius: $radius-md;
+  color: $color-border-strong;
+  cursor: pointer;
+
+  svg { width: 30px; height: 30px; }
+
+  &:hover { color: $color-warning; }
+}
+
+.starOn {
+  color: $color-warning;
+
+  svg { fill: currentColor; }
+}
+
+.error {
+  margin: 0;
+  color: $color-danger;
+  font-size: $font-size-sm;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}
