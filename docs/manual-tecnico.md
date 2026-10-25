@@ -885,3 +885,8 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
   interfaz solo se piden al marcar "Usar otra tarifa para este curso".
 - **Calificar y reportar** se hacen desde "Mis reservas" (`BookingList`,
   `ReviewDialog`, `ReportDialog`) sobre tutorías completadas.
+- **Panel del tutor como lista de pasos:** `TutorDashboardPage` calcula el
+  avance con `useTutorSetup` (horarios publicados, cursos activos y próximas
+  tutorías, leídos de `/availability/me`, `/courses/me/list` y `/bookings/me`).
+  Los pasos son perfil, horarios, primer curso y aprobación; la aprobación depende
+  del administrador y solo se espera.
