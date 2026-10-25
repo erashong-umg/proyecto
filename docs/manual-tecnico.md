@@ -367,13 +367,12 @@ de `baseUrl` — cada entrada usa una ruta explícita `./src/...`):
 Dos mecanismos distintos resuelven estos alias según cómo corre el código,
 y **ambos** son necesarios:
 
-- `tsconfig-paths/register` para `ts-node-dev` (scripts `dev`/`seed`) —
-  resuelve en tiempo de ejecución, requiere que `tsconfig.json` y el propio
-  paquete estén presentes.
+- `tsx` (scripts `dev`/`seed`) — lee `paths` de `tsconfig.json` y resuelve los
+  alias en tiempo de ejecución, sin plugins adicionales.
 - `tsc-alias` como paso de post-procesamiento de `npm run build` — reescribe
   los alias a rutas relativas `require(...)` dentro del `dist/*.js` emitido,
   así el output compilado no depende en tiempo de ejecución de
-  `tsconfig.json`/`tsconfig-paths`.
+  `tsconfig.json`.
 
 `vitest.config.mts` (nótese `.mts`, no `.ts`) replica el mismo mapa en
 `resolve.alias` a mano, porque Vite/Vitest no soporta de forma nativa los
@@ -573,8 +572,7 @@ el siguiente:
   build` es `tsc && tsc-alias && node -e "...cpSync(...)"`, no un `tsc`
   simple: sin `tsc-alias`, el JS compilado conserva literalmente
   `require("@middleware/auth")`, que Node no resuelve en runtime (a
-  diferencia de `ts-node-dev`, que sí resuelve alias vía
-  `tsconfig-paths/register`); y `tsc` nunca copia archivos no-`.ts` (como
+  diferencia de `tsx`, que sí resuelve alias vía `tsconfig.json`); y `tsc` nunca copia archivos no-`.ts` (como
   `favicon.ico`) a `dist/`.
 - **Usuario no-root en Docker, pero con `logs/` pre-creado y con dueño
   correcto.** El `Dockerfile` corre como `USER node` por seguridad, pero
@@ -582,7 +580,7 @@ el siguiente:
   primera vez que se requiere, y `/app` es de `root` por defecto en la
   imagen — se agregó `RUN mkdir -p logs && chown -R node:node /app` **antes**
   de `USER node` para evitar `EACCES` al arrancar.
-- **`npm run dev` en Windows y procesos zombi.** `ts-node-dev --respawn`
+- **`npm run dev` en Windows y procesos zombi.** `tsx watch`
   vigila `src/**`; un `kill $PID` en PowerShell/Git Bash a menudo no mata el
   `node.exe` subyacente — sigue reteniendo el puerto 4000 y resucita en el
   siguiente guardado de archivo. Hay que ubicar el PID real con
