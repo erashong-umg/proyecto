@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Plus, Pencil, Ban } from 'lucide-react';
-import { useMyCourses, useCategories, type CourseFormData } from '../../hooks';
+import { useMyCourses, useCategories, useAuth, type CourseFormData } from '../../hooks';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
@@ -23,13 +23,17 @@ const emptyForm = (defaultCategoryId: string): CourseFormData => ({
   description: '',
   categoryId: defaultCategoryId,
   modalities: ['virtual'],
-  baseRate: 100,
-  ratePerKm: 0,
 });
 
 export const TutorCoursesPage = () => {
   const { courses, isLoading, isSaving, error, create, update, deactivate } = useMyCourses();
   const { categories } = useCategories();
+  const { user } = useAuth();
+  // Tarifas del perfil: los cursos las heredan; solo se piden aquí si el tutor
+  // quiere una distinta para un curso concreto.
+  const profileBase = user?.tutorData?.baseRate ?? 0;
+  const profileKm = user?.tutorData?.ratePerKm ?? 0;
+  const [customRate, setCustomRate] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState<Course | null>(null);
@@ -38,6 +42,7 @@ export const TutorCoursesPage = () => {
   const openNew = () => {
     setEditing(null);
     setForm(emptyForm(categories[0]?._id ?? ''));
+    setCustomRate(false);
     setIsModalOpen(true);
   };
 
@@ -51,6 +56,7 @@ export const TutorCoursesPage = () => {
       baseRate: c.baseRate,
       ratePerKm: c.ratePerKm,
     });
+    setCustomRate(c.baseRate !== profileBase || c.ratePerKm !== profileKm);
     setIsModalOpen(true);
   };
 
@@ -66,7 +72,12 @@ export const TutorCoursesPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (form.modalities.length === 0) return;
-    const ok = editing ? await update(editing._id, form) : await create(form);
+    // Sin tarifa propia, el curso queda con la del perfil (al editar hay que enviarla
+    // explícita para volver a ella si antes tenía una distinta).
+    const payload: CourseFormData = customRate
+      ? form
+      : { ...form, baseRate: profileBase || undefined, ratePerKm: profileKm };
+    const ok = editing ? await update(editing._id, payload) : await create(payload);
     if (ok) setIsModalOpen(false);
   };
 
@@ -173,23 +184,36 @@ export const TutorCoursesPage = () => {
             </div>
             {form.modalities.length === 0 && <span className={inputStyles.errorMsg}>Elija al menos una modalidad.</span>}
           </div>
-          <Input
-            label="Tarifa base por hora (Q)"
-            type="number"
-            value={form.baseRate}
-            onChange={(e) => setForm({ ...form, baseRate: Number(e.target.value) })}
-            min={1}
-            required
-          />
-          <Input
-            label="Tarifa adicional por kilómetro (Q/km)"
-            type="number"
-            value={form.ratePerKm}
-            onChange={(e) => setForm({ ...form, ratePerKm: Number(e.target.value) })}
-            min={0}
-            step={0.5}
-            hint="Solo aplica a la modalidad 'a domicilio del estudiante'. Deje 0 si no aplica."
-          />
+          <label className={styles.rateToggle}>
+            <input type="checkbox" checked={customRate} onChange={(e) => setCustomRate(e.target.checked)} />
+            Usar otra tarifa para este curso
+          </label>
+          {!customRate ? (
+            <p className={styles.rateNote}>
+              Tarifa de su perfil: {formatQ(profileBase)} por hora
+              {profileKm > 0 ? ` y ${formatQ(profileKm)} por km de traslado` : ''}.
+            </p>
+          ) : (
+            <>
+              <Input
+                label="Tarifa base por hora (Q)"
+                type="number"
+                value={form.baseRate ?? profileBase}
+                onChange={(e) => setForm({ ...form, baseRate: Number(e.target.value) })}
+                min={1}
+                required
+              />
+              <Input
+                label="Tarifa adicional por kilómetro (Q/km)"
+                type="number"
+                value={form.ratePerKm ?? profileKm}
+                onChange={(e) => setForm({ ...form, ratePerKm: Number(e.target.value) })}
+                min={0}
+                step={0.5}
+                hint="Solo aplica a la modalidad 'a domicilio del estudiante'. Deje 0 si no aplica."
+              />
+            </>
+          )}
           <Button type="submit" isLoading={isSaving} disabled={form.modalities.length === 0}>
             {editing ? 'Guardar cambios' : 'Crear curso'}
           </Button>

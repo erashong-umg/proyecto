@@ -7,8 +7,9 @@ export interface CourseFormData {
   description: string;
   categoryId: string;
   modalities: Modality[];
-  baseRate: number;
-  ratePerKm: number;
+  /** Si se omiten, el curso usa las tarifas del perfil del tutor. */
+  baseRate?: number;
+  ratePerKm?: number;
 }
 
 export const useMyCourses = () => {

@@ -101,18 +101,18 @@ En el navegador principal (perfil de "estudiante"):
 
 ### Acto 3 — Onboarding paso a paso [2 min]
 
-Continuando con la cuenta recién creada, recorrer los 3 pasos que le
-corresponden a un estudiante (mencionar que un tutor vería un cuarto paso
-adicional — información profesional — que se omite aquí por tiempo):
+Continuando con la cuenta recién creada, recorrer los 2 pasos que le
+corresponden a un estudiante (mencionar que un tutor vería un tercer paso,
+su perfil profesional, que se omite aquí por tiempo):
 
-1. **Datos personales**: teléfono/WhatsApp y género.
+1. **Sobre usted**: teléfono/WhatsApp, género, documento de identificación
+   (DPI) y al menos una categoría de interés (ej. Idiomas) como chip — todo en
+   una sola pantalla.
 2. **Ubicación**: escribir una dirección (ej. "Zona 10, Ciudad de
    Guatemala") y presionar **Ubicar en el mapa**, o arrastrar el pin
    directamente — mencionar que esta dirección es la que luego alimenta el
    cálculo de distancia a los tutores.
-3. **Categorías de interés**: seleccionar al menos una categoría (ej.
-   Idiomas) como chip.
-4. Presionar **Finalizar** → redirige a `/` con la cuenta ya lista para
+3. Presionar **Finalizar** → redirige a `/` con la cuenta ya lista para
    usarse.
 
 ### Acto 4 — Login como estudiante, búsqueda de tutores y perfil [2.5 min]

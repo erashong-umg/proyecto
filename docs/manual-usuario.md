@@ -105,18 +105,24 @@ asistente de onboarding en `/onboarding`. Si su perfil ya fue completado
 anteriormente, el sistema lo redirige automáticamente al inicio y no podrá
 volver a ver este asistente.
 
-El asistente tiene **4 pasos** para un tutor y **3 pasos** para un
-estudiante (el estudiante no pasa por el paso de información profesional).
-En la parte superior se muestra un indicador de progreso con el paso actual.
+El asistente tiene **3 pasos** para un tutor y **2 pasos** para un
+estudiante (el estudiante no pasa por el perfil profesional). En la parte
+superior se muestra un indicador de progreso con el paso actual.
 
-### Paso 1 — Datos personales
+### Paso 1 — Sobre usted
 
-Se le saluda por su nombre y se le pide:
+Se le saluda por su nombre y se le pide, todo en una sola pantalla:
 
-- **Teléfono / WhatsApp** (campo obligatorio, ej. `+502 5555-1234`).
+- **Teléfono / WhatsApp** (obligatorio, ej. `+502 5555-1234`).
 - **Género**: Masculino, Femenino u Otro (selección única, obligatoria).
+- **Documento de identificación** (obligatorio): DPI (13 dígitos) o pasaporte.
+  Solo lo ve el equipo de administración, para verificar su identidad.
+- **Categorías**: chips que se activan o desactivan con un clic; debe elegir al
+  menos una. Si es **estudiante**, son las categorías en las que **desea
+  aprender**; si es **tutor**, en las que **ofrece clases** (ej. Matemática,
+  Inglés, Natación).
 
-![Onboarding — paso 1, datos personales](capturas/03-onboarding-datos.png)
+![Onboarding — paso 1, sobre usted](capturas/03-onboarding-datos.png)
 
 ### Paso 2 — Ubicación
 
@@ -142,7 +148,7 @@ que usted lo mueva o use la búsqueda.
 
 ![Onboarding — paso 2, ubicación en el mapa](capturas/04-onboarding-mapa.png)
 
-### Paso 3 — Información profesional (solo tutores)
+### Paso 3 — Perfil profesional (solo tutores)
 
 Este paso únicamente aparece si se registró con el rol de **Tutor**. Se le
 solicita:
@@ -157,33 +163,20 @@ solicita:
   solo se aplica cuando el tutor ofrece la modalidad "a domicilio del
   estudiante" (puede dejarse en 0 si no aplica).
 
+Estas tarifas se piden **una sola vez**: todos sus cursos las usan
+automáticamente. Al crear o editar un curso solo las vuelve a ver si marca
+**"Usar otra tarifa para este curso"**.
+
 Al final de este paso se le recuerda que su cuenta quedará en estado
 **"pendiente de aprobación"** hasta que un administrador valide su perfil
 (vea la sección 12, "Aprobación de tutores").
 
 ![Onboarding — paso 3, información profesional del tutor](capturas/05-onboarding-tutor.png)
 
-### Paso 4 — Categorías de interés
-
-El último paso es común a estudiantes y tutores, aunque el texto cambia
-según el rol:
-
-- Si es **tutor**, seleccione las categorías académicas en las que **ofrece
-  clases** (ej. Matemática, Inglés, Natación).
-- Si es **estudiante**, seleccione las categorías en las que **desea
-  aprender**.
-
-Las categorías se presentan como chips que se activan o desactivan con un
-clic; debe seleccionar al menos una para poder finalizar.
-
-![Onboarding — paso 4, selección de categorías](capturas/06-onboarding-categorias.png)
-
 Al presionar **Finalizar** en el último paso, el sistema guarda todo el
 perfil y lo redirige a la página de inicio (`/`), ya con acceso completo a
 la plataforma. En cualquier paso posterior al primero puede usar el botón
-**Atrás** para corregir información; si es estudiante, el botón **Atrás**
-en el paso 4 lo regresa directamente al paso 2 (el paso 3 se salta por no
-aplicarle).
+**Atrás** para corregir información.
 
 ---
 
