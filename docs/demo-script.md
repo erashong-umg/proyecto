@@ -244,9 +244,10 @@ las claves públicas de Google, vigencia, que el token fue emitido para
 **nuestro** Client ID y que el correo esté verificado. Con eso extrae nombre,
 correo y foto y emite el JWT propio del sistema, igual que en el login con
 contraseña. Si el correo ya tenía cuenta se vincula; si no, solo se crea desde "Crear
-cuenta", con el rol elegido ahí (estudiante o tutor), y pasa al onboarding;
-desde "Iniciar sesión" nunca se crea una cuenta, porque el rol no se puede
-cambiar después y no se debe asignar uno por defecto. Los
+cuenta" (con el rol elegido ahí) o desde "Iniciar sesión": en ese caso el backend
+responde 404 con el código `GOOGLE_ACCOUNT_NOT_FOUND` y la pantalla le pregunta el rol
+a la persona ("Es su primera vez aquí") y reenvía la misma credencial con el rol
+elegido. Nunca se asigna un rol por defecto, porque no se puede cambiar después. Los
 administradores no entran por aquí: tienen su propio acceso en `/admin/login`.
 El Client ID es público; no hay ningún secreto de Google en el repositorio.
 

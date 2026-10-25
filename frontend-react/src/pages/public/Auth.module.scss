@@ -171,3 +171,31 @@
 .chevronOpen { transform: rotate(180deg); }
 
 .emailForm { margin-top: $space-4; }
+
+// Primera vez con Google: se pregunta el rol aquí mismo en vez de mostrar un error.
+.firstTime {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4;
+  border: 1px solid $color-primary;
+  border-radius: $radius-lg;
+  background: color-mix(in srgb, $color-primary 6%, transparent);
+
+  h2 { margin: 0; font-size: $font-size-lg; }
+  p { margin: 0; color: $color-text-muted; font-size: $font-size-sm; }
+}
+
+.linkButton {
+  align-self: center;
+  background: none;
+  border: 0;
+  padding: $space-1;
+  color: $color-text-muted;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover { color: $color-text; }
+}

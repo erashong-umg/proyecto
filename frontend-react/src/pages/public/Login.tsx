@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { useLoginForm } from '../../hooks/useLoginForm';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { RoleSelector } from '../../components/auth/RoleSelector';
 import { AuthBrandPanel } from '../../components/auth/AuthBrandPanel';
 import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
 import { isGoogleEnabled } from '../../services/google';
@@ -11,7 +12,11 @@ import { AuthBrandLink } from '../../components/auth/AuthBrandLink';
 import styles from './Auth.module.scss';
 
 export const LoginPage = () => {
-  const { email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential } = useLoginForm();
+  const {
+    email, setEmail, password, setPassword, error, isLoading, expired, handleSubmit, handleGoogleCredential,
+    pendingGoogle, completeGoogleSignup, cancelGoogleSignup,
+  } = useLoginForm();
+  const [newRole, setNewRole] = useState<'student' | 'tutor'>('student');
   // Acceso rápido: con Google habilitado, es la entrada principal y el correo y la
   // contraseña quedan plegados hasta que se pidan. Sin Google, el formulario va abierto.
   const [showEmail, setShowEmail] = useState(!isGoogleEnabled);
@@ -28,7 +33,19 @@ export const LoginPage = () => {
           {expired && <div className={styles.expiredMsg}>Su sesión expiró. Inicie sesión de nuevo.</div>}
           {error && <div className={styles.errorMsg}>{error}</div>}
 
-          {isGoogleEnabled && (
+          {pendingGoogle && (
+            <div className={styles.firstTime} role="group" aria-labelledby="first-time-title">
+              <h2 id="first-time-title">Es su primera vez aquí</h2>
+              <p>Esta cuenta de Google todavía no tiene cuenta en EducaSpot. Elija cómo quiere unirse y la creamos ahora mismo:</p>
+              <RoleSelector value={newRole} onChange={setNewRole} />
+              <Button type="button" size="lg" className={styles.submit} isLoading={isLoading} onClick={() => completeGoogleSignup(newRole)}>
+                Continuar como {newRole === 'tutor' ? 'tutor' : 'estudiante'}
+              </Button>
+              <button type="button" className={styles.linkButton} onClick={cancelGoogleSignup}>Cancelar</button>
+            </div>
+          )}
+
+          {isGoogleEnabled && !pendingGoogle && (
             <>
               <GoogleSignInButton text="signin_with" onCredential={handleGoogleCredential} />
               <div className={styles.divider}>o</div>
@@ -45,7 +62,7 @@ export const LoginPage = () => {
             </>
           )}
 
-          {showEmail && (
+          {showEmail && !pendingGoogle && (
             <div id="login-email-form" className={styles.emailForm}>
               <Input
                 label="Correo electrónico"
