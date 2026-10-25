@@ -28,6 +28,17 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copiar el código compilado (incluye dist/public, ya generado por npm run build)
 COPY --from=builder /app/dist ./dist
 
+# Versión visible en /api/version y /api/health. Los pasa el workflow de deploy;
+# van al final para no invalidar el caché de las capas de dependencias.
+ARG APP_VERSION=dev
+ARG APP_BRANCH=local
+ARG APP_COMMIT=local
+ARG APP_BUILT_AT=
+ENV APP_VERSION=$APP_VERSION \
+    APP_BRANCH=$APP_BRANCH \
+    APP_COMMIT=$APP_COMMIT \
+    APP_BUILT_AT=$APP_BUILT_AT
+
 # winston (src/utils/logger.ts) crea ./logs al arrancar — el usuario no-root
 # de abajo necesita permiso de escritura sobre /app, no solo sobre dist/.
 RUN mkdir -p logs && chown -R node:node /app
