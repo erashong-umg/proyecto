@@ -12,6 +12,15 @@ COPY . .
 # Client ID público de Google (inicio de sesión); vacío = sin botón de Google
 ARG VITE_GOOGLE_CLIENT_ID=
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+# Versión visible en el badge flotante (los pasa el workflow de deploy; ver vite.config.ts)
+ARG APP_VERSION=
+ARG APP_BRANCH=
+ARG APP_COMMIT=
+ARG APP_BUILT_AT=
+ENV VITE_APP_VERSION=$APP_VERSION \
+    VITE_APP_BRANCH=$APP_BRANCH \
+    VITE_APP_COMMIT=$APP_COMMIT \
+    VITE_APP_BUILT_AT=$APP_BUILT_AT
 RUN pnpm run build
 
 # --- Runtime stage ---
