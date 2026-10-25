@@ -108,5 +108,26 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             ENVEOF
             podman-compose pull
+            # `up -d` NO recrea contenedores que ya existen aunque haya una imagen
+            # nueva (ni aplica un .env distinto): solo los vuelve a arrancar y el
+            # servidor seguía con el código viejo. Se eliminan backend y frontend
+            # para que `up -d` los cree de nuevo con la imagen y el .env actuales.
+            # Mongo no se toca (sus datos están en el volumen mongodb_data).
+            podman rm -f educaspot_backend_1 educaspot_frontend_1 || true
             podman-compose up -d
             podman image prune -f
+
+            # Verifica que lo desplegado realmente responde; si no, falla el job.
+            ok=0
+            for i in $(seq 1 20); do
+              if curl -fsS http://127.0.0.1:4000/api/health >/dev/null 2>&1 \
+                 && curl -fsS http://127.0.0.1:8080/ >/dev/null 2>&1; then ok=1; break; fi
+              sleep 3
+            done
+            podman ps --format '{{.Names}}  {{.Image}}  {{.Status}}'
+            if [ "$ok" != 1 ]; then
+              echo "El backend o el frontend no respondió tras el despliegue" >&2
+              podman logs --tail 40 educaspot_backend_1 >&2 || true
+              exit 1
+            fi
+            echo "Despliegue verificado"
