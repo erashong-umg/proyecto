@@ -383,7 +383,24 @@ nombre y una insignia de estado de aprobación:
 - **"Pendiente de aprobación"**: aún no aparece en las búsquedas, pero
   puede preparar sus cursos y horarios mientras espera la revisión.
 
-Desde aquí se accede, mediante tres tarjetas, a:
+**Lista de pasos para empezar.** Mientras la configuración no esté completa,
+arriba aparece "Para empezar a recibir reservas", con una barra de avance
+(por ejemplo "1 de 4") y cuatro pasos:
+
+1. **Complete su perfil**: biografía, CV y tarifas (ya hecho al terminar el
+   onboarding).
+2. **Publique sus horarios**: los estudiantes solo pueden reservar dentro de
+   los horarios que usted marque. Botón **Configurar horarios**.
+3. **Cree su primer curso**: usa las tarifas de su perfil. Botón **Crear curso**.
+4. **Aprobación de la administración**: no depende de usted; mientras se
+   revisa, aparece "en espera". Cuando se aprueba, ya aparece en las búsquedas.
+
+El primer paso que le toca se resalta con su botón. Al completar los cuatro, la
+lista se reemplaza por "Todo listo. Ya aparece en las búsquedas y puede recibir
+reservas."
+
+Debajo, tres tarjetas dan acceso directo a, con un dato útil en cada una (por
+ejemplo, cuántos cursos activos tiene o cuántas tutorías próximas):
 
 - **Mis cursos** (`/tutor/cursos`).
 - **Disponibilidad** (`/tutor/disponibilidad`).

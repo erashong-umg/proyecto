@@ -67,15 +67,112 @@
   p { color: $color-text-muted; font-size: $font-size-sm; margin: 0; }
 }
 
-.pendingMsg {
+.checklist {
+  @include card;
+  margin-bottom: $space-6;
+}
+
+.checklistHead {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
+  justify-content: space-between;
   gap: $space-3;
-  background: color-mix(in srgb, $color-warning 10%, transparent);
-  color: $color-warning-dark;
-  padding: $space-4;
-  border-radius: $radius-md;
+  margin-bottom: $space-3;
+
+  h2 { margin: 0; font-size: $font-size-xl; }
+}
+
+.progressText {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  font-weight: 600;
+}
+
+.progress {
+  height: 8px;
+  border-radius: $radius-full;
+  background: $color-surface-alt;
+  overflow: hidden;
+  margin-bottom: $space-5;
+
+  span {
+    display: block;
+    height: 100%;
+    background: $color-primary;
+    transition: width $transition-fast;
+  }
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  background: $color-surface;
+  flex-wrap: wrap;
+}
+
+// El paso que toca ahora se destaca.
+.stepNext {
+  border-color: $color-primary;
+  background: color-mix(in srgb, $color-primary 6%, transparent);
+}
+
+.stepDone { opacity: 0.8; }
+
+.stepMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  background: $color-surface-alt;
+  color: $color-text-muted;
+  font-weight: 700;
   font-size: $font-size-sm;
 
-  svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+  svg { width: 16px; height: 16px; }
+}
+
+.stepNext .stepMark { background: $color-primary; color: $on-accent-text; }
+
+.stepDone .stepMark {
+  background: color-mix(in srgb, $color-success 18%, transparent);
+  color: $color-success-dark;
+}
+
+.stepText {
+  flex: 1;
+  min-width: 200px;
+
+  h3 { margin: 0 0 2px; font-size: $font-size-base; }
+  p { margin: 0; color: $color-text-muted; font-size: $font-size-sm; }
+}
+
+.stepAction { flex-shrink: 0; }
+
+.ready {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  margin-bottom: $space-6;
+  padding: $space-4;
+  border-radius: $radius-md;
+  background: color-mix(in srgb, $color-success 12%, transparent);
+  color: $color-success-dark;
+
+  svg { width: 24px; height: 24px; flex-shrink: 0; }
 }
