@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from './store/authStore';
 import { AppRouter } from './router';
+import { VersionBadge } from './components/layout/VersionBadge';
 
 function App() {
   // Zustand no necesita un Provider — solo disparamos la verificación de
@@ -9,7 +10,12 @@ function App() {
     useAuthStore.getState().initialize();
   }, []);
 
-  return <AppRouter />;
+  return (
+    <>
+      <AppRouter />
+      <VersionBadge />
+    </>
+  );
 }
 
 export default App;

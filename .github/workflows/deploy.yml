@@ -1,8 +1,28 @@
 name: Deploy
 
+# Qué rama se despliega aparece en el título de cada ejecución.
+run-name: Deploy — ${{ inputs.branch || github.ref_name }}
+
 on:
+  # Automático: cada push a main despliega main.
   push:
     branches: [main]
+  # Manual: Actions → Deploy → Run workflow → lista "Rama a desplegar".
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Rama a desplegar en el servidor
+        type: choice
+        options:
+          - main
+          - release
+          - develop
+        default: main
+
+# Un solo despliegue a la vez: dos ejecuciones simultáneas se pisarían en el servidor.
+concurrency:
+  group: deploy-prd
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
@@ -29,6 +49,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # Manual: la rama elegida en la lista. Push: el commit que lo disparó.
+          ref: ${{ inputs.branch || github.sha }}
+          # Historial y tags completos: la versión visible se calcula con los tags.
+          fetch-depth: 0
+
+      # Qué se está construyendo: commit realmente construido (con otra rama,
+      # github.sha no es este) y la versión que mostrarán el badge y /api/version.
+      - name: Resolver versión
+        id: src
+        run: |
+          short=$(git rev-parse --short HEAD)
+          # "v1.2" si el commit está etiquetado; si no, el último tag por número de
+          # versión + el commit ("v1.2+abc1234").
+          exact=$(git describe --tags --exact-match 2>/dev/null || true)
+          latest=$(git tag --sort=-v:refname | head -n 1)
+          version="${exact:-${latest:+$latest+}$short}"
+          {
+            echo "sha=$(git rev-parse HEAD)"
+            echo "short=$short"
+            echo "version=$version"
+            echo "branch=${{ inputs.branch || github.ref_name }}"
+            echo "built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } >> "$GITHUB_OUTPUT"
+          echo "Versión: $version (${{ inputs.branch || github.ref_name }}@$short)"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -47,9 +92,13 @@ jobs:
           push: true
           build-args: |
             VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            APP_VERSION=${{ steps.src.outputs.version }}
+            APP_BRANCH=${{ steps.src.outputs.branch }}
+            APP_COMMIT=${{ steps.src.outputs.short }}
+            APP_BUILT_AT=${{ steps.src.outputs.built_at }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ steps.src.outputs.sha }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
@@ -58,6 +107,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEPLOY_PRD
     steps:
+      - name: Resumen
+        run: echo "Desplegando la rama ${{ inputs.branch || github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1
         with:
@@ -77,5 +129,26 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             ENVEOF
             podman-compose pull
+            # `up -d` NO recrea contenedores que ya existen aunque haya una imagen
+            # nueva (ni aplica un .env distinto): solo los vuelve a arrancar y el
+            # servidor seguía con el código viejo. Se eliminan backend y frontend
+            # para que `up -d` los cree de nuevo con la imagen y el .env actuales.
+            # Mongo no se toca (sus datos están en el volumen mongodb_data).
+            podman rm -f educaspot_backend_1 educaspot_frontend_1 || true
             podman-compose up -d
             podman image prune -f
+
+            # Verifica que lo desplegado realmente responde; si no, falla el job.
+            ok=0
+            for i in $(seq 1 20); do
+              if curl -fsS http://127.0.0.1:4000/api/health >/dev/null 2>&1 \
+                 && curl -fsS http://127.0.0.1:8080/ >/dev/null 2>&1; then ok=1; break; fi
+              sleep 3
+            done
+            podman ps --format '{{.Names}}  {{.Image}}  {{.Status}}'
+            if [ "$ok" != 1 ]; then
+              echo "El backend o el frontend no respondió tras el despliegue" >&2
+              podman logs --tail 40 educaspot_backend_1 >&2 || true
+              exit 1
+            fi
+            echo "Despliegue verificado"

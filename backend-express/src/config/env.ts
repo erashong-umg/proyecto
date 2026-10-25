@@ -15,6 +15,12 @@ const envSchema = z.object({
   // público, no un secreto. Vacío = el inicio de sesión con Google queda
   // deshabilitado (el endpoint responde 503).
   GOOGLE_CLIENT_ID: z.string().default(''),
+  // Metadatos de la compilación (los fija el workflow de despliegue al construir
+  // la imagen). Sin ellos: ejecución local.
+  APP_VERSION: z.string().default('dev'),
+  APP_BRANCH: z.string().default('local'),
+  APP_COMMIT: z.string().default('local'),
+  APP_BUILT_AT: z.string().default(''),
   // Servidor OSRM para rutas por calles. Vacío = sin routing (línea recta).
   // El demo público es solo para desarrollo; en producción conviene uno propio.
   OSRM_URL: z.string().default('https://router.project-osrm.org'),
