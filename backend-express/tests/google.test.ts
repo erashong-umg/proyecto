@@ -68,7 +68,7 @@ describe('POST /api/auth/google', () => {
   });
 
   it('crea la cuenta con nombre, correo y foto de Google, y devuelve un JWT válido', async () => {
-    const res = await loginGoogle();
+    const res = await loginGoogle({ role: 'student' });
 
     expect(res.status).toBe(200);
     expect(res.body.isNewUser).toBe(true);
@@ -87,11 +87,28 @@ describe('POST /api/auth/google', () => {
     const res = await loginGoogle({ role: 'tutor' });
 
     expect(res.body.user.role).toBe('tutor');
+    expect((await User.findOne({ email: 'ana@gmail.com' }))!.role).toBe('tutor');
   });
 
-  it('un segundo ingreso reutiliza la cuenta y no la marca como nueva', async () => {
-    await loginGoogle();
+  it('el rol enviado se ignora si la cuenta ya existe', async () => {
+    await loginGoogle({ role: 'student' });
+
     const res = await loginGoogle({ role: 'tutor' });
+
+    expect(res.body.user.role).toBe('student');
+  });
+
+  it('sin rol y sin cuenta existente no crea nada y pide registrarse', async () => {
+    const res = await loginGoogle();
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toMatch(/Crear cuenta/);
+    expect(await User.countDocuments()).toBe(0);
+  });
+
+  it('un segundo ingreso reutiliza la cuenta, sin pedir rol, y no la marca como nueva', async () => {
+    await loginGoogle({ role: 'student' });
+    const res = await loginGoogle();
 
     expect(res.status).toBe(200);
     expect(res.body.isNewUser).toBe(false);
@@ -117,7 +134,7 @@ describe('POST /api/auth/google', () => {
   });
 
   it('una cuenta creada con Google no puede entrar con contraseña', async () => {
-    await loginGoogle();
+    await loginGoogle({ role: 'student' });
 
     const res = await request(app).post('/api/auth/login').send({ email: 'ana@gmail.com', password: 'Clave1234' });
 
@@ -125,7 +142,7 @@ describe('POST /api/auth/google', () => {
   });
 
   it('no permite que un correo ya vinculado a un Google se asocie a otro', async () => {
-    await loginGoogle();
+    await loginGoogle({ role: 'student' });
     verify.mockResolvedValue({ ...perfil, googleId: 'otro-google-sub' });
 
     const res = await loginGoogle();

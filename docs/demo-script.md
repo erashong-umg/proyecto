@@ -234,8 +234,10 @@ verifica con `google-auth-library` (`services/google.service.ts`): firma con
 las claves públicas de Google, vigencia, que el token fue emitido para
 **nuestro** Client ID y que el correo esté verificado. Con eso extrae nombre,
 correo y foto y emite el JWT propio del sistema, igual que en el login con
-contraseña. Si el correo ya tenía cuenta se vincula; si no, se crea una nueva
-(con el rol elegido en la pantalla de registro) y pasa al onboarding. Los
+contraseña. Si el correo ya tenía cuenta se vincula; si no, solo se crea desde "Crear
+cuenta", con el rol elegido ahí (estudiante o tutor), y pasa al onboarding;
+desde "Iniciar sesión" nunca se crea una cuenta, porque el rol no se puede
+cambiar después y no se debe asignar uno por defecto. Los
 administradores no entran por aquí: tienen su propio acceso en `/admin/login`.
 El Client ID es público; no hay ningún secreto de Google en el repositorio.
 
