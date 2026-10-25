@@ -211,6 +211,29 @@ antes de integrarla en `main`.
 También se puede desplegar sin GitHub, conectándose por SSH y repitiendo los
 comandos de "Primer arranque manual" arriba.
 
+### Versión visible: qué hay desplegado
+
+Como hay un solo servidor y se puede desplegar cualquier rama, cada compilación
+queda identificada y la versión se ve en dos lugares:
+
+- **Badge flotante** (esquina inferior izquierda de todas las páginas): muestra
+  la versión y, si no es `main`, la rama. El punto indica la rama (verde `main`,
+  ámbar `release`, azul `develop`, gris otra/local). Al pulsarlo se abre el
+  detalle del **frontend** y del **backend** (versión, rama, commit y fecha de
+  compilación) y avisa si los dos están en commits distintos, señal de un
+  despliegue incompleto.
+- **`GET /api/version`** (pública) y `GET /api/health`: devuelven `version`,
+  `branch`, `commit` y `builtAt` del backend. Útil desde `curl` o el navegador:
+  `https://<DOMAIN>/api/version`.
+
+La **versión** se calcula al compilar, en el workflow, con los tags de git:
+`v1.2` si el commit está etiquetado, o el último tag + el commit
+(`v1.2+abc1234`) si hay cambios posteriores. Por eso conviene **crear un tag
+`vX.Y` por cada versión publicada** (en `main`, tras integrar la release). Se
+pasa a las imágenes como `APP_VERSION`, `APP_BRANCH`, `APP_COMMIT` y
+`APP_BUILT_AT` (build-args); en desarrollo local el frontend las lee del git y
+el backend muestra `dev` / `local`.
+
 ## 6. Conectarse a Mongo desde fuera
 
 El puerto 27017 está atado a `127.0.0.1` en el servidor (no expuesto a

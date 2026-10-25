@@ -52,11 +52,28 @@ jobs:
         with:
           # Manual: la rama elegida en la lista. Push: el commit que lo disparó.
           ref: ${{ inputs.branch || github.sha }}
+          # Historial y tags completos: la versión visible se calcula con los tags.
+          fetch-depth: 0
 
-      # Commit realmente construido (con otra rama, github.sha no es este).
-      - name: Resolver commit
+      # Qué se está construyendo: commit realmente construido (con otra rama,
+      # github.sha no es este) y la versión que mostrarán el badge y /api/version.
+      - name: Resolver versión
         id: src
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          short=$(git rev-parse --short HEAD)
+          # "v1.2" si el commit está etiquetado; si no, el último tag por número de
+          # versión + el commit ("v1.2+abc1234").
+          exact=$(git describe --tags --exact-match 2>/dev/null || true)
+          latest=$(git tag --sort=-v:refname | head -n 1)
+          version="${exact:-${latest:+$latest+}$short}"
+          {
+            echo "sha=$(git rev-parse HEAD)"
+            echo "short=$short"
+            echo "version=$version"
+            echo "branch=${{ inputs.branch || github.ref_name }}"
+            echo "built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } >> "$GITHUB_OUTPUT"
+          echo "Versión: $version (${{ inputs.branch || github.ref_name }}@$short)"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -75,6 +92,10 @@ jobs:
           push: true
           build-args: |
             VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            APP_VERSION=${{ steps.src.outputs.version }}
+            APP_BRANCH=${{ steps.src.outputs.branch }}
+            APP_COMMIT=${{ steps.src.outputs.short }}
+            APP_BUILT_AT=${{ steps.src.outputs.built_at }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ steps.src.outputs.sha }}
