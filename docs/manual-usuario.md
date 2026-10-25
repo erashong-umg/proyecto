@@ -290,6 +290,12 @@ mapa interactivo a un lado y un listado de resultados al otro.
    aplica, el costo adicional estimado de traslado. Al pasar el mouse o
    enfocar un resultado de la lista, el pin correspondiente se resalta en
    el mapa (y viceversa).
+   Al elegir un tutor (en el mapa o en la lista) se traza sobre el mapa la
+   **ruta** desde su ubicación hasta él, como en Google Maps o InDrive, y
+   aparece una tarjeta con la distancia por calles y el tiempo aproximado en
+   auto; la distancia del listado pasa a ser esa y el costo de traslado se
+   ajusta. La **×** de la tarjeta quita la ruta. Si no se puede calcular la
+   ruta por calles, se dibuja una línea recta punteada con su distancia.
 7. Haga clic sobre cualquier resultado para ir a su perfil completo.
 
 Si no hay tutores cerca con el criterio usado, se muestra un estado vacío

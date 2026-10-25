@@ -131,7 +131,8 @@ demo ya poblada por el seed, que tiene historial:
    ubicación del navegador (o mencionar que, si se rechaza, cae de forma
    automática a la dirección registrada en el onboarding).
 3. Mostrar el mapa con los pines de tutores cercanos y el listado al lado
-   (distancia en km, calificación, tarifa).
+   (distancia en km, calificación, tarifa). Pasar el mouse por un tutor
+   traza la ruta hasta él con la distancia y el tiempo en auto.
 4. Escribir "inglés" en el buscador por categoría y presionar **Buscar**
    para filtrar.
 5. Hacer clic en el resultado de **María López** para abrir `/tutores/:id`:

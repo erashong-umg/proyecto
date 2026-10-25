@@ -30,7 +30,7 @@ export const TOURS: Record<TourId, TourDef> = {
       {
         target: '[data-tour="buscar-mapa"]',
         title: 'Usted y los tutores',
-        content: 'El punto naranja con pulso es usted; cada pin es un tutor cercano. Pulse un pin para verlo en la lista.',
+        content: 'El punto naranja con pulso es usted; cada pin es un tutor cercano. Al elegir uno (en el mapa o en la lista) se traza la ruta hasta él, con la distancia y el tiempo.',
         placement: 'right',
       },
       {

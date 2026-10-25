@@ -9,12 +9,16 @@ interface TutorResultItemProps {
   categoryMap: Map<string, string>;
   isSelected: boolean;
   onSelect: () => void;
+  /** Distancia por calles, cuando ya se dibujó la ruta a este tutor: reemplaza a la de línea recta. */
+  roadDistanceKm?: number;
 }
 
-export const TutorResultItem = ({ tutor, categoryMap, isSelected, onSelect }: TutorResultItemProps) => {
+export const TutorResultItem = ({ tutor, categoryMap, isSelected, onSelect, roadDistanceKm }: TutorResultItemProps) => {
   const { tutorData } = tutor;
-  const transportCost = tutor.distanceKm !== undefined
-    ? Math.round(tutor.distanceKm * tutorData.ratePerKm * 100) / 100
+  // Con la ruta calculada se usa la distancia real, la misma con la que se cobra el traslado al reservar.
+  const distanceKm = roadDistanceKm ?? tutor.distanceKm;
+  const transportCost = distanceKm !== undefined
+    ? Math.round(distanceKm * tutorData.ratePerKm * 100) / 100
     : undefined;
   const categoryName = tutorData.categories.length > 0 ? categoryMap.get(tutorData.categories[0]) : undefined;
 
@@ -30,7 +34,7 @@ export const TutorResultItem = ({ tutor, categoryMap, isSelected, onSelect }: Tu
         <div className={styles.info}>
           <div className={styles.nameRow}>
             <h3>{tutor.name}</h3>
-            {tutor.distanceKm !== undefined && <span className={styles.distance}>{tutor.distanceKm} km</span>}
+            {distanceKm !== undefined && <span className={styles.distance}>{distanceKm} km</span>}
           </div>
           <div className={styles.metaRow}>
             <span className={styles.rating}>
