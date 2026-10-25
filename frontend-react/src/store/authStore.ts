@@ -9,12 +9,6 @@ export interface RegisterData {
   role: 'student' | 'tutor';
 }
 
-export interface GoogleStubData {
-  email: string;
-  name: string;
-  role: 'student' | 'tutor';
-}
-
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -27,7 +21,8 @@ interface AuthStore extends AuthState {
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  googleStub: (data: GoogleStubData) => Promise<void>;
+  /** Inicia sesión (o crea la cuenta) con el ID token de Google; devuelve true si la cuenta es nueva. */
+  loginWithGoogle: (credential: string, role?: 'student' | 'tutor') => Promise<boolean>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -77,10 +72,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     await get().refreshUser();
   },
 
-  googleStub: async (stub) => {
-    const { data } = await api.post<{ token: string }>('/auth/google', stub);
+  loginWithGoogle: async (credential, role) => {
+    const { data } = await api.post<{ token: string; isNewUser: boolean }>('/auth/google', { credential, role });
     localStorage.setItem(TOKEN_KEY, data.token);
     await get().refreshUser();
+    return data.isNewUser;
   },
 
   logout: async () => {

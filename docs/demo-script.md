@@ -225,19 +225,21 @@ Cerrar sesión e iniciar como `admin@educaspot.gt` / `Admin123!`:
 
 ## Preguntas frecuentes anticipadas
 
-### P1 — ¿Por qué el login de Google es un stub y no OAuth real?
+### P1 — ¿Cómo funciona el inicio de sesión con Google?
 
-Es una decisión de alcance documentada desde el día 1 del proyecto (tabla
-D1–D10 de `.omo/plans/plan-edumarket.md`, decisión **D4**): el endpoint
-`POST /api/auth/google` acepta un payload simulado (`{ email, name,
-photoUrl }`) y devuelve un JWT real del sistema, pero no implementa
-`passport-google-oauth20` ni verifica un identity token real de Google. Fue
-una decisión consciente para no desviar tiempo de desarrollo (apretado,
-proyecto solo) hacia la configuración de credenciales OAuth de un proveedor
-externo, cuando el valor académico está en demostrar el flujo de
-autenticación y emisión de JWT, no en la integración particular con Google.
-La alternativa completa (`passport-google-oauth20` real) queda identificada
-en el plan como trabajo futuro, no como algo pendiente de esta entrega.
+Es OAuth 2.0 / OpenID Connect real. El botón oficial de Google Identity
+Services abre la selección de cuenta y devuelve un **ID token** (JWT firmado
+por Google). El frontend lo manda a `POST /api/auth/google` y el backend lo
+verifica con `google-auth-library` (`services/google.service.ts`): firma con
+las claves públicas de Google, vigencia, que el token fue emitido para
+**nuestro** Client ID y que el correo esté verificado. Con eso extrae nombre,
+correo y foto y emite el JWT propio del sistema, igual que en el login con
+contraseña. Si el correo ya tenía cuenta se vincula; si no, solo se crea desde "Crear
+cuenta", con el rol elegido ahí (estudiante o tutor), y pasa al onboarding;
+desde "Iniciar sesión" nunca se crea una cuenta, porque el rol no se puede
+cambiar después y no se debe asignar uno por defecto. Los
+administradores no entran por aquí: tienen su propio acceso en `/admin/login`.
+El Client ID es público; no hay ningún secreto de Google en el repositorio.
 
 ### P2 — ¿Cómo se calcula la distancia y el costo de traslado?
 
