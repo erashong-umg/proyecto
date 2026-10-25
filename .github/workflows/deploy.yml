@@ -43,7 +43,7 @@ jobs:
           context: ${{ matrix.context }}
           push: true
           build-args: |
-            VITE_GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ github.sha }}
@@ -71,7 +71,7 @@ jobs:
             MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
             MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             ENVEOF
             podman-compose pull
             podman-compose up -d

@@ -161,16 +161,23 @@ mano ya no tiene efecto después del siguiente push a `main`.
 `GITHUB_TOKEN` (usado para publicar en GHCR) es automático, no hay que
 crearlo.
 
-### Variable `GOOGLE_CLIENT_ID` (inicio de sesión con Google)
+### Secret `GOOGLE_CLIENT_ID` (inicio de sesión con Google)
 
-A diferencia de los secrets anteriores, el Client ID de Google **no es un
-secreto**: se carga como *variable* de Actions (Settings → Secrets and
-variables → Actions → pestaña **Variables** → `GOOGLE_CLIENT_ID`). El workflow
-la usa en dos lugares: como argumento de build del frontend
-(`VITE_GOOGLE_CLIENT_ID`, se compila dentro del SPA) y escrita en el `.env`
-del servidor para el backend. Si no está definida, el botón de Google
-simplemente no aparece y `POST /api/auth/google` responde 503. Cómo obtener el
-Client ID: sección 7.
+A diferencia de los de la tabla anterior (que son *environment secrets* de
+`DEPLOY_PRD`), este debe crearse como secret de **repositorio**: Settings →
+Secrets and variables → Actions → pestaña **Secrets** → *New repository
+secret*, nombre `GOOGLE_CLIENT_ID`, valor el ID de cliente de Google. La razón
+es que lo necesita el job de build del frontend, que no usa el entorno
+`DEPLOY_PRD`; un secret definido solo en ese entorno no es visible ahí y el
+botón de Google saldría vacío en producción. (El Client ID en realidad es
+público, porque queda dentro del JavaScript del frontend; se guarda como secret
+solo por comodidad.)
+
+El workflow lo usa en dos lugares: como argumento de build del frontend
+(`VITE_GOOGLE_CLIENT_ID`, se compila dentro del SPA) y escrito en el `.env` del
+servidor para el backend. Si no está definido, el botón de Google simplemente no
+aparece y `POST /api/auth/google` responde 503. Cómo obtener el Client ID:
+sección 7.
 
 ## 5. Uso diario
 
@@ -226,7 +233,7 @@ si no, usa `mongodb://admin:<password>@localhost:27017/educaspot?authSource=admi
    - Desarrollo: `backend-express/.env` → `GOOGLE_CLIENT_ID=...` y
      `frontend-react/.env.local` → `VITE_GOOGLE_CLIENT_ID=...` (el mismo
      valor en ambos; `.env.local` no se versiona).
-   - Producción: variable de Actions `GOOGLE_CLIENT_ID` (ver sección 4).
+   - Producción: secret de Actions `GOOGLE_CLIENT_ID` (ver sección 4).
 
 ## Troubleshooting
 
