@@ -185,8 +185,25 @@ A partir de aquí, cada push/merge a `main` dispara
 2. Se conecta por SSH y corre `podman-compose pull && up -d` en
    `~/apps/educaspot`.
 
-Para desplegar manualmente sin esperar un push, conectarse por SSH y
-repetir los comandos de "Primer arranque manual" arriba.
+### Desplegar una rama a mano (lista de ramas)
+
+El mismo workflow se puede lanzar manualmente eligiendo la rama: en GitHub →
+**Actions → Deploy → Run workflow**, abrir la lista **Rama a desplegar**
+(`main`, `release` o `develop`) y pulsar **Run workflow**. Construye esa rama y
+la despliega con el mismo proceso. Útil para probar `release` en el servidor
+antes de integrarla en `main`.
+
+- El título de cada ejecución indica qué rama se desplegó, y las imágenes se
+  etiquetan con el commit realmente construido.
+- El servidor siempre corre la imagen `latest`: lo último que se despliegue
+  (sea cual sea la rama) es lo que queda en producción. Para volver a `main`,
+  vuelva a lanzar el workflow con `main`.
+- Solo corre un despliegue a la vez; si se lanza otro, espera su turno.
+- Para ofrecer otras ramas en la lista, agréguelas en `options` del input
+  `branch` de `deploy.yml`.
+
+También se puede desplegar sin GitHub, conectándose por SSH y repitiendo los
+comandos de "Primer arranque manual" arriba.
 
 ## 6. Conectarse a Mongo desde fuera
 

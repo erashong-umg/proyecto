@@ -1,8 +1,28 @@
 name: Deploy
 
+# Qué rama se despliega aparece en el título de cada ejecución.
+run-name: Deploy — ${{ inputs.branch || github.ref_name }}
+
 on:
+  # Automático: cada push a main despliega main.
   push:
     branches: [main]
+  # Manual: Actions → Deploy → Run workflow → lista "Rama a desplegar".
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Rama a desplegar en el servidor
+        type: choice
+        options:
+          - main
+          - release
+          - develop
+        default: main
+
+# Un solo despliegue a la vez: dos ejecuciones simultáneas se pisarían en el servidor.
+concurrency:
+  group: deploy-prd
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
@@ -29,6 +49,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # Manual: la rama elegida en la lista. Push: el commit que lo disparó.
+          ref: ${{ inputs.branch || github.sha }}
+
+      # Commit realmente construido (con otra rama, github.sha no es este).
+      - name: Resolver commit
+        id: src
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -49,7 +77,7 @@ jobs:
             VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/proyecto-${{ matrix.service }}:${{ steps.src.outputs.sha }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
@@ -58,6 +86,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEPLOY_PRD
     steps:
+      - name: Resumen
+        run: echo "Desplegando la rama ${{ inputs.branch || github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1
         with:
