@@ -65,6 +65,13 @@
 
 .submit { width: 100%; }
 
+.googleHint {
+  text-align: center;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin: $space-3 0 0;
+}
+
 .divider {
   text-align: center;
   color: $color-text-muted;

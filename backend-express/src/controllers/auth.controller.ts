@@ -113,12 +113,17 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
         await user.save();
       }
     } else {
+      // Crear una cuenta exige haber elegido el rol (pantalla "Crear cuenta"):
+      // el rol no se puede cambiar después, así que nunca se asigna uno por defecto.
+      if (!role) {
+        throw NotFound('No existe una cuenta con esa cuenta de Google. Cree una desde "Crear cuenta" y elija si es estudiante o tutor.');
+      }
       user = await User.create({
         email: profile.email,
         name: profile.name,
         photoUrl: profile.photoUrl,
         googleId: profile.googleId,
-        role: role ?? 'student',
+        role,
         onboardingCompleted: false,
       });
       isNewUser = true;

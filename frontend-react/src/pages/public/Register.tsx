@@ -38,6 +38,9 @@ export const RegisterPage = () => {
             <>
               <div className={styles.divider}>o</div>
               <GoogleSignInButton text="signup_with" onCredential={handleGoogleCredential} />
+              <p className={styles.googleHint}>
+                Con Google se creará su cuenta como <strong>{form.role === 'tutor' ? 'tutor' : 'estudiante'}</strong>.
+              </p>
             </>
           )}
 

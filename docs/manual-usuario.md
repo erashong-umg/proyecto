@@ -212,12 +212,14 @@ automáticamente:
 
 También puede ingresar con el botón de **Google** (se muestra solo si el
 servicio está habilitado). Elija su cuenta de Google y el sistema inicia
-sesión: si es su primera vez se crea su cuenta con el nombre, el correo y la
-foto de su cuenta de Google, y pasa al registro de su perfil (onboarding). Si
-ya tenía una cuenta con ese mismo correo, se vincula a ella. En la pantalla de
-**Crear cuenta** el mismo botón crea la cuenta con el rol (estudiante o tutor)
-que haya elegido arriba. Las cuentas creadas con Google no tienen contraseña:
-ingresan siempre con el botón de Google.
+sesión si ya tiene cuenta (si usted se había registrado con ese mismo correo, el
+sistema la vincula). Para **crear** una cuenta con Google hay que hacerlo desde
+**Crear cuenta**: primero elija arriba si es estudiante o tutor, y luego pulse
+el botón de Google; se crea con el nombre, el correo y la foto de su cuenta de
+Google y pasa al registro de su perfil (onboarding). Si pulsa el botón desde
+**Iniciar sesión** y todavía no tiene cuenta, el sistema se lo indica y no crea
+nada, porque el rol no se puede cambiar después. Las cuentas creadas con Google
+no tienen contraseña: ingresan siempre con el botón de Google.
 
 El enlace **"¿Olvidó su contraseña?"** se muestra en el formulario, pero a
 la fecha de este manual la recuperación de contraseña no se encuentra

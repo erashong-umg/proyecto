@@ -17,7 +17,8 @@ export const loginSchema = z.object({
 });
 
 // `credential` es el ID token (JWT) que entrega el botón de Google Identity
-// Services. `role` solo aplica al crear una cuenta nueva (pantalla de registro).
+// Services. `role` es obligatorio solo para crear una cuenta nueva (pantalla de registro);
+// para una cuenta existente se ignora.
 export const googleAuthSchema = z.object({
   credential: z.string().min(20, 'Credencial de Google inválida'),
   role: z.enum(['student', 'tutor']).optional(),
