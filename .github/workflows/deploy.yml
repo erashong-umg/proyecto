@@ -13,6 +13,9 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    # Mismo entorno que el deploy: aquí viven los secrets, y el build del
+    # frontend necesita GOOGLE_CLIENT_ID (se compila dentro del SPA).
+    environment: DEPLOY_PRD
     permissions:
       contents: read
       packages: write
