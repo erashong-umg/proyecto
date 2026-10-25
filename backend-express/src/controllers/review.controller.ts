@@ -4,12 +4,14 @@ import { Review } from '../models/Review';
 import { Booking } from '../models/Booking';
 import { User } from '../models/User';
 import { Unauthorized, NotFound, BadRequest } from '../utils/errors';
+import { syncCompletedBookings } from '../services/booking.service';
 
 export const createReview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     if (!req.user) throw Unauthorized('No autenticado.');
     const { bookingId, rating, comment } = req.body;
 
+    await syncCompletedBookings({ _id: bookingId });   // si ya terminó, se completa sola
     const booking = await Booking.findById(bookingId);
     if (!booking) throw NotFound('Reserva no encontrada.');
     if (!booking.studentId.equals(req.user.id)) throw Unauthorized('No le pertenece esta reserva.');

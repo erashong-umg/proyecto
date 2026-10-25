@@ -161,8 +161,7 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
   `getTutorAvailability` (pública, para que el estudiante vea huecos libres).
 - `booking.controller.ts` — `createBookingController` (convierte
   `startsAt` de string ISO a `Date` antes de delegar al servicio — ver bug
-  documentado en §8), `getMyBookings`, `cancelBookingController`,
-  `completeBookingController`.
+  documentado en §8), `getMyBookings`, `cancelBookingController`.
 - `tutor.controller.ts` — `searchTutorsController` (filtro por categoría,
   radio, precio — delega en `search.service.ts`), `getTutorPublicProfile`.
 - `geo.controller.ts` — `calculateDistance` (expone `haversineKm` como
@@ -189,7 +188,7 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
 - `geo.service.ts` — `haversineKm(a, b)` (distancia en km entre dos
   `{lat,lng}`), `calculateTripPrice(...)`, `toGeoJsonPoint` (utilidad no
   usada para indexar, ver §8).
-- `booking.service.ts` — `createBooking`/`cancelBooking`/`completeBooking`.
+- `booking.service.ts` — `createBooking`/`cancelBooking`/`syncCompletedBookings`/`getFreeSlots`.
   Aquí vive la lógica anti-traslape: dos reservas chocan si
   `s1 < e2 && s2 < e1`; se verifica por separado contra las reservas
   `pending`+`confirmed` del tutor y del estudiante. Si el tutor no tiene
@@ -282,7 +281,7 @@ src/
 │   ├── layout/       Header, Footer, ProtectedRoute, ThemeToggle, ComingSoon
 │   ├── map/          MapPicker (Leaflet, selección de dirección)
 │   ├── onboarding/   OnboardingProgress + 4 Step* (wizard de 5 pasos)
-│   ├── tutors/        BookingWidget, SearchMap, TutorResultItem
+│   ├── tutors/        BookingWizard, RouteMap, SearchMap, TutorResultItem
 │   └── ui/            Button, Input, Modal, Textarea (design system base)
 ├── hooks/            un hook por caso de uso de datos (ver abajo)
 ├── pages/            una carpeta por sección de ruta (public/tutors/tutor/
@@ -671,7 +670,7 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 | # | Requisito original del enunciado | Implementación real (stub aceptado) | Alternativa completa (fuera de alcance) |
 |---|---|---|---|
 | D1 | Vistas de calendario Diaria/Semanal/Mensual | Cuadrícula de 7 días × horas, interacción de "pintar" por clic-y-arrastre (`useMyAvailability`, `TutorAvailabilityPage`) — sin librería de calendario | `react-big-calendar` con las 3 vistas |
-| D2 | Suscripción periódica de 4 u 8 semanas | Checkbox "Repetir N semanas" que crea N documentos `Booking` individuales agrupados por `recurringGroupId` | Motor de recurrencia real con job programado |
+| D2 | Suscripción periódica de 4 u 8 semanas | En el paso "Cuándo" del asistente de reserva: una vez, o cada semana por 4 u 8 semanas (`REPEAT_OPTIONS`, validado también en el backend). Crea N documentos `Booking` individuales agrupados por `recurringGroupId`; `getFreeSlots` solo ofrece horas libres todas las semanas | Motor de recurrencia real con job programado |
 | D3 | Ruta trazada en el mapa | Ruta real por calles con OSRM (`geo.service.ts::getRoute`, `POST /api/geo/route`), dibujada con Leaflet en `RouteMap` dentro del formulario de reserva. La distancia de la ruta es la que se cobra (`quoteTrip`) y se guarda en la reserva. Si OSRM no responde o `OSRM_URL` está vacío, cae a línea recta Haversine (trazo punteado) para no bloquear reservas | Servidor OSRM propio: el demo público (`router.project-osrm.org`) es solo para desarrollo |
 | D4 | OAuth 2.0 real con Google | **Implementado.** El botón oficial de Google Identity Services entrega un ID token; `POST /api/auth/google` lo verifica con `google-auth-library` (`google.service.ts`: firma, vigencia, audiencia = `GOOGLE_CLIENT_ID` y correo verificado) y emite el JWT propio. Crea la cuenta con nombre, correo y foto de Google, o vincula la cuenta existente con el mismo correo. Los administradores quedan excluidos (tienen `/admin/login`). Sin `GOOGLE_CLIENT_ID` el endpoint responde 503 y el frontend no muestra el botón | — |
 | D5 | Hoja de vida en PDF | Campo `cvUrl` (string, URL a archivo externo/LinkedIn/portafolio) en `tutorData` | Subida real de archivo con `multer` + almacenamiento (S3/disco) |
@@ -864,3 +863,22 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
 | `$z-sticky` | `1100` |
 | `$z-modal` | `1200` |
 | `$z-toast` | `1300` |
+
+## Agenda y reservas: reglas actuales
+
+- **Zona horaria:** los horarios de los tutores ("lunes 09:00–18:00") son hora
+  local de la academia, no la del servidor (en Docker es UTC). Todo cálculo de
+  agenda pasa por `utils/time.ts` con `APP_TIMEZONE` (por defecto
+  `America/Guatemala`).
+- **Una sola regla de disponibilidad:** se reserva siempre dentro de los
+  horarios que el tutor publicó, también las clases virtuales. No se reserva en
+  el pasado.
+- **Horas libres:** `GET /api/availability/:tutorId/slots?date&durationMin&repeatWeeks`
+  devuelve solo inicios que se pueden reservar (descontadas las tutorías del
+  tutor y del estudiante y, en una suscripción, todas las semanas).
+- **Sesiones que se completan solas:** una reserva confirmada cuyo horario
+  terminó pasa a `completed` (`syncCompletedBookings`, al consultar reservas y
+  al calificar); ya no existe el endpoint de completar a mano. No se puede
+  cancelar una tutoría que ya comenzó.
+- **Calificar y reportar** se hacen desde "Mis reservas" (`BookingList`,
+  `ReviewDialog`, `ReportDialog`) sobre tutorías completadas.

@@ -112,7 +112,16 @@ export interface Booking {
   status: BookingStatus;
   priceBreakdown: PriceBreakdown;
   recurringGroupId?: string;
+  /** Ya tiene reseña del estudiante (lo calcula GET /bookings/me). */
+  reviewed?: boolean;
 }
+
+// Hora de inicio libre que ofrece GET /api/availability/:tutorId/slots.
+export interface FreeSlot {
+  startsAt: string;   // ISO UTC, es lo que se envía al reservar
+  label: string;      // "09:30" en hora de la academia
+}
+
 
 // --- Moderación (panel de administración) ---
 

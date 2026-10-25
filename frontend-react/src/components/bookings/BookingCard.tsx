@@ -1,4 +1,5 @@
-import { Video, Home, MapPinned, CircleCheck } from 'lucide-react';
+import { useState } from 'react';
+import { Video, Home, MapPinned, Star, Flag } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatQ, formatDayTime } from '../../services/formatters';
 import type { Booking, BookingStatus, Modality } from '../../types/api';
@@ -29,16 +30,24 @@ interface BookingCardProps {
   counterpartLabel: string;
   onCancel?: () => void;
   isCancelling?: boolean;
-  onComplete?: () => void;
-  isCompleting?: boolean;
+  /** Solo el estudiante califica, y solo una vez por tutoría completada. */
+  onReview?: () => void;
+  /** Cualquiera de los dos puede reportar al otro después de la tutoría. */
+  onReport?: () => void;
 }
 
 export const BookingCard = ({
-  booking: b, counterpartLabel, onCancel, isCancelling, onComplete, isCompleting,
+  booking: b, counterpartLabel, onCancel, isCancelling, onReview, onReport,
 }: BookingCardProps) => {
   const Icon = MODALITY_ICONS[b.modality];
-  const canCancel = b.status === 'pending' || b.status === 'confirmed';
-  const canComplete = b.status === 'confirmed';
+  // Las tutorías se completan solas al terminar su horario (no hay botón manual) y
+  // no se pueden cancelar una vez comenzadas.
+  const [now] = useState(() => Date.now());
+  const isUpcoming = new Date(b.startsAt).getTime() > now;
+  const canCancel = (b.status === 'pending' || b.status === 'confirmed') && isUpcoming;
+  const isCompleted = b.status === 'completed';
+  const canReview = isCompleted && !!onReview && !b.reviewed;
+  const canReport = isCompleted && !!onReport;
 
   return (
     <div className={styles.card}>
@@ -56,16 +65,17 @@ export const BookingCard = ({
         <span className={styles.price}>{formatQ(b.priceBreakdown.total)}</span>
       </div>
 
-      {(onCancel && canCancel) || (onComplete && canComplete) ? (
+      {(onCancel && canCancel) || canReview || canReport || (isCompleted && b.reviewed) ? (
         <div className={styles.actions}>
-          {onComplete && canComplete && (
-            <Button
-              variant="secondary"
-              size="sm"
-              isLoading={isCompleting}
-              onClick={onComplete}
-            >
-              <CircleCheck aria-hidden="true" /> Marcar completada
+          {isCompleted && b.reviewed && <span className={styles.reviewed}><Star aria-hidden="true" /> Ya la calificó</span>}
+          {canReview && (
+            <Button variant="secondary" size="sm" onClick={onReview}>
+              <Star aria-hidden="true" /> Calificar
+            </Button>
+          )}
+          {canReport && (
+            <Button variant="ghost" size="sm" onClick={onReport}>
+              <Flag aria-hidden="true" /> Reportar
             </Button>
           )}
           {onCancel && canCancel && (
