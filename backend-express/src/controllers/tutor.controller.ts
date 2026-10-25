@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 import { Course } from '../models/Course';
 import { Review } from '../models/Review';
-import { NotFound } from '../utils/errors';
-import { searchTutors, type SearchTutorsParams } from '../services/search.service';
+import { NotFound, BadRequest } from '../utils/errors';
+import { searchTutors } from '../services/search.service';
+import { searchTutorsQuerySchema } from '../utils/validators';
 
 export const getTutorPublicProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -33,10 +34,14 @@ export const getTutorPublicProfile = async (req: Request, res: Response, next: N
 
 export const searchTutorsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const params: SearchTutorsParams = {
-      ...(req.query as any),
-    };
-    const tutors = await searchTutors(params);
+    const parsed = searchTutorsQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      throw BadRequest(parsed.error.issues[0]?.message ?? 'Parámetros de búsqueda inválidos.');
+    }
+    if (parsed.data.minPrice !== undefined && parsed.data.maxPrice !== undefined && parsed.data.minPrice > parsed.data.maxPrice) {
+      throw BadRequest('El precio mínimo no puede ser mayor que el máximo.');
+    }
+    const tutors = await searchTutors(parsed.data);
     res.json({ tutors });
   } catch (error) { next(error); }
 };

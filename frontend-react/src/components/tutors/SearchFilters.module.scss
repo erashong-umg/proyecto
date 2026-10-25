@@ -1,0 +1,87 @@
+@use '../../styles/variables' as *;
+
+.filters {
+  padding: 0 $space-4 $space-3;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-1 0;
+  background: none;
+  border: 0;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg { width: 16px; height: 16px; }
+  svg:last-child { transition: transform $transition-fast; }
+}
+
+.chevronOpen { transform: rotate(180deg); }
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 $space-1;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: $on-accent-text;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+// En pantallas bajas el panel de filtros hace scroll para no tapar los resultados.
+.panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+  margin-top: $space-2;
+  max-height: 34vh;
+  overflow-y: auto;
+  padding-bottom: $space-1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  min-width: 0;
+
+  label,
+  .label {
+    font-size: $font-size-xs;
+    font-weight: 600;
+    color: $color-text-muted;
+  }
+
+  select,
+  input { padding: $space-2 $space-3; font-size: $font-size-sm; }
+}
+
+.wide { grid-column: 1 / -1; }
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+
+  input { flex: 1; min-width: 0; padding-left: $space-3; }
+}
+
+.error {
+  margin: 0;
+  color: $color-danger;
+  font-size: $font-size-xs;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

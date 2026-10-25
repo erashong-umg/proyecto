@@ -64,12 +64,17 @@
   }
 }
 
+// Buscador + filtros: el borde inferior es del conjunto.
+.searchForm {
+  border-bottom: 1px solid $color-border;
+  flex-shrink: 0;
+}
+
 .searchBar {
   display: flex;
   align-items: center;
   gap: $space-2;
   padding: $space-4;
-  border-bottom: 1px solid $color-border;
   flex-shrink: 0;
   position: relative;
 

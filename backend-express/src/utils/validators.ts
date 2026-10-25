@@ -54,6 +54,27 @@ export const idDocumentSchema = z
     }
   });
 
+// Parámetros de GET /api/tutors/search. Llegan como texto en la query string: se
+// convierten y validan aquí (antes se pasaban tal cual y, por ejemplo, minRating "4"
+// no coincidía con el número 4 guardado en Mongo, así que ese filtro no devolvía nada).
+const queryNumber = (schema: z.ZodNumber) =>
+  z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), z.coerce.number().pipe(schema).optional());
+
+export const searchTutorsQuerySchema = z.object({
+  studentLat: queryNumber(z.number().min(-90).max(90)),
+  studentLng: queryNumber(z.number().min(-180).max(180)),
+  radiusKm: queryNumber(z.number().positive().max(500)),
+  categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Categoría inválida').optional(),
+  modality: z.enum(['virtual', 'presencial-tutor', 'presencial-estudiante']).optional(),
+  minRating: queryNumber(z.number().min(0).max(5)),
+  minReviews: queryNumber(z.number().int().min(0)),
+  minPrice: queryNumber(z.number().min(0)),
+  maxPrice: queryNumber(z.number().min(0)),
+  limit: queryNumber(z.number().int().min(1).max(100)),
+});
+
+export type SearchTutorsQuery = z.infer<typeof searchTutorsQuerySchema>;
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;

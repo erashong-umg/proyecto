@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
-import type { TutorSummary } from '../types/api';
+import type { SearchCriteria, TutorSummary } from '../types/api';
 
 interface Coords {
   lat: number;
@@ -13,12 +13,15 @@ export const useNearbySearch = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const search = useCallback((coords: Coords, categoryId?: string) => {
+  const search = useCallback((coords: Coords, criteria: SearchCriteria = {}) => {
     setIsLoading(true);
     setError(null);
     setHasSearched(true);
     const params: Record<string, string | number> = { studentLat: coords.lat, studentLng: coords.lng };
-    if (categoryId) params.categoryId = categoryId;
+    // Solo se envían los criterios que la persona eligió.
+    for (const [key, value] of Object.entries(criteria)) {
+      if (value !== undefined && value !== '') params[key] = value;
+    }
 
     api
       .get<{ tutors: TutorSummary[] }>('/tutors/search', { params })

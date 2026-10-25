@@ -903,3 +903,13 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
   cuenta responde 404 con `details.code = 'GOOGLE_ACCOUNT_NOT_FOUND'`; `useLoginForm` lo
   reconoce, guarda la credencial y muestra "Es su primera vez aquí" con el selector de rol, y
   reenvía la misma credencial con el rol elegido (`completeGoogleSignup`).
+- **Búsqueda de tutores con filtros** (`GET /api/tutors/search`, `search.service.ts`):
+  parámetros `studentLat`, `studentLng`, `radiusKm`, `categoryId`, `modality`,
+  `minRating`, `minReviews`, `minPrice`, `maxPrice` y `limit`. El controlador los valida
+  y convierte con `searchTutorsQuerySchema` (llegan como texto; antes `minRating` no
+  filtraba nada porque `"4"` no coincide con el número 4 en Mongo). Calificación,
+  reseñas, precio (tarifa base del tutor), categoría y modalidad se resuelven en la
+  consulta (la modalidad, con los cursos activos del tutor); la distancia se calcula con
+  Haversine en memoria (D8) y el resultado sale ordenado por cercanía, con el límite
+  aplicado después. En el frontend, `SearchFilters` es el panel plegable y
+  `useNearbySearch` envía solo los criterios elegidos.

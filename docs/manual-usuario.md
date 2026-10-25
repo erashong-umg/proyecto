@@ -267,21 +267,34 @@ mapa interactivo a un lado y un listado de resultados al otro.
    los nombres de categoría existentes; si no coincide con ninguna, se le
    avisa y de todas formas se muestran todos los tutores cercanos sin ese
    filtro.
-4. En el **mapa**, su propia ubicación se marca con un punto distinto al de
+4. **Filtros** (botón plegable bajo el buscador; muestra cuántos hay activos):
+   - **Distancia**: a menos de 1, 3, 5, 10 o 25 km de usted.
+   - **Modalidad**: virtual, en casa del tutor o a su domicilio (solo aparecen
+     tutores con un curso activo en esa modalidad).
+   - **Calificación**: 3★, 4★ o 4.5★ o más.
+   - **Reseñas**: tutores con 1, 3, 5 o 10 reseñas o más.
+   - **Precio por hora**: un mínimo y/o un máximo, en quetzales.
+
+   Los filtros se combinan entre sí y con el texto de categoría, y se aplican
+   al presionar **Buscar**. **Limpiar filtros** los quita todos. Si el mínimo de
+   precio es mayor que el máximo, se le avisa y no se busca. Los resultados
+   salen ordenados del más cercano al más lejano.
+5. En el **mapa**, su propia ubicación se marca con un punto distinto al de
    los tutores (representados con un pin de color). Al hacer clic sobre un
    pin de tutor se resalta y se abre una pequeña etiqueta con su nombre; el
    mapa también se centra y hace zoom automáticamente para mostrar a todos
    los tutores encontrados junto con su propia posición.
-5. En el **listado**, cada resultado muestra foto o iniciales, nombre,
+6. En el **listado**, cada resultado muestra foto o iniciales, nombre,
    distancia en kilómetros, calificación promedio (o "Nuevo/a" si aún no
    tiene reseñas), una de sus categorías, su tarifa base por hora y, si
    aplica, el costo adicional estimado de traslado. Al pasar el mouse o
    enfocar un resultado de la lista, el pin correspondiente se resalta en
    el mapa (y viceversa).
-6. Haga clic sobre cualquier resultado para ir a su perfil completo.
+7. Haga clic sobre cualquier resultado para ir a su perfil completo.
 
 Si no hay tutores cerca con el criterio usado, se muestra un estado vacío
-indicándolo.
+indicándolo; si había filtros activos, el mensaje lo dice y ofrece **Limpiar
+filtros**.
 
 ![Búsqueda de tutores con mapa](capturas/08-busqueda.png)
 

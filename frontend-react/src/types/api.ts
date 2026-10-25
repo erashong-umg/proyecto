@@ -16,6 +16,17 @@ export interface Category {
   parentId?: string | null;
 }
 
+// Criterios de GET /api/tutors/search (todos opcionales).
+export interface SearchCriteria {
+  categoryId?: string;
+  radiusKm?: number;
+  minRating?: number;
+  minReviews?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  modality?: Modality;
+}
+
 export interface TutorSummary {
   _id: string;
   name: string;
