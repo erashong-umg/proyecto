@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { Booking, type IBooking } from '../models/Booking';
 import { Course } from '../models/Course';
 import { User } from '../models/User';
-import { calculateTripPrice, type LatLng } from './geo.service';
+import { quoteTrip, type LatLng } from './geo.service';
 import { Conflict, BadRequest, NotFound } from '../utils/errors';
 import type { Modality } from '../models/Course';
 import { Availability } from '../models/Availability';
@@ -88,13 +88,13 @@ export const createBooking = async (
     if (!tutor.address?.coords) throw BadRequest('El tutor no tiene dirección registrada.');
     if (!tutor.tutorData) throw BadRequest('Datos del tutor incompletos.');
 
-    priceBreakdown = calculateTripPrice(
+    ({ breakdown: priceBreakdown } = await quoteTrip(
       course.baseRate,
       course.ratePerKm,
       durationMin / 60,
       tutor.address.coords as LatLng,
       student.address.coords as LatLng
-    );
+    ));
   } else {
     const baseAmount = Math.round((course.baseRate * durationMin / 60) * 100) / 100;
     priceBreakdown = { distanceKm: undefined, baseAmount, transportAmount: 0, total: baseAmount };

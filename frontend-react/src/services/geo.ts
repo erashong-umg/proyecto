@@ -1,7 +1,5 @@
-// Espejo de backend-express/src/services/geo.service.ts — misma fórmula,
-// para poder previsualizar el precio en el formulario de reserva sin pegarle
-// al backend en cada cambio del formulario. El backend recalcula y valida
-// esto mismo al crear la reserva; esto es solo una vista previa.
+// Vista previa del precio en el formulario de reserva (la distancia viene de la
+// ruta que calcula el backend). El backend recalcula todo al crear la reserva.
 
 export interface LatLng {
   lat: number;
@@ -30,20 +28,20 @@ export interface PriceBreakdown {
   total: number;
 }
 
+// `distanceKm` es la distancia de la ruta (ver useTripRoute); sin ella no hay
+// traslado que cobrar. Debe coincidir con el cálculo del backend al reservar.
 export const calculateTripPrice = (
   baseRate: number,
   ratePerKm: number,
   hours: number,
-  tutorCoords: LatLng | undefined,
-  studentCoords: LatLng | undefined
+  distanceKm: number | undefined
 ): PriceBreakdown => {
   const baseAmount = Math.round(baseRate * hours * 100) / 100;
 
-  if (!tutorCoords || !studentCoords) {
+  if (distanceKm === undefined) {
     return { baseAmount, transportAmount: 0, total: baseAmount };
   }
 
-  const distanceKm = haversineKm(tutorCoords, studentCoords);
   const transportAmount = Math.round(distanceKm * ratePerKm * 100) / 100;
   const total = Math.round((baseAmount + transportAmount) * 100) / 100;
   return { distanceKm: Math.round(distanceKm * 100) / 100, baseAmount, transportAmount, total };

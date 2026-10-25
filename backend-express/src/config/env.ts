@@ -11,6 +11,9 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('7d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.string().default('dev'),
+  // Servidor OSRM para rutas por calles. Vacío = sin routing (línea recta).
+  // El demo público es solo para desarrollo; en producción conviene uno propio.
+  OSRM_URL: z.string().default('https://router.project-osrm.org'),
 });
 
 const parsed = envSchema.safeParse(process.env);
