@@ -246,6 +246,15 @@ y `presence:update` (en línea / `lastSeenAt`). El estado de cada mensaje propio
 se deriva de `deliveredTo` / `readBy`: ✓ enviado, ✓✓ entregado, ✓✓ azul leído.
 La presencia en memoria es válida para una sola instancia del servidor.
 
+### Versión publicada
+
+`routes/meta.routes.ts` expone `GET /api/health` y `GET /api/version` con la
+versión, rama, commit y fecha de compilación (`APP_VERSION`, `APP_BRANCH`,
+`APP_COMMIT`, `APP_BUILT_AT`, definidas en `config/env.ts` y fijadas al
+construir la imagen). El frontend muestra lo mismo en un badge flotante
+(`VersionBadge`) y compara su commit con el del backend. Ver
+`docs/despliegue.md`.
+
 ### Rutas montadas en `server.ts`
 
 `/api/auth`, `/api/users`, `/api/categories` (solo `GET /` pública — el

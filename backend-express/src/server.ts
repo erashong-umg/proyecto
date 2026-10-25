@@ -8,6 +8,7 @@ import { env } from './config/env';
 import { connectDB } from './config/db';
 import { errorMiddleware } from './middleware/error';
 import { setupSockets } from './sockets';
+import metaRoutes from './routes/meta.routes';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import categoryRoutes from './routes/category.routes';
@@ -42,16 +43,8 @@ app.use(cors({ origin: env.CORS_ORIGIN }));   // JWT va en el header Authorizati
 app.use(express.json());
 app.use(morgan(env.LOG_LEVEL));
 
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'educaspot-backend',
-  });
-});
-
 // Rutas de la API
+app.use('/api', metaRoutes);   // /api/health y /api/version
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -83,6 +76,7 @@ const start = async (): Promise<void> => {
     console.log(`[Server] educaspot API escuchando en http://localhost:${env.PORT}`);
     console.log(`[Server] Socket.io listo en ws://localhost:${env.PORT}`);
     console.log(`[Server] Health check: http://localhost:${env.PORT}/api/health`);
+    console.log(`[Server] Versión ${env.APP_VERSION} (${env.APP_BRANCH}@${env.APP_COMMIT})`);
   });
 };
 
