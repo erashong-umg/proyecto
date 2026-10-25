@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
+import type { IdDocumentType } from '../services/idDocument';
 
 export interface PendingTutor {
   _id: string;
   name: string;
   email: string;
   photoUrl?: string;
+  idDocument?: { type: IdDocumentType; number: string };
   createdAt: string;
   tutorData: {
     bio: string;

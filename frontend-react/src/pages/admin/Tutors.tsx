@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Textarea } from '../../components/ui/Textarea';
 import { formatShortDate, getInitials } from '../../services/formatters';
+import { ID_DOCUMENT_LABELS } from '../../services/idDocument';
 import styles from './Tutors.module.scss';
 
 export const AdminTutorsPage = () => {
@@ -48,6 +49,11 @@ export const AdminTutorsPage = () => {
               <div className={styles.info}>
                 <h3>{tutor.name}</h3>
                 <p className={styles.email}>{tutor.email}</p>
+                <p className={styles.date}>
+                  {tutor.idDocument
+                    ? `${ID_DOCUMENT_LABELS[tutor.idDocument.type]}: ${tutor.idDocument.number}`
+                    : 'Sin documento de identificación'}
+                </p>
                 <p className={styles.date}>Registrado el {formatShortDate(tutor.createdAt)}</p>
               </div>
 

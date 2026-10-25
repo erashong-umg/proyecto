@@ -144,7 +144,14 @@ error directamente — siempre `next(error)` hacia `errorMiddleware`:
 - `auth.controller.ts` — `register`, `login`, `logout` (no-op, token sin
   estado), `me`, `googleStub` (D4, ver §10), `forgotPassword`/`resetPassword`.
 - `user.controller.ts` — `getMe`, `updateMe`, `completeOnboarding` (marca
-  `onboardingCompleted` tras el wizard de 5 pasos del frontend).
+  `onboardingCompleted` tras el wizard de 5 pasos del frontend). El onboarding
+  exige el **documento de identificación** (`User.idDocument`): DPI de 13
+  dígitos o pasaporte de 6 a 20 caracteres, validado con `idDocumentSchema` y
+  guardado normalizado (sin espacios ni guiones). Es un dato sensible:
+  el campo es `select: false`, no sale en `/users/me` ni en ninguna respuesta
+  pública, y solo lo ve el administrador en la revisión de tutores pendientes
+  (`GET /api/admin/tutors/pending`). Un índice único parcial impide usar el
+  mismo documento en dos cuentas (responde 409).
 - `category.controller.ts` — `listCategories` (pública), `createCategory` /
   `deleteCategory` (exportadas pero **sin router propio montado** — ver
   nota de F4 abajo).
