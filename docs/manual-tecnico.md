@@ -142,7 +142,7 @@ Cada uno expone funciones async `(req, res, next)` que **nunca** responden el
 error directamente — siempre `next(error)` hacia `errorMiddleware`:
 
 - `auth.controller.ts` — `register`, `login`, `logout` (no-op, token sin
-  estado), `me`, `googleStub` (D4, ver §10), `forgotPassword`/`resetPassword`.
+  estado), `me`, `googleLogin` (OAuth 2.0 con Google, D4 — ver §10), `forgotPassword`/`resetPassword`.
 - `user.controller.ts` — `getMe`, `updateMe`, `completeOnboarding` (marca
   `onboardingCompleted` tras el wizard de 5 pasos del frontend). El onboarding
   exige el **documento de identificación** (`User.idDocument`): DPI de 13
@@ -311,7 +311,7 @@ D1). Se re-exportan todos desde `hooks/index.ts` como barrel file.
 - `authStore.ts` — `user`, `isAuthenticated`, `isLoading`, `isSuspended`;
   acciones `initialize` (lee el token de `localStorage` bajo la clave
   `edumarket_token` y llama a `/auth/me`), `login`, `register`,
-  `googleStub`, `logout`, `refreshUser`. Es el único lugar que escribe el
+  `loginWithGoogle`, `logout`, `refreshUser`. Es el único lugar que escribe el
   token en `localStorage` (`TOKEN_KEY` importado de `services/api.ts`).
 - `themeStore.ts` — `theme: 'light' | 'dark' | null` (`null` = sigue al
   S.O.); `setTheme`/`toggle`; persiste en `localStorage` (`edumarket_theme`)
@@ -545,7 +545,7 @@ el siguiente:
   `README.md` en la raíz) usaba cookies httpOnly. El enunciado exige
   explícitamente "Toda petición protegida al backend debe validar el Bearer
   Token en los headers" / "deberá ser enviado en los headers de cada
-  solicitud", así que se migró: `register`/`login`/`googleStub` devuelven
+  solicitud", así que se migró: `register`/`login`/`googleLogin` devuelven
   `{ user, token }` en el cuerpo JSON (no hay ningún `Set-Cookie` en la
   API), `authMiddleware` lee `req.headers.authorization`, y el paquete
   `cookie-parser` fue **desinstalado** del proyecto, no solo dejado sin
@@ -664,7 +664,7 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 | D1 | Vistas de calendario Diaria/Semanal/Mensual | Cuadrícula de 7 días × horas, interacción de "pintar" por clic-y-arrastre (`useMyAvailability`, `TutorAvailabilityPage`) — sin librería de calendario | `react-big-calendar` con las 3 vistas |
 | D2 | Suscripción periódica de 4 u 8 semanas | Checkbox "Repetir N semanas" que crea N documentos `Booking` individuales agrupados por `recurringGroupId` | Motor de recurrencia real con job programado |
 | D3 | Ruta trazada en el mapa | Ruta real por calles con OSRM (`geo.service.ts::getRoute`, `POST /api/geo/route`), dibujada con Leaflet en `RouteMap` dentro del formulario de reserva. La distancia de la ruta es la que se cobra (`quoteTrip`) y se guarda en la reserva. Si OSRM no responde o `OSRM_URL` está vacío, cae a línea recta Haversine (trazo punteado) para no bloquear reservas | Servidor OSRM propio: el demo público (`router.project-osrm.org`) es solo para desarrollo |
-| D4 | OAuth 2.0 real con Google | `POST /api/auth/google` (`googleStub`) acepta un payload simulado (`{email, name, role}` o `photoUrl`) y emite un JWT real — **sin** verificación de identidad real contra Google | `passport-google-oauth20` con verificación de id_token |
+| D4 | OAuth 2.0 real con Google | **Implementado.** El botón oficial de Google Identity Services entrega un ID token; `POST /api/auth/google` lo verifica con `google-auth-library` (`google.service.ts`: firma, vigencia, audiencia = `GOOGLE_CLIENT_ID` y correo verificado) y emite el JWT propio. Crea la cuenta con nombre, correo y foto de Google, o vincula la cuenta existente con el mismo correo. Los administradores quedan excluidos (tienen `/admin/login`). Sin `GOOGLE_CLIENT_ID` el endpoint responde 503 y el frontend no muestra el botón | — |
 | D5 | Hoja de vida en PDF | Campo `cvUrl` (string, URL a archivo externo/LinkedIn/portafolio) en `tutorData` | Subida real de archivo con `multer` + almacenamiento (S3/disco) |
 | D6 | Gráficos estadísticos dinámicos | `AdminAnalyticsPage` arma gráficos de barras/dona con CSS puro sobre los tokens del design system (clases `sliceA`…`sliceF`), sin librería de charting | Chart.js o Recharts con gráficos interactivos |
 | D7 | Confirmación de lectura en chat | Checks estilo WhatsApp (✓ enviado → ✓✓ entregado → ✓✓ azul leído) vía eventos de Socket.io en `chat.handler.ts`; `Message.deliveredTo` y `Message.readBy` persisten en Mongo | — (ya cumple el requisito, con mecanismo simplificado) |

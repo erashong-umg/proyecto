@@ -210,12 +210,14 @@ automáticamente:
 - **Cuenta suspendida**: si su cuenta está suspendida, el sistema lo
   redirige a `/suspension` en cuanto inicia sesión (vea la sección 13).
 
-La pantalla también incluye un botón **"Continuar con Google (stub)"**. Tal
-como su nombre lo indica, es una simulación de autenticación con Google
-para fines de demostración académica: le pide escribir un correo electrónico
-y crea/inicia sesión con una cuenta de estudiante asociada a ese correo, sin
-una verificación real de identidad de Google. No debe usarse como un inicio
-de sesión social genuino.
+También puede ingresar con el botón de **Google** (se muestra solo si el
+servicio está habilitado). Elija su cuenta de Google y el sistema inicia
+sesión: si es su primera vez se crea su cuenta con el nombre, el correo y la
+foto de su cuenta de Google, y pasa al registro de su perfil (onboarding). Si
+ya tenía una cuenta con ese mismo correo, se vincula a ella. En la pantalla de
+**Crear cuenta** el mismo botón crea la cuenta con el rol (estudiante o tutor)
+que haya elegido arriba. Las cuentas creadas con Google no tienen contraseña:
+ingresan siempre con el botón de Google.
 
 El enlace **"¿Olvidó su contraseña?"** se muestra en el formulario, pero a
 la fecha de este manual la recuperación de contraseña no se encuentra
