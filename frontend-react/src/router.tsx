@@ -80,12 +80,12 @@ export const AppRouter = () => {
 
         {/* Búsqueda y perfil de tutores */}
         <Route path="/tutores" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['student']}>
             <TutorSearchPage />
           </ProtectedRoute>
         } />
         <Route path="/tutores/:id" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['student']}>
             <TutorProfilePage />
           </ProtectedRoute>
         } />

@@ -17,9 +17,15 @@ export const HomePage = () => {
               Encuentre profesores de idiomas, deportes, ciencias, tecnología y posgrado. Modalidad virtual o presencial.
             </p>
             <div className={styles.heroActions}>
-              <Link to="/tutores">
-                <Button size="lg">Buscar tutores</Button>
-              </Link>
+              {user?.role === 'tutor' ? (
+                <Link to="/tutor/dashboard">
+                  <Button size="lg">Ir a mi panel</Button>
+                </Link>
+              ) : (
+                <Link to="/tutores">
+                  <Button size="lg">Buscar tutores</Button>
+                </Link>
+              )}
               {!isAuthenticated && (
                 <Link to="/register">
                   <Button size="lg" variant="secondary">Crear cuenta gratuita</Button>

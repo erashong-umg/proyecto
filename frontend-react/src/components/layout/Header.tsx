@@ -43,9 +43,11 @@ export const Header = () => {
 
   const navLinks = (
     <>
-      <NavLink to="/tutores" className={linkClass} onClick={() => setMobileOpen(false)}>
-        <Search aria-hidden="true" /> Buscar tutores
-      </NavLink>
+      {user?.role !== 'tutor' && (
+        <NavLink to="/tutores" className={linkClass} onClick={() => setMobileOpen(false)}>
+          <Search aria-hidden="true" /> Buscar tutores
+        </NavLink>
+      )}
       {isAuthenticated && user?.role === 'student' && (
         <NavLink to="/mis-reservas" className={linkClass} onClick={() => setMobileOpen(false)}>
           <ClipboardList aria-hidden="true" /> Mis reservas
