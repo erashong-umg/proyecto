@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
-import { Unauthorized, NotFound, BadRequest } from '../utils/errors';
+import { Unauthorized, NotFound, BadRequest, Conflict } from '../utils/errors';
+import { idDocumentSchema } from '../utils/validators';
 
 export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -36,6 +37,13 @@ export const completeOnboarding = async (req: Request, res: Response, next: Next
       onboardingCompleted: true,
     };
 
+    // Documento de identificación: obligatorio en el onboarding.
+    const idDocument = idDocumentSchema.safeParse(req.body.idDocument);
+    if (!idDocument.success) {
+      throw BadRequest(idDocument.error.issues[0]?.message ?? 'Documento de identificación inválido.');
+    }
+    update.idDocument = idDocument.data;
+
     // Campos comunes
     const commonFields = ['phone', 'gender', 'address', 'categoryIds', 'photoUrl', 'name'] as const;
     for (const f of commonFields) {
@@ -62,5 +70,11 @@ export const completeOnboarding = async (req: Request, res: Response, next: Next
       .lean();
     if (!user) throw NotFound('Usuario no encontrado.');
     res.json({ user });
-  } catch (error) { next(error); }
+  } catch (error) {
+    // E11000 sobre el índice único del documento: ya pertenece a otra cuenta.
+    if ((error as { code?: number }).code === 11000) {
+      return next(Conflict('Ese documento de identificación ya está registrado en otra cuenta.'));
+    }
+    next(error);
+  }
 };
