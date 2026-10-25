@@ -890,3 +890,12 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
   tutorías, leídos de `/availability/me`, `/courses/me/list` y `/bookings/me`).
   Los pasos son perfil, horarios, primer curso y aprobación; la aprobación depende
   del administrador y solo se espera.
+- **Guía rápida (React Joyride 3):** `components/tour/` define los recorridos
+  (`tours.ts`), los lanza (`GuidedTour`, montado en `App`) y ofrece el botón "?"
+  del encabezado (`TourHelpButton`). Cada guía apunta a elementos marcados con
+  `data-tour="…"` en las páginas. Arrancan solas la primera vez solo en buscar,
+  perfil del tutor y panel del tutor, esperando a que exista su primer elemento;
+  lo ya visto se guarda por usuario en `localStorage` (`educaspot_tours_vistos`).
+- **Acceso rápido:** en `/login` y `/register`, con Google habilitado, el botón de
+  Google es la entrada principal y el formulario de correo queda plegado; sin
+  `VITE_GOOGLE_CLIENT_ID` se muestra abierto.

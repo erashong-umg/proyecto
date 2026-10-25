@@ -127,7 +127,7 @@ export const TutorDashboardPage = () => {
         </section>
       ))}
 
-      <div className={styles.grid}>
+      <div className={styles.grid} data-tour="tutor-tarjetas">
         <Link to="/tutor/cursos" className={styles.card}>
           <BookOpen aria-hidden="true" />
           <h3>Mis cursos</h3>

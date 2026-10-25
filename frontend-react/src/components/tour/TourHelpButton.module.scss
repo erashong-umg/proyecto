@@ -1,0 +1,21 @@
+@use '../../styles/variables' as *;
+
+// Mismo aspecto que el botón de tema del encabezado.
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  color: $color-text;
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast;
+
+  svg { width: 17px; height: 17px; }
+
+  &:hover { background: $color-surface-alt; }
+}
