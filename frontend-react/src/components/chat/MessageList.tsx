@@ -1,14 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { formatLongDate, formatTime } from '../../services/formatters';
+import { getDeliveryStatus } from '../../services/chat';
 import type { ChatMessage } from '../../types/api';
+import { MessageStatus } from './MessageStatus';
 import styles from './MessageList.module.scss';
 
 interface MessageListProps {
   messages: ChatMessage[];
   currentUserId: string;
+  otherUserId: string;
   hasMore?: boolean;
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
+  onRetry?: (clientId: string) => void;
 }
 
 interface DayGroup {
@@ -43,25 +47,44 @@ const groupByDay = (messages: ChatMessage[]): DayGroup[] => {
   return groups;
 };
 
-export const MessageList = ({ messages, currentUserId, hasMore, isLoadingMore, onLoadMore }: MessageListProps) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const lastIdRef = useRef<string | null>(null);
+// Distancia al fondo (px) por debajo de la cual se considera que el usuario
+// sigue "pegado" al final de la conversación.
+const NEAR_BOTTOM_PX = 120;
 
-  // Autoscroll al fondo solo cuando se agrega un mensaje nuevo al final (envío
-  // propio o entrada en vivo) — no cuando se antepone historial más viejo con
-  // "Ver mensajes anteriores".
+export const MessageList = ({
+  messages, currentUserId, otherUserId, hasMore, isLoadingMore, onLoadMore, onRetry,
+}: MessageListProps) => {
+  const listRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const lastKeyRef = useRef<string | null>(null);
+  const nearBottomRef = useRef(true);
+
+  const handleScroll = () => {
+    const el = listRef.current;
+    if (el) nearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX;
+  };
+
+  // Autoscroll al fondo cuando se agrega un mensaje al final: siempre si es
+  // propio, y si es del otro solo cuando el usuario ya estaba leyendo lo más
+  // reciente (si subió a ver historial no se le arrebata la posición). No
+  // aplica cuando se antepone historial con "Ver mensajes anteriores". La clave
+  // usa clientId para que confirmar un mensaje propio no cuente como uno nuevo.
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage._id !== lastIdRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: lastIdRef.current ? 'smooth' : 'auto' });
+    const key = lastMessage ? (lastMessage.clientId ?? lastMessage._id) : null;
+    if (lastMessage && key !== lastKeyRef.current) {
+      const isFirstRender = lastKeyRef.current === null;
+      if (isFirstRender || lastMessage.senderId === currentUserId || nearBottomRef.current) {
+        bottomRef.current?.scrollIntoView({ behavior: isFirstRender ? 'auto' : 'smooth' });
+      }
     }
-    lastIdRef.current = lastMessage?._id ?? null;
-  }, [messages]);
+    lastKeyRef.current = key;
+  }, [messages, currentUserId]);
 
   const groups = groupByDay(messages);
 
   return (
-    <div className={styles.list} role="log" aria-live="polite" aria-label="Mensajes de la conversación">
+    <div ref={listRef} onScroll={handleScroll} className={styles.list} role="log" aria-live="polite" aria-label="Mensajes de la conversación">
       {hasMore && (
         <div className={styles.loadMoreWrap}>
           <button
@@ -83,13 +106,22 @@ export const MessageList = ({ messages, currentUserId, hasMore, isLoadingMore, o
             <div className={styles.dayDivider}><span>{group.label}</span></div>
             {group.messages.map((message) => {
               const mine = message.senderId === currentUserId;
+              const status = mine ? getDeliveryStatus(message, otherUserId) : null;
               return (
                 <div key={message._id} className={`${styles.row} ${mine ? styles.rowMine : styles.rowTheirs}`}>
                   <div className={`${styles.bubble} ${mine ? styles.bubbleMine : styles.bubbleTheirs}`}>
                     <p className={styles.content}>{message.content}</p>
-                    <time className={styles.time} dateTime={message.createdAt}>
-                      {formatTime(message.createdAt)}
-                    </time>
+                    <div className={styles.meta}>
+                      {status === 'failed' && message.clientId && (
+                        <button type="button" className={styles.retry} onClick={() => onRetry?.(message.clientId!)}>
+                          Reintentar
+                        </button>
+                      )}
+                      <time className={styles.time} dateTime={message.createdAt}>
+                        {formatTime(message.createdAt)}
+                      </time>
+                      {status && <MessageStatus status={status} />}
+                    </div>
                   </div>
                 </div>
               );

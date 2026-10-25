@@ -1,7 +1,8 @@
 import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { verifyToken } from '../utils/jwt';
 import { User } from '../models/User';
-import { setupChatHandlers } from './chat.handler';
+import { markPendingAsDelivered, setupChatHandlers } from './chat.handler';
+import { addConnection, presenceRoom, removeConnection, userRoom } from './presence';
 import { logger } from '../utils/logger';
 
 // Extender el tipo Socket para tener user
@@ -38,13 +39,30 @@ export const setupSockets = (io: SocketIOServer): void => {
   io.on('connection', (socket: AuthedSocket) => {
     logger.info(`[Socket] Conectado: ${socket.id} (userId=${socket.data.userId})`);
 
+    const userId = socket.data.userId as string;
+
     // Cada socket se une a su room personal
-    socket.join(`user:${socket.data.userId}`);
+    socket.join(userRoom(userId));
 
     setupChatHandlers(io, socket);
 
-    socket.on('disconnect', () => {
-      logger.info(`[Socket] Desconectado: ${socket.id} (userId=${socket.data.userId})`);
+    if (addConnection(userId)) {
+      io.to(presenceRoom(userId)).emit('presence:update', { userId, online: true });
+    }
+    markPendingAsDelivered(io, userId).catch((err) =>
+      logger.error('[Socket] Error marcando mensajes como entregados:', err)
+    );
+
+    socket.on('disconnect', async () => {
+      logger.info(`[Socket] Desconectado: ${socket.id} (userId=${userId})`);
+      if (!removeConnection(userId)) return;
+      const lastSeenAt = new Date();
+      try {
+        await User.updateOne({ _id: userId }, { lastSeenAt });
+      } catch (err) {
+        logger.error('[Socket] Error guardando lastSeenAt:', err);
+      }
+      io.to(presenceRoom(userId)).emit('presence:update', { userId, online: false, lastSeenAt });
     });
   });
 };

@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { RoleSelector } from '../../components/auth/RoleSelector';
 import { AuthBrandPanel } from '../../components/auth/AuthBrandPanel';
+import { AuthBrandLink } from '../../components/auth/AuthBrandLink';
 import styles from './Auth.module.scss';
 
 export const RegisterPage = () => {
@@ -13,6 +14,7 @@ export const RegisterPage = () => {
     <div className={styles.auth}>
       <AuthBrandPanel />
       <div className={styles.formPanel}>
+        <AuthBrandLink />
         <form className={styles.form} onSubmit={handleSubmit}>
           <h1 className={styles.title}>Crear cuenta</h1>
           <p className={styles.subtitle}>Únase a EducaSpot como estudiante o tutor.</p>

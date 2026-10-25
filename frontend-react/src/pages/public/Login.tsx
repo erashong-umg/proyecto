@@ -3,6 +3,7 @@ import { useLoginForm } from '../../hooks/useLoginForm';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { AuthBrandPanel } from '../../components/auth/AuthBrandPanel';
+import { AuthBrandLink } from '../../components/auth/AuthBrandLink';
 import styles from './Auth.module.scss';
 
 export const LoginPage = () => {
@@ -12,6 +13,7 @@ export const LoginPage = () => {
     <div className={styles.auth}>
       <AuthBrandPanel />
       <div className={styles.formPanel}>
+        <AuthBrandLink />
         <form className={styles.form} onSubmit={handleSubmit}>
           <h1 className={styles.title}>Iniciar sesión</h1>
           <p className={styles.subtitle}>Ingrese a su cuenta de EducaSpot.</p>

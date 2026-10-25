@@ -6,6 +6,8 @@ export interface IMessage extends Document {
   senderId: Types.ObjectId;
   content: string;
   readBy: Types.ObjectId[];  // usuarios que marcaron como leído
+  deliveredTo: Types.ObjectId[];  // usuarios cuyo cliente ya recibió el mensaje
+  clientId?: string;       // id generado por el cliente; hace idempotente el reenvío
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,10 +34,18 @@ const messageSchema = new Schema<IMessage>(
         ref: 'User'
       }
     ],
+    deliveredTo: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+    clientId: { type: String, maxlength: 64 },
   },
   { timestamps: true }
 );
 
 messageSchema.index({ threadId: 1, createdAt: -1 });
+messageSchema.index({ senderId: 1, clientId: 1 }, { sparse: true });
 
 export const Message = model<IMessage>('Message', messageSchema);

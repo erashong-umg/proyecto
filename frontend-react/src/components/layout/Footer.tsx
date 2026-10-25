@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.scss';
 
-export const Footer = () => {
+interface FooterProps {
+  // El chat ocupa toda la pantalla en móvil, sin footer debajo.
+  hideOnMobile?: boolean;
+}
+
+export const Footer = ({ hideOnMobile = false }: FooterProps) => {
   return (
-    <footer className={styles.footer}>
+    <footer className={`${styles.footer} ${hideOnMobile ? styles.hiddenMobile : ''}`}>
       <div className={`${styles.inner} container`}>
         <p className={styles.copy}>© {new Date().getFullYear()} EducaSpot — Marketplace educativo.</p>
         <nav className={styles.links}>

@@ -1,0 +1,27 @@
+@use '../../styles/variables' as *;
+
+// Color de los checks "leído". Cada contenedor puede ajustarlo según su fondo
+// con --tick-read (p.ej. la burbuja propia es naranja y necesita un azul claro).
+.status {
+  display: inline-flex;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.pending,
+.sent,
+.delivered {
+  opacity: 0.75;
+}
+
+.read {
+  color: var(--tick-read, #{$color-info});
+}
+
+.failed {
+  color: $color-danger;
+}

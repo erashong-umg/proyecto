@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
 import { useSocketStore } from '../store/socketStore';
 import type { ChatThread } from '../types/api';
 
-// Intervalo de respaldo para refrescar el inbox. El backend solo retransmite
-// "chat:message" a los sockets que se unieron al room del thread (chat:join,
-// ver chat.handler.ts) — un socket que está mirando el inbox pero no tiene
-// abierto NINGÚN thread no recibe push en tiempo real para threads ajenos al
-// que está activo. Este polling corto es el respaldo para que el inbox no
-// quede desactualizado mientras se está viendo.
-const REFRESH_INTERVAL_MS = 15000;
+// Varios eventos seguidos (mensajes, checks) se agrupan en una sola recarga.
+const RELOAD_DEBOUNCE_MS = 300;
+
+// Eventos del socket que cambian lo que muestra el inbox: último mensaje,
+// contador de no leídos y checks del último mensaje propio.
+const INBOX_EVENTS = ['chat:message', 'chat:read', 'chat:delivered'] as const;
 
 export const useChatThreads = () => {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const socket = useSocketStore((state) => state.socket);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const reload = useCallback(() => {
     setError(null);
@@ -28,19 +28,23 @@ export const useChatThreads = () => {
 
   useEffect(() => { reload(); }, [reload]);
 
-  // Si el thread actualmente abierto recibe un mensaje nuevo (propio o del
-  // otro participante), refrescamos el inbox para que el último mensaje y el
-  // contador de no leídos queden al día.
+  // Cada usuario recibe los mensajes en su room personal (user:<id>), así que
+  // el inbox se entera en vivo de cualquier conversación, esté abierta o no.
+  // Al reconectar se recarga por si se perdió algo mientras estaba caído.
   useEffect(() => {
     if (!socket) return;
-    socket.on('chat:message', reload);
-    return () => { socket.off('chat:message', reload); };
+    const scheduleReload = () => {
+      clearTimeout(debounceTimer.current);
+      debounceTimer.current = setTimeout(reload, RELOAD_DEBOUNCE_MS);
+    };
+    INBOX_EVENTS.forEach((event) => socket.on(event, scheduleReload));
+    socket.io.on('reconnect', reload);
+    return () => {
+      INBOX_EVENTS.forEach((event) => socket.off(event, scheduleReload));
+      socket.io.off('reconnect', reload);
+      clearTimeout(debounceTimer.current);
+    };
   }, [socket, reload]);
-
-  useEffect(() => {
-    const interval = setInterval(reload, REFRESH_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [reload]);
 
   return { threads, isLoading, error, reload };
 };
