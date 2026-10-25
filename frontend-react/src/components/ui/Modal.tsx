@@ -15,6 +15,16 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
   const triggerRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
 
+  // Casi todos los usos pasan `onClose` como función en línea, o sea una nueva en cada
+  // render. Si el efecto de abajo dependiera de ella, se volvería a ejecutar con cada
+  // tecla que cambia el estado del formulario: devolvería el foco al botón que abrió el
+  // modal y luego al diálogo, y el campo perdería el foco en cada carácter. Se guarda la
+  // última versión en una ref y el efecto depende solo de `isOpen`.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
   // Foco: entra al abrir, queda atrapado adentro, vuelve al disparador al cerrar.
   useEffect(() => {
     if (!isOpen) return;
@@ -24,7 +34,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== 'Tab' || !dialogRef.current) return;
@@ -48,7 +58,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
       document.removeEventListener('keydown', handleKeyDown);
       triggerRef.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
