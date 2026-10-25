@@ -144,3 +144,30 @@
   color: $color-text-muted;
   font-size: $font-size-sm;
 }
+
+// Acceso rápido: el correo y la contraseña quedan plegados bajo este botón.
+.emailToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  width: 100%;
+  padding: $space-3;
+  background: none;
+  border: 1px solid $color-border-strong;
+  border-radius: $radius-md;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover { background: $color-surface-alt; }
+
+  svg { width: 16px; height: 16px; transition: transform $transition-fast; }
+}
+
+.chevronOpen { transform: rotate(180deg); }
+
+.emailForm { margin-top: $space-4; }

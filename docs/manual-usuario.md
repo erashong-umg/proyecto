@@ -21,7 +21,8 @@
 11. [Reportes y denuncias](#11-reportes-y-denuncias)
 12. [Panel de administración](#12-panel-de-administración)
 13. [Suspensión de cuenta](#13-suspensión-de-cuenta)
-14. [Soporte y contacto](#14-soporte-y-contacto)
+14. [Guía rápida](#14-guía-rápida)
+15. [Soporte y contacto](#15-soporte-y-contacto)
 
 ---
 
@@ -79,14 +80,18 @@ Pasos:
 2. Elija su rol: **Estudiante** o **Tutor**. Esta elección es definitiva en
    este formulario — determina qué pasos del onboarding verá a
    continuación y no puede cambiarse después desde la interfaz.
-3. Complete los campos:
+3. **Registro rápido con Google:** si el servicio está habilitado, el botón de
+   Google aparece justo debajo del rol y crea la cuenta con ese rol (debajo del
+   botón se lee con cuál se creará). Con eso termina el registro y pasa al
+   onboarding. Si prefiere usar correo, pulse **"Registrarme con correo y
+   contraseña"** y complete los campos:
    - **Nombre completo.**
    - **Correo electrónico** (debe ser único; si ya existe una cuenta con ese
      correo, el sistema se lo indicará).
    - **Contraseña**: debe tener al menos 8 caracteres, al menos una letra
      mayúscula y al menos un número.
    - **Confirmar contraseña**: debe coincidir exactamente con la anterior.
-4. Presione **Crear cuenta**.
+4. Presione **Crear cuenta** (en el formulario de correo).
 5. Si el registro es exitoso, el sistema lo redirige automáticamente a
    `/onboarding` para completar su perfil — no podrá usar el resto de la
    plataforma hasta terminar ese proceso (vea la sección siguiente).
@@ -185,9 +190,16 @@ la plataforma. En cualquier paso posterior al primero puede usar el botón
 El inicio de sesión se realiza en `/login`, accesible con el botón
 **"Iniciar sesión"** del encabezado.
 
-Pasos:
+**Acceso rápido:** si Google está habilitado, el botón de Google va arriba y es la
+entrada principal; el correo y la contraseña quedan plegados bajo **"Usar correo y
+contraseña"** para no sobrecargar la pantalla. Si Google no está habilitado, el
+formulario de correo se muestra abierto. Desde el login, Google solo entra a
+cuentas que ya existen: para crear una hay que usar **Crear cuenta** y elegir el rol.
 
-1. Ingrese su **correo electrónico** y **contraseña**.
+Pasos con correo:
+
+1. Pulse **Usar correo y contraseña** (si está plegado) e ingrese su **correo
+   electrónico** y **contraseña**.
 2. Presione **Iniciar sesión**.
 3. Si las credenciales son correctas, se le redirige a la página que
    intentaba visitar antes de que se le pidiera autenticarse (o a la página
@@ -661,7 +673,26 @@ esta misma pantalla, o cerrar sesión si lo desea.
 
 ---
 
-## 14. Soporte y contacto
+## 14. Guía rápida
+
+Para orientarle sin abrumarle, la aplicación incluye guías cortas de una a tres
+ventanas, página por página. Cada ventana señala un elemento de la pantalla y
+explica en una frase para qué sirve.
+
+- **Salen solas la primera vez** en las páginas clave: *Buscar tutores* y el
+  perfil de un tutor (estudiantes), y el *Panel del tutor* (tutores). Después de
+  verlas, cerrarlas u omitirlas, no vuelven a salir solas.
+- **Se pueden repetir** con el botón **?** del encabezado, que aparece en las
+  páginas que tienen guía (también *Mis reservas* y *Mensajes*).
+- **Controles:** **Siguiente** (con el avance, p. ej. "1 de 3"), **Atrás**,
+  **Omitir guía** y **Entendido** en el último paso. También se cierra con la
+  tecla Esc.
+- Se recuerdan por persona en este navegador; en otro navegador o en una ventana
+  privada volverán a salir.
+
+---
+
+## 15. Soporte y contacto
 
 Para cualquier duda, problema técnico, o para reportar una situación que
 todavía no tiene un formulario dedicado en la aplicación (vea la sección

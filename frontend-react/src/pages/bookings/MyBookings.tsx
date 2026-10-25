@@ -25,6 +25,7 @@ export const MyBookingsPage = () => {
             <Link to="/tutores"><Button size="sm">Buscar tutores</Button></Link>
           </div>
         ) : (
+          <div data-tour="reservas-lista">
           <BookingList
             className={styles.list}
             bookings={bookings}
@@ -33,6 +34,7 @@ export const MyBookingsPage = () => {
             cancellingId={cancellingId}
             onReviewed={reload}
           />
+          </div>
         )}
       </div>
     </div>

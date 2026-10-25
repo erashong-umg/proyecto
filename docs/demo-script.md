@@ -99,6 +99,12 @@ En el navegador principal (perfil de "estudiante"):
    `/onboarding`, sin permitir el uso del resto de la plataforma hasta
    completarlo.
 
+> **Guía rápida:** la primera vez que una persona entra a *Buscar tutores*, al perfil
+> de un tutor o al panel del tutor, aparece una guía corta de 1 a 3 ventanas (React
+> Joyride). Puede mostrarse en vivo o repetirse con el botón **?** del encabezado. Para
+> volver a ver las guías en una demo: borrar `educaspot_tours_vistos` del almacenamiento
+> local del navegador.
+
 ### Acto 3 — Onboarding paso a paso [2 min]
 
 Continuando con la cuenta recién creada, recorrer los 2 pasos que le
