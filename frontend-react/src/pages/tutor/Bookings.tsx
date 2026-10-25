@@ -1,6 +1,6 @@
 import { ClipboardX } from 'lucide-react';
 import { useBookings } from '../../hooks';
-import { BookingList } from '../../components/bookings/BookingList';
+import { BookingsAgenda } from '../../components/bookings/BookingsAgenda';
 import styles from './Bookings.module.scss';
 
 export const TutorBookingsPage = () => {
@@ -21,8 +21,8 @@ export const TutorBookingsPage = () => {
           <p>Todavía no tiene reservas.</p>
         </div>
       ) : (
-        <BookingList
-          className={styles.list}
+        <BookingsAgenda
+          listClassName={styles.list}
           bookings={bookings}
           viewer="tutor"
           onCancel={cancel}

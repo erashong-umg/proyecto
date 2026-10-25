@@ -669,7 +669,7 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 
 | # | Requisito original del enunciado | Implementación real (stub aceptado) | Alternativa completa (fuera de alcance) |
 |---|---|---|---|
-| D1 | Vistas de calendario Diaria/Semanal/Mensual | Cuadrícula de 7 días × horas, interacción de "pintar" por clic-y-arrastre (`useMyAvailability`, `TutorAvailabilityPage`) — sin librería de calendario | `react-big-calendar` con las 3 vistas |
+| D1 | Vistas de calendario Diaria/Semanal/Mensual | **Implementado** para las reservas (estudiante y tutor): `BookingCalendar` con vistas de día, semana y mes, sin librería de calendario (lógica de fechas en `services/calendar.ts` con `date-fns`), integrado en `BookingsAgenda` junto a la lista. La **disponibilidad** del tutor se sigue editando en una cuadrícula semanal de 7 días × horas con clic-y-arrastre (`useMyAvailability`, `TutorAvailabilityPage`) | `react-big-calendar` con arrastrar y soltar de reservas |
 | D2 | Suscripción periódica de 4 u 8 semanas | En el paso "Cuándo" del asistente de reserva: una vez, o cada semana por 4 u 8 semanas (`REPEAT_OPTIONS`, validado también en el backend). Crea N documentos `Booking` individuales agrupados por `recurringGroupId`; `getFreeSlots` solo ofrece horas libres todas las semanas | Motor de recurrencia real con job programado |
 | D3 | Ruta trazada en el mapa | Ruta real por calles con OSRM (`geo.service.ts::getRoute`, `POST /api/geo/route`), dibujada con Leaflet en `RouteMap` dentro del formulario de reserva. La distancia de la ruta es la que se cobra (`quoteTrip`) y se guarda en la reserva. Si OSRM no responde o `OSRM_URL` está vacío, cae a línea recta Haversine (trazo punteado) para no bloquear reservas | Servidor OSRM propio: el demo público (`router.project-osrm.org`) es solo para desarrollo |
 | D4 | OAuth 2.0 real con Google | **Implementado.** El botón oficial de Google Identity Services entrega un ID token; `POST /api/auth/google` lo verifica con `google-auth-library` (`google.service.ts`: firma, vigencia, audiencia = `GOOGLE_CLIENT_ID` y correo verificado) y emite el JWT propio. Crea la cuenta con nombre, correo y foto de Google, o vincula la cuenta existente con el mismo correo. Los administradores quedan excluidos (tienen `/admin/login`). Sin `GOOGLE_CLIENT_ID` el endpoint responde 503 y el frontend no muestra el botón | — |
@@ -913,3 +913,8 @@ tipo bounce/elastic están prohibidos por el propio sistema de diseño
   Haversine en memoria (D8) y el resultado sale ordenado por cercanía, con el límite
   aplicado después. En el frontend, `SearchFilters` es el panel plegable y
   `useNearbySearch` envía solo los criterios elegidos.
+- **Calendario de reservas:** `BookingsAgenda` ofrece Lista | Calendario (se recuerda en `localStorage`,
+  `educaspot_agenda_vista`). `BookingCalendar` dibuja las vistas de día, semana y mes; en día y semana
+  las reservas se colocan por hora y duración, y las que se solapan (p. ej. una cancelada y otra
+  nueva) se reparten en columnas (`layoutDay`). Al elegir una reserva se muestra su tarjeta con las
+  acciones de `BookingList`. Las canceladas se ocultan salvo que se marque "Mostrar canceladas".

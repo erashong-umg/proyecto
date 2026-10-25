@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { CalendarX2 } from 'lucide-react';
 import { useBookings } from '../../hooks/useBookings';
 import { Button } from '../../components/ui/Button';
-import { BookingList } from '../../components/bookings/BookingList';
+import { BookingsAgenda } from '../../components/bookings/BookingsAgenda';
 import styles from './MyBookings.module.scss';
 
 export const MyBookingsPage = () => {
@@ -26,14 +26,14 @@ export const MyBookingsPage = () => {
           </div>
         ) : (
           <div data-tour="reservas-lista">
-          <BookingList
-            className={styles.list}
-            bookings={bookings}
-            viewer="student"
-            onCancel={cancel}
-            cancellingId={cancellingId}
-            onReviewed={reload}
-          />
+            <BookingsAgenda
+              listClassName={styles.list}
+              bookings={bookings}
+              viewer="student"
+              onCancel={cancel}
+              cancellingId={cancellingId}
+              onReviewed={reload}
+            />
           </div>
         )}
       </div>

@@ -1,0 +1,292 @@
+@use '../../styles/variables' as *;
+
+.calendar {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $space-4;
+}
+
+// ---- Barra superior ----
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-bottom: $space-3;
+}
+
+.nav { display: flex; align-items: center; gap: $space-1; }
+
+.navButton,
+.todayButton,
+.viewButton {
+  background: $color-surface;
+  border: 1px solid $color-border-strong;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover { background: $color-surface-alt; }
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $radius-md;
+
+  svg { width: 18px; height: 18px; }
+}
+
+.todayButton { height: 34px; padding: 0 $space-3; border-radius: $radius-md; }
+
+.title {
+  flex: 1;
+  min-width: 180px;
+  margin: 0;
+  font-size: $font-size-lg;
+  text-align: center;
+}
+
+.views { display: inline-flex; }
+
+.viewButton {
+  height: 34px;
+  padding: 0 $space-3;
+  border-radius: 0;
+
+  &:first-child { border-radius: $radius-md 0 0 $radius-md; }
+  &:last-child { border-radius: 0 $radius-md $radius-md 0; }
+  & + & { margin-left: -1px; }
+}
+
+.viewOn {
+  background: $color-primary;
+  border-color: $color-primary;
+  color: $on-accent-text;
+
+  &:hover { background: $color-primary; }
+}
+
+.cancelled {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-3;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+}
+
+// ---- Reservas (chips) y colores por estado ----
+.event {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  width: 100%;
+  height: 100%;
+  padding: 2px $space-2;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-radius: $radius-md;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.eventCompact { height: auto; margin-bottom: 2px; }
+
+.eventTime { font-weight: 700; flex-shrink: 0; }
+
+.eventTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventSelected { outline: 2px solid $color-text; outline-offset: 1px; }
+
+.status-confirmed {
+  background: color-mix(in srgb, $color-primary 14%, $color-surface);
+  border-color: $color-primary;
+  color: $color-text;
+}
+
+.status-pending {
+  background: color-mix(in srgb, $color-warning 16%, $color-surface);
+  border-color: $color-warning;
+  color: $color-text;
+}
+
+.status-completed {
+  background: color-mix(in srgb, $color-success 14%, $color-surface);
+  border-color: $color-success;
+  color: $color-text;
+}
+
+.status-cancelled {
+  background: $color-surface-alt;
+  border-color: $color-border-strong;
+  color: $color-text-muted;
+  text-decoration: line-through;
+}
+
+// ---- Vistas de día y semana ----
+.scroller { overflow-x: auto; }
+
+.timeGrid {
+  display: grid;
+  min-width: 640px;
+  border-top: 1px solid $color-border;
+}
+
+.corner { border-bottom: 1px solid $color-border; }
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $space-2 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid $color-border;
+  border-left: 1px solid $color-border;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-xs;
+  text-transform: capitalize;
+  cursor: pointer;
+
+  strong { font-size: $font-size-lg; line-height: 1.2; }
+
+  &:hover:not(:disabled) { background: $color-surface-alt; }
+  &:disabled { cursor: default; }
+}
+
+.today strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: $on-accent-text;
+}
+
+.gutter {
+  display: flex;
+  flex-direction: column;
+
+  span {
+    padding-right: $space-2;
+    font-size: 11px;
+    color: $color-text-muted;
+    text-align: right;
+    transform: translateY(-7px);
+  }
+}
+
+.dayColumn {
+  position: relative;
+  border-left: 1px solid $color-border;
+  background-image: linear-gradient(to bottom, $color-border 1px, transparent 1px);
+}
+
+.todayColumn { background-color: color-mix(in srgb, $color-primary 4%, transparent); }
+
+.slot {
+  position: absolute;
+  padding: 1px 2px;
+  box-sizing: border-box;
+}
+
+// ---- Vista de mes ----
+.month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid $color-border;
+  border-left: 1px solid $color-border;
+}
+
+.weekday {
+  padding: $space-2 0;
+  border-right: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  text-align: center;
+  text-transform: capitalize;
+  color: $color-text-muted;
+}
+
+.cell {
+  min-height: 96px;
+  padding: $space-1;
+  border-right: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+  min-width: 0;
+}
+
+.outside { background: $color-surface-alt; opacity: 0.7; }
+
+.todayCell { background: color-mix(in srgb, $color-primary 6%, transparent); }
+
+.cellNumber {
+  display: block;
+  margin: 0 0 2px auto;
+  padding: 0 $space-1;
+  background: none;
+  border: 0;
+  border-radius: $radius-md;
+  color: $color-text;
+  font-family: inherit;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover { background: $color-surface-alt; }
+}
+
+.todayCell .cellNumber { background: $color-primary; color: $on-accent-text; }
+
+.more {
+  display: block;
+  padding: 0 $space-1;
+  background: none;
+  border: 0;
+  color: $color-primary;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+// ---- Leyenda ----
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin: $space-3 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+
+  li { display: inline-flex; align-items: center; gap: $space-1; }
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid;
+  border-radius: $radius-full;
+}
