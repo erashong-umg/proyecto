@@ -188,6 +188,7 @@ export interface AdminMonthlyStat {
 
 export interface AdminAnalytics {
   topTutors: AdminTopTutor[];
+  bottomTutors: AdminTopTutor[];
   categoryDemand: AdminCategoryDemand[];
   monthlyStats: AdminMonthlyStat[];
   generatedAt: string;

@@ -1,4 +1,4 @@
-import { Star, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
+import { Star, ThumbsDown, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 import { useAdminAnalytics } from '../../hooks';
 import { formatShortDate } from '../../services/formatters';
 import type { AdminCategoryDemand, AdminMonthlyStat, AdminTopTutor, BookingStatus } from '../../types/api';
@@ -37,7 +37,20 @@ export const AdminAnalyticsPage = () => {
         <p className={styles.status}>Cargando…</p>
       ) : data ? (
         <div className={styles.grid}>
-          <TopTutorsChart tutors={data.topTutors} />
+          <TutorRatingChart
+            tutors={data.topTutors}
+            icon={Star}
+            title="Top 5 tutores por calificación"
+            emptyMessage="Aún no hay tutores con reseñas suficientes para mostrar un ranking."
+            chartId="top-tutors"
+          />
+          <TutorRatingChart
+            tutors={data.bottomTutors}
+            icon={ThumbsDown}
+            title="5 tutores con menor calificación"
+            emptyMessage="Aún no hay tutores con reseñas suficientes para mostrar un ranking."
+            chartId="bottom-tutors"
+          />
           <CategoryDemandChart demand={data.categoryDemand} />
           <MonthlyStatusChart stats={data.monthlyStats} />
         </div>
@@ -46,14 +59,20 @@ export const AdminAnalyticsPage = () => {
   );
 };
 
-const TopTutorsChart = ({ tutors }: { tutors: AdminTopTutor[] }) => {
+interface TutorRatingChartProps {
+  tutors: AdminTopTutor[];
+  icon: typeof Star;
+  title: string;
+  emptyMessage: string;
+  chartId: string;
+}
+
+const TutorRatingChart = ({ tutors, icon: Icon, title, emptyMessage, chartId }: TutorRatingChartProps) => {
   if (tutors.length === 0) {
     return (
       <figure className={styles.chartCard}>
-        <figcaption className={styles.chartTitle}><Star aria-hidden="true" /> Top 5 tutores por calificación</figcaption>
-        <div className={styles.emptyChart}>
-          Aún no hay tutores con reseñas suficientes para mostrar un ranking.
-        </div>
+        <figcaption className={styles.chartTitle}><Icon aria-hidden="true" /> {title}</figcaption>
+        <div className={styles.emptyChart}>{emptyMessage}</div>
       </figure>
     );
   }
@@ -64,19 +83,21 @@ const TopTutorsChart = ({ tutors }: { tutors: AdminTopTutor[] }) => {
   const width = 360;
   const barMaxWidth = width - 150;
   const height = chartTop * 2 + tutors.length * rowHeight;
+  const titleId = `${chartId}-title`;
+  const descId = `${chartId}-desc`;
 
   return (
     <figure className={styles.chartCard}>
-      <figcaption className={styles.chartTitle}><Star aria-hidden="true" /> Top 5 tutores por calificación</figcaption>
+      <figcaption className={styles.chartTitle}><Icon aria-hidden="true" /> {title}</figcaption>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         preserveAspectRatio="xMidYMid meet"
         role="img"
-        aria-labelledby="top-tutors-title top-tutors-desc"
+        aria-labelledby={`${titleId} ${descId}`}
         className={styles.svg}
       >
-        <title id="top-tutors-title">Top 5 tutores por calificación promedio</title>
-        <desc id="top-tutors-desc">
+        <title id={titleId}>{title}</title>
+        <desc id={descId}>
           Gráfico de barras horizontales.{' '}
           {tutors
             .map((t) => `${t.name}: ${t.tutorData.avgRating.toFixed(1)} de 5 con ${t.tutorData.reviewCount} reseñas.`)
