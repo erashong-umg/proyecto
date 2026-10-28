@@ -2,7 +2,8 @@
 
 > Proyecto académico de la Universidad Mariano Gálvez. Entrega: 2026-10-18.
 > Este manual documenta el estado real del código en el momento de su redacción
-> (backend F1+F2 cerrados, frontend en F3/F4), no un diseño aspiracional.
+> (backend y frontend implementados, con despliegue real en producción), no un
+> diseño aspiracional.
 
 ## Índice
 
@@ -142,7 +143,9 @@ Cada uno expone funciones async `(req, res, next)` que **nunca** responden el
 error directamente — siempre `next(error)` hacia `errorMiddleware`:
 
 - `auth.controller.ts` — `register`, `login`, `logout` (no-op, token sin
-  estado), `me`, `googleLogin` (OAuth 2.0 con Google, D4 — ver §10), `forgotPassword`/`resetPassword`.
+  estado), `me`, `googleLogin` (OAuth 2.0 con Google, D4 — ver §10),
+  `forgotPassword`/`resetPassword` (endpoints completos y montados, pero sin
+  pantalla conectada en el frontend — ver manual de usuario §4).
 - `user.controller.ts` — `getMe`, `updateMe`, `completeOnboarding` (marca
   `onboardingCompleted` tras el wizard de 2 o 3 pasos del frontend). El onboarding
   exige el **documento de identificación** (`User.idDocument`): DPI de 13
@@ -256,11 +259,13 @@ construir la imagen). El frontend muestra lo mismo en un badge flotante
 
 ### Rutas montadas en `server.ts`
 
-`/api/auth`, `/api/users`, `/api/categories` (solo `GET /` pública — el
-CRUD admin de categorías existe en el controller pero **no tiene router
-montado**, es trabajo intencionalmente diferido a F4), `/api/courses`,
-`/api/availability`, `/api/bookings`, `/api/tutors` (`/search`, `/:id`),
-`/api/geo`, `/api/reviews`, `/api/reports`, `/api/appeals`, `/api/admin`.
+`/api/auth`, `/api/users`, `/api/categories` (`GET /` pública; el CRUD
+admin — crear/editar/eliminar — vive bajo `/api/admin/categories`, ver
+abajo), `/api/courses`, `/api/availability`, `/api/bookings`, `/api/tutors`
+(`/search`, `/:id`), `/api/geo`, `/api/reviews`, `/api/reports`,
+`/api/appeals`, `/api/admin` (incluye `/categories`, `/reports`, `/appeals`,
+`/users`, `/tutors`, `/analytics` y `/audit-logs`, todas protegidas con
+`roleMiddleware('admin')`).
 
 ## 4. Componentes principales del frontend
 
@@ -682,19 +687,21 @@ proyecto fuera viable en el tiempo disponible (entrega solo, due
 | D9 | Políticas de convivencia editables | Página estática `/politicas` (`PoliciesPage`) con texto fijo en el componente | CMS editable desde el panel de administración |
 | D10 | Foto de perfil | Campo `photoUrl` (string, URL externa o vacío) en `User` | Subida real con `multer` |
 
-Además, se detectó durante el desarrollo que la ruta admin de creación/
-eliminación de categorías (`adminCreateCategory`/`adminUpdateCategory`/
-`adminDeleteCategory` en `admin.controller.ts`, y las funciones equivalentes
-exportadas en `category.controller.ts`) **existe en código pero no tiene
-router montado en `server.ts`** — es trabajo intencionalmente diferido a la
-Fase 4 del plan (gestión de categorías vía UI de administración), no un
-olvido a corregir sin más contexto.
+Nota de corrección: una versión anterior de este manual indicaba que el CRUD
+admin de categorías (`adminCreateCategory`/`adminUpdateCategory`/
+`adminDeleteCategory` en `admin.controller.ts`) existía en código pero sin
+router montado, como trabajo diferido a la Fase 4. Eso ya no es así: las tres
+rutas están montadas en `admin.routes.ts` (`POST/PUT/DELETE
+/api/admin/categories[/:id]`) y la UI de administración (`/admin/categorias`,
+sección 12.2 del manual de usuario) ya las consume.
 
-El target de despliegue documentado (`render.yaml`, `Dockerfile`,
-`.dockerignore`) es evidencia de portabilidad del backend (se verificó con
-un `docker build` + `docker run` real contra el contenedor de Mongo), pero
-el despliegue efectivo del proyecto para la entrega es local
-(`npm run dev` + Mongo en Docker Compose), no un deploy real a Render.
+El proyecto está desplegado en la nube: `https://educaspot.yettotools.com`,
+en un servidor propio vía Podman + nginx + certbot, publicado
+automáticamente por GitHub Actions al hacer merge a `develop`/`main` (ver
+`docs/despliegue.md` y `.github/workflows/deploy.yml`). `render.yaml` sigue
+en el repo solo como evidencia adicional de portabilidad del backend (se
+verificó también con un `docker build` + `docker run` real contra el
+contenedor de Mongo), no porque Render sea la plataforma usada.
 
 ## 11. Sistema de diseño: tabla de tokens
 

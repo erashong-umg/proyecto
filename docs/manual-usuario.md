@@ -229,11 +229,10 @@ correo y la foto de su cuenta de Google y pasa al registro de su perfil
 usted lo elija. Las cuentas creadas con Google no tienen contraseña: ingresan siempre
 con el botón de Google.
 
-El enlace **"¿Olvidó su contraseña?"** se muestra en el formulario, pero a
-la fecha de este manual la recuperación de contraseña no se encuentra
-implementada en la aplicación — no complete ese flujo esperando un correo
-de restablecimiento. Si olvidó su contraseña, comuníquese con soporte (vea
-la sección 14).
+Si olvidó su contraseña, comuníquese con soporte (vea la sección 14): la
+aplicación todavía no ofrece una pantalla de recuperación de contraseña
+para el usuario final (el backend sí expone los endpoints necesarios, pero
+no hay un formulario conectado en la interfaz).
 
 ![Formulario de inicio de sesión](capturas/07-login.png)
 
@@ -567,14 +566,15 @@ otro) y que la administración revisa cada caso en un plazo de 5 días
 hábiles. Los reportes resueltos y su seguimiento pueden consultarse por el
 lado del administrador en el panel de moderación (vea la sección 12.3).
 
-> Nota importante: al momento de este manual, la aplicación **todavía no
-> ofrece un formulario o botón dentro de la interfaz** (por ejemplo, en el
-> perfil de un tutor o en una reserva) para que un estudiante o tutor
-> presente una denuncia por su cuenta. Mientras esa función no esté
-> disponible en pantalla, si necesita reportar una conducta indebida,
-> una inasistencia o un cobro irregular, comuníquese directamente con
-> soporte (vea la sección 14) describiendo el caso, para que la
-> administración le dé seguimiento por ese medio.
+> Nota: la denuncia se presenta directamente sobre la reserva, no en un
+> formulario aparte. Tanto el estudiante (desde "Mis reservas", sección 8)
+> como el tutor (desde "Reservas recibidas", sección 9.4) pueden pulsar
+> **Reportar** en una tutoría ya **completada**, indicando el motivo y una
+> descripción; el caso se suma al historial de denuncias que revisa la
+> administración. Todavía no existe un botón de denuncia fuera de ese
+> contexto — por ejemplo, desde el perfil de un tutor antes de haber tenido
+> una tutoría con él — para esos casos, comuníquese directamente con
+> soporte (vea la sección 14) describiendo el caso.
 
 Lo que sí puede hacer cualquier usuario desde la aplicación es leer el
 detalle completo de qué se considera una conducta prohibida y cuáles son
