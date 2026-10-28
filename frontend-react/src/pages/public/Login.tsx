@@ -81,8 +81,6 @@ export const LoginPage = () => {
                 autoComplete="current-password"
               />
 
-              <Link to="/recuperar" className={styles.forgotLink}>¿Olvidó su contraseña?</Link>
-
               <Button type="submit" isLoading={isLoading} size="lg" className={styles.submit}>
                 Iniciar sesión
               </Button>
