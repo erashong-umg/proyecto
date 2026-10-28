@@ -22,6 +22,7 @@ import { AdminModerationPage } from './pages/admin/Moderation';
 import { AdminAnalyticsPage } from './pages/admin/Analytics';
 import { AdminTutorsPage } from './pages/admin/Tutors';
 import { AdminAppearancePage } from './pages/admin/Appearance';
+import { AdminAuditLogPage } from './pages/admin/AuditLog';
 import { ChatPage } from './pages/chat/ChatPage';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { PublicShell } from './components/layout/PublicShell';
@@ -56,6 +57,7 @@ export const AppRouter = () => {
         <Route path="analytics" element={<AdminAnalyticsPage />} />
         <Route path="tutores" element={<AdminTutorsPage />} />
         <Route path="apariencia" element={<AdminAppearancePage />} />
+        <Route path="auditoria" element={<AdminAuditLogPage />} />
       </Route>
 
       {/* Sitio público (estudiante/tutor): Header + Footer compartidos */}

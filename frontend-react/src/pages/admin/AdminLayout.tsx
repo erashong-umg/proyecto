@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Tags, Users, ShieldAlert, BarChart3, GraduationCap, Palette, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, Tags, Users, ShieldAlert, BarChart3, GraduationCap, Palette, ShieldCheck, LogOut, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { getInitials } from '../../services/formatters';
 import styles from './AdminLayout.module.scss';
@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/tutores', label: 'Tutores', icon: GraduationCap },
   { to: '/admin/apariencia', label: 'Apariencia', icon: Palette },
+  { to: '/admin/auditoria', label: 'Auditoría', icon: ClipboardList },
 ];
 
 // Título del header según la sub-sección activa. Se busca por el prefijo de
@@ -33,6 +34,7 @@ const SECTION_TITLES: Record<string, string> = {
   '/admin/analytics': 'Analítica',
   '/admin/tutores': 'Aprobación de tutores',
   '/admin/apariencia': 'Apariencia',
+  '/admin/auditoria': 'Registro de auditoría',
 };
 
 const getActiveTitle = (pathname: string): string => {
