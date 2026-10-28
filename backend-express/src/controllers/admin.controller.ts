@@ -6,7 +6,9 @@ import { Appeal } from '@models/Appeal';
 import { User } from '@models/User';
 import { Booking } from '@models/Booking';
 import { Review } from '@models/Review';
+import { AuditLog } from '@models/AuditLog';
 import { Unauthorized, NotFound, BadRequest } from '@utils/errors';
+import { logAdminAction } from '@services/audit.service';
 
 const requireAdmin = (req: Request): void => {
   if (!req.user || req.user.role !== 'admin') {
@@ -20,6 +22,7 @@ export const adminCreateCategory = async (req: Request, res: Response, next: Nex
   try {
     requireAdmin(req);
     const cat = await Category.create(req.body);
+    await logAdminAction(req.user!, 'category.create', 'Category', cat._id, cat.name);
     res.status(201).json({ category: cat });
   } catch (error) { next(error); }
 };
@@ -29,6 +32,7 @@ export const adminUpdateCategory = async (req: Request, res: Response, next: Nex
     requireAdmin(req);
     const cat = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!cat) throw NotFound('Categoría no encontrada.');
+    await logAdminAction(req.user!, 'category.update', 'Category', cat._id, cat.name);
     res.json({ category: cat });
   } catch (error) { next(error); }
 };
@@ -38,6 +42,7 @@ export const adminDeleteCategory = async (req: Request, res: Response, next: Nex
     requireAdmin(req);
     const cat = await Category.findByIdAndDelete(req.params.id);
     if (!cat) throw NotFound('Categoría no encontrada.');
+    await logAdminAction(req.user!, 'category.delete', 'Category', cat._id, cat.name);
     res.json({ message: 'Categoría eliminada.' });
   } catch (error) { next(error); }
 };
@@ -73,6 +78,7 @@ export const adminResolveReport = async (req: Request, res: Response, next: Next
       { new: true }
     );
     if (!report) throw NotFound('Denuncia no encontrada.');
+    await logAdminAction(req.user!, 'report.resolve', 'Report', report._id, `status=${status}`);
     res.json({ report });
   } catch (error) { next(error); }
 };
@@ -112,6 +118,7 @@ export const adminResolveAppeal = async (req: Request, res: Response, next: Next
       });
     }
     await appeal.save();
+    await logAdminAction(req.user!, 'appeal.resolve', 'Appeal', appeal._id, `decision=${decision}`);
 
     res.json({ appeal });
   } catch (error) { next(error); }
@@ -132,6 +139,7 @@ export const adminSuspendUser = async (req: Request, res: Response, next: NextFu
     ).select('email name status suspensionReason');
 
     if (!user) throw NotFound('Usuario no encontrado.');
+    await logAdminAction(req.user!, 'user.suspend', 'User', user._id, reason);
     res.json({ user });
   } catch (error) { next(error); }
 };
@@ -145,6 +153,7 @@ export const adminReactivateUser = async (req: Request, res: Response, next: Nex
       { new: true }
     ).select('email name status').lean();
     if (!user) throw NotFound('Usuario no encontrado.');
+    await logAdminAction(req.user!, 'user.reactivate', 'User', user._id);
     res.json({ user });
   } catch (error) { next(error); }
 };
@@ -223,7 +232,18 @@ export const adminApproveTutor = async (req: Request, res: Response, next: NextF
       { new: true }
     ).select('name email tutorData');
     if (!user) throw NotFound('Tutor no encontrado.');
+    await logAdminAction(req.user!, 'tutor.approve', 'User', user._id, user.name);
     res.json({ user });
+  } catch (error) { next(error); }
+};
+
+// --- Auditoría ---
+
+export const adminListAuditLogs = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    requireAdmin(req);
+    const logs = await AuditLog.find({}).sort({ createdAt: -1 }).limit(200).lean();
+    res.json({ logs });
   } catch (error) { next(error); }
 };
 

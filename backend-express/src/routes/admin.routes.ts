@@ -7,6 +7,7 @@ import {
   adminListAppeals, adminResolveAppeal,
   adminSuspendUser, adminReactivateUser, adminListUsers,
   adminAnalytics, adminApproveTutor, adminListPendingTutors,
+  adminListAuditLogs,
 } from '@controllers/admin.controller';
 
 const router = Router();
@@ -30,5 +31,7 @@ router.get('/tutors/pending', adminListPendingTutors);
 router.patch('/tutors/:id/approve', adminApproveTutor);
 
 router.get('/analytics', adminAnalytics);
+
+router.get('/audit-logs', adminListAuditLogs);
 
 export default router;
