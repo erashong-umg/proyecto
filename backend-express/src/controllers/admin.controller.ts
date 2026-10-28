@@ -180,10 +180,17 @@ export const adminAnalytics = async (_req: Request, res: Response, next: NextFun
   try {
     if (!_req.user || _req.user.role !== 'admin') throw Unauthorized('Solo admin.');
 
-    const [topTutors, categoryDemand, monthlyStats] = await Promise.all([
-      // Top 5 tutores por rating
+    const [topTutors, bottomTutors, categoryDemand, monthlyStats] = await Promise.all([
+      // Top 5 tutores por rating (mejor calificados)
       User.find({ role: 'tutor', 'tutorData.reviewCount': { $gte: 1 } })
         .sort({ 'tutorData.avgRating': -1 })
+        .limit(5)
+        .select('name photoUrl tutorData')
+        .lean(),
+
+      // Bottom 5 tutores por rating (peor calificados)
+      User.find({ role: 'tutor', 'tutorData.reviewCount': { $gte: 1 } })
+        .sort({ 'tutorData.avgRating': 1 })
         .limit(5)
         .select('name photoUrl tutorData')
         .lean(),
@@ -214,6 +221,7 @@ export const adminAnalytics = async (_req: Request, res: Response, next: NextFun
 
     res.json({
       topTutors,
+      bottomTutors,
       categoryDemand,
       monthlyStats,
       generatedAt: new Date().toISOString(),
