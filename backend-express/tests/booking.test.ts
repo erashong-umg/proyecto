@@ -208,6 +208,58 @@ describe('Booking - anti-traslape', () => {
     expect(bookings[1].startsAt.getTime() - bookings[0].startsAt.getTime()).toBe(7 * DIA);
     expect(bookings[3].startsAt.getTime() - bookings[0].startsAt.getTime()).toBe(21 * DIA);
   });
+
+  // Caso 6: dos solicitudes concurrentes para el mismo horario del mismo tutor
+  // (dos estudiantes distintos) — solo una debe ganar, la otra debe rechazarse,
+  // y en la base de datos debe quedar exactamente una reserva activa.
+  it('Caso 6: dos reservas concurrentes para el mismo horario — solo una gana', async () => {
+    const start = lunes(10, DIEZ);
+    const input = {
+      tutorId: tutorId.toString(),
+      courseId: courseId.toString(),
+      startsAt: start,
+      durationMin: 60,
+      modality: 'virtual' as const,
+    };
+
+    const resultados = await Promise.allSettled([
+      createBooking(studentId, input),
+      createBooking(student2Id, input),
+    ]);
+
+    expect(resultados.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(resultados.filter((r) => r.status === 'rejected')).toHaveLength(1);
+
+    const enDb = await Booking.find({
+      tutorId,
+      status: { $in: ['pending', 'confirmed'] },
+      startsAt: { $lt: new Date(start.getTime() + HORA) },
+      endsAt: { $gt: start },
+    });
+    expect(enDb).toHaveLength(1);
+  });
+
+  // Caso 7: si una semana de una serie recurrente choca, no deben quedar
+  // reservas huérfanas de las semanas anteriores ya insertadas en ese lote.
+  it('Caso 7: si una semana de la serie choca, se revierten las semanas ya creadas', async () => {
+    const start = lunes(11, DIEZ);
+    const semana3 = new Date(start.getTime() + 2 * 7 * DIA);
+    await ocupar(semana3);   // otro estudiante ya ocupa la 3.ª semana de la serie
+
+    await expect(
+      createBooking(studentId, {
+        tutorId: tutorId.toString(),
+        courseId: courseId.toString(),
+        startsAt: start,
+        durationMin: 60,
+        modality: 'virtual',
+        repeatWeeks: 4,
+      })
+    ).rejects.toThrow();
+
+    const propias = await Booking.find({ studentId, startsAt: { $gte: start } });
+    expect(propias).toHaveLength(0);
+  });
 });
 
 

@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { Booking, type IBooking } from '../models/Booking';
 import { Course } from '../models/Course';
 import { User } from '../models/User';
@@ -7,6 +7,57 @@ import { Conflict, BadRequest, NotFound } from '../utils/errors';
 import type { Modality } from '../models/Course';
 import { Availability } from '../models/Availability';
 import { dayOfWeekOfKey, formatHHMM, isDateKey, zonedParts, zonedTimeToUtc } from '../utils/time';
+
+/**
+ * Mutex de aplicación para serializar la creación de reservas por tutor y por
+ * estudiante. MongoDB corre aquí como nodo único (sin replica set, ni en local
+ * ni en producción — ver docker-container/MongoDB y deploy/compose.yml), así
+ * que no hay transacciones multi-documento disponibles para proteger el
+ * anti-traslape contra condiciones de carrera. En su lugar, se usa el propio
+ * índice único de `_id` como primitiva atómica: dos solicitudes que compiten
+ * por el mismo `_id` de lock solo dejan crearlo a una (la otra recibe un
+ * error de clave duplicada y reintenta), lo que da exclusión mutua real sin
+ * necesitar transacciones.
+ */
+interface IBookingLock { _id: string; lockedUntil: Date }
+const bookingLockSchema = new Schema<IBookingLock>({ _id: String, lockedUntil: Date }, { versionKey: false });
+const BookingLock = model<IBookingLock>('BookingLock', bookingLockSchema);
+
+const LOCK_TTL_MS = 15_000;     // por si un proceso muere sin liberar el lock
+const LOCK_RETRY_MS = 50;
+const LOCK_MAX_WAIT_MS = 5_000;
+
+const acquireLock = async (key: string): Promise<void> => {
+  const deadline = Date.now() + LOCK_MAX_WAIT_MS;
+  for (;;) {
+    const now = new Date();
+    const lockedUntil = new Date(now.getTime() + LOCK_TTL_MS);
+
+    // El lock existe pero venció (nadie lo liberó) → lo tomamos.
+    if (await BookingLock.findOneAndUpdate({ _id: key, lockedUntil: { $lt: now } }, { $set: { lockedUntil } })) {
+      return;
+    }
+
+    // El lock no existe todavía → intentamos crearlo. _id es único a nivel de
+    // MongoDB: si dos solicitudes compiten por el mismo key, solo una logra
+    // insertarlo; la otra recibe un error de clave duplicada (11000).
+    try {
+      await BookingLock.create({ _id: key, lockedUntil });
+      return;
+    } catch (err: unknown) {
+      if ((err as { code?: number }).code !== 11000) throw err;
+    }
+
+    if (Date.now() >= deadline) {
+      throw Conflict('Hay otra operación en curso sobre este horario. Intente de nuevo en unos segundos.');
+    }
+    await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS));
+  }
+};
+
+const releaseLock = async (key: string): Promise<void> => {
+  await BookingLock.deleteOne({ _id: key });
+};
 
 // Una sola vez, o suscripción semanal de 4 u 8 semanas.
 export const REPEAT_OPTIONS = [1, 4, 8];
@@ -121,33 +172,56 @@ export const createBooking = async (
   const bookings: IBooking[] = [];
   const recurringGroupId = repeatWeeks > 1 ? new Types.ObjectId().toString() : undefined;
 
-  for (let i = 0; i < repeatWeeks; i++) {
-    const slotStart = new Date(startsAt.getTime() + i * 7 * 24 * 60 * 60 * 1000);
-    const slotEnd = new Date(slotStart.getTime() + durationMin * 60 * 1000);
-
-    // Anti-traslape del tutor
-    if (await hasOverlap(new Types.ObjectId(tutorId), 'tutor', slotStart, slotEnd)) {
-      throw Conflict(`El tutor ya tiene una tutoría en la semana ${i + 1} (${slotStart.toISOString()}).`);
+  const rollback = async (): Promise<void> => {
+    if (bookings.length > 0) {
+      await Booking.deleteMany({ _id: { $in: bookings.map((b) => b._id) } });
     }
+  };
 
-    // Anti-traslape del estudiante
-    if (await hasOverlap(studentId, 'student', slotStart, slotEnd)) {
-      throw Conflict(`Usted ya tiene una tutoría en la semana ${i + 1} (${slotStart.toISOString()}).`);
+  // Serializa por tutor y por estudiante: mientras se tiene el lock, ninguna
+  // otra solicitud concurrente puede pasar su propia verificación de
+  // traslape para ese mismo tutor/estudiante hasta que esta termine (y la
+  // vea ya reflejada en la base de datos). Así se evita la condición de
+  // carrera "verificar → insertar" sin necesitar transacciones de Mongo.
+  const tutorLockKey = `tutor:${tutorId}`;
+  const studentLockKey = `student:${studentId.toString()}`;
+
+  await acquireLock(tutorLockKey);
+  try {
+    await acquireLock(studentLockKey);
+    try {
+      for (let i = 0; i < repeatWeeks; i++) {
+        const slotStart = new Date(startsAt.getTime() + i * 7 * 24 * 60 * 60 * 1000);
+        const slotEnd = new Date(slotStart.getTime() + durationMin * 60 * 1000);
+
+        if (await hasOverlap(new Types.ObjectId(tutorId), 'tutor', slotStart, slotEnd)) {
+          await rollback();
+          throw Conflict(`El tutor ya tiene una tutoría en la semana ${i + 1} (${slotStart.toISOString()}).`);
+        }
+        if (await hasOverlap(studentId, 'student', slotStart, slotEnd)) {
+          await rollback();
+          throw Conflict(`Usted ya tiene una tutoría en la semana ${i + 1} (${slotStart.toISOString()}).`);
+        }
+
+        const created = await Booking.create({
+          studentId,
+          tutorId: new Types.ObjectId(tutorId),
+          courseId: new Types.ObjectId(courseId),
+          startsAt: slotStart,
+          endsAt: slotEnd,
+          durationMin,
+          modality,
+          status: 'confirmed',
+          priceBreakdown,
+          recurringGroupId,
+        });
+        bookings.push(created);
+      }
+    } finally {
+      await releaseLock(studentLockKey);
     }
-
-    const created = await Booking.create({
-      studentId,
-      tutorId: new Types.ObjectId(tutorId),
-      courseId: new Types.ObjectId(courseId),
-      startsAt: slotStart,
-      endsAt: slotEnd,
-      durationMin,
-      modality,
-      status: 'confirmed',
-      priceBreakdown,
-      recurringGroupId,
-    });
-    bookings.push(created);
+  } finally {
+    await releaseLock(tutorLockKey);
   }
 
   return bookings;
