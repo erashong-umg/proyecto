@@ -1,7 +1,9 @@
 import { Input } from '../ui/Input';
 import type { OnboardingData } from '../../hooks/useOnboardingWizard';
-import { ID_DOCUMENT_LABELS, type IdDocumentType } from '../../services/idDocument';
+import { ID_DOCUMENT_LABELS, normalizeIdNumber, type IdDocumentType } from '../../services/idDocument';
 import styles from '../../pages/onboarding/Onboarding.module.scss';
+
+const DPI_LENGTH = 13;
 
 const GENDER_LABELS: Record<'M' | 'F' | 'other', string> = {
   M: 'Masculino',
@@ -25,7 +27,10 @@ interface StepPersonalInfoProps {
 export const StepPersonalInfo = ({
   userName, isTutor, phone, gender, idType, idNumber,
   onChangePhone, onChangeGender, onChangeIdType, onChangeIdNumber,
-}: StepPersonalInfoProps) => (
+}: StepPersonalInfoProps) => {
+  const dpiDigits = normalizeIdNumber(idNumber).length;
+
+  return (
   <div className={styles.step}>
     <h2>Bienvenido/a{userName ? `, ${userName}` : ''}</h2>
     <p className={styles.hint}>
@@ -81,5 +86,14 @@ export const StepPersonalInfo = ({
       hint="Lo usamos para verificar su identidad. Solo lo ve el equipo de administración."
       required
     />
+    {idType === 'dpi' && (
+      <p
+        className={`${styles.idCounter} ${dpiDigits === DPI_LENGTH ? styles.idCounterOk : ''}`}
+        aria-live="polite"
+      >
+        {dpiDigits}/{DPI_LENGTH} dígitos
+      </p>
+    )}
   </div>
-);
+  );
+};
