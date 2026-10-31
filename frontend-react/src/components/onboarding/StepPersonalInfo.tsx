@@ -1,12 +1,43 @@
 import { Input } from '../ui/Input';
 import type { OnboardingData } from '../../hooks/useOnboardingWizard';
-import { ID_DOCUMENT_LABELS, type IdDocumentType } from '../../services/idDocument';
+import { ID_DOCUMENT_LABELS, normalizeIdNumber, type IdDocumentType } from '../../services/idDocument';
 import styles from '../../pages/onboarding/Onboarding.module.scss';
 
 const GENDER_LABELS: Record<'M' | 'F' | 'other', string> = {
   M: 'Masculino',
   F: 'Femenino',
   other: 'Otro',
+};
+
+const DPI_LENGTH = 13;
+const ID_PRIVACY_HINT = 'Lo usamos para verificar su identidad. Solo lo ve el equipo de administración.';
+
+// Error en vivo: solo cuando ya escribió algo que no puede ser válido.
+const idError = (type: IdDocumentType, value: string): string | undefined => {
+  const number = normalizeIdNumber(value);
+  if (!number) return undefined;
+  if (type === 'dpi') {
+    if (!/^\d+$/.test(number)) return 'El DPI solo lleva números.';
+    if (number.length > DPI_LENGTH) return `Sobran ${number.length - DPI_LENGTH} dígitos: el DPI tiene ${DPI_LENGTH}.`;
+    return undefined;
+  }
+  if (!/^[A-Z0-9]+$/.test(number)) return 'El pasaporte solo lleva letras y números.';
+  if (number.length > 20) return 'El pasaporte tiene como máximo 20 caracteres.';
+  return undefined;
+};
+
+// Contador visible de lo que falta, o confirmación cuando ya está completo.
+const idHint = (type: IdDocumentType, value: string): string => {
+  const length = normalizeIdNumber(value).length;
+  if (type === 'dpi') {
+    if (length === 0) return `El DPI tiene ${DPI_LENGTH} dígitos. ${ID_PRIVACY_HINT}`;
+    if (length < DPI_LENGTH) return `${length}/${DPI_LENGTH} dígitos: faltan ${DPI_LENGTH - length}.`;
+    if (length === DPI_LENGTH) return `${DPI_LENGTH}/${DPI_LENGTH} dígitos ✓`;
+  } else {
+    if (length === 0) return `Entre 6 y 20 letras o números. ${ID_PRIVACY_HINT}`;
+    if (length < 6) return `Faltan al menos ${6 - length} caracteres (mínimo 6).`;
+  }
+  return ID_PRIVACY_HINT;
 };
 
 interface StepPersonalInfoProps {
@@ -78,7 +109,11 @@ export const StepPersonalInfo = ({
       inputMode={idType === 'dpi' ? 'numeric' : 'text'}
       autoComplete="off"
       placeholder={idType === 'dpi' ? '1234 56789 0101' : 'AB123456'}
-      hint="Lo usamos para verificar su identidad. Solo lo ve el equipo de administración."
+      pattern={idType === 'dpi' ? '[0-9\\s\\-]{13,17}' : '[A-Za-z0-9\\s\\-]{6,24}'}
+      maxLength={idType === 'dpi' ? 17 : 24}
+      title={idType === 'dpi' ? 'El DPI tiene 13 dígitos' : 'El pasaporte tiene entre 6 y 20 letras o números'}
+      error={idError(idType, idNumber)}
+      hint={idHint(idType, idNumber)}
       required
     />
   </div>
