@@ -83,6 +83,20 @@
   }
 }
 
+// El control nativo de fecha en móvil tiene ancho intrínseco y, vacío, puede
+// colapsar: se fija ancho, alto táctil y 16px (evita el zoom automático de iOS).
+.dateInput {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+
+  &::-webkit-date-and-time-value { text-align: left; }
+}
+
 .courseName {
   margin: 0;
   font-weight: 700;

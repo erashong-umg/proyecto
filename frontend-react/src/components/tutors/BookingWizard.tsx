@@ -38,7 +38,14 @@ const STEPS = ['Qué', 'Cuándo', 'Confirmar'] as const;
 type Step = 1 | 2 | 3;
 
 // Fecha local de hoy como AAAA-MM-DD (toISOString daría la de UTC, que puede ser mañana).
-const todayKey = (): string => new Date().toLocaleDateString('en-CA');
+// Se arma a mano: toLocaleDateString('en-CA') no devuelve ese formato en todos los móviles
+// y un `min` inválido deja al input de fecha sin comportamiento fiable.
+const todayKey = (): string => {
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${mm}-${dd}`;
+};
 
 interface BookingWizardProps {
   tutor: TutorSummary;
@@ -215,7 +222,7 @@ export const BookingWizard = ({ tutor, courses }: BookingWizardProps) => {
               id="bw-date"
               type="date"
               min={todayKey()}
-              className={inputStyles.input}
+              className={`${inputStyles.input} ${styles.dateInput}`}
               value={date}
               onChange={(e) => { setDate(e.target.value); resetSlot(); }}
             />
