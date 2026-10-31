@@ -149,12 +149,16 @@ $header-height-mobile: 65px;
   }
 }
 
+.headerAvatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .headerPhoto,
 .headerAvatar {
   width: 40px;
   height: 40px;
   border-radius: $radius-full;
-  flex-shrink: 0;
 }
 
 .headerPhoto { object-fit: cover; }
@@ -165,6 +169,20 @@ $header-height-mobile: 65px;
   font-weight: 700;
   @include flex-center;
 }
+
+.onlineDot,
+.offlineDot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: $radius-full;
+  border: 2px solid $color-surface;
+}
+
+.onlineDot { background: $color-success; }
+.offlineDot { background: $color-border-strong; }
 
 .headerInfo {
   display: flex;

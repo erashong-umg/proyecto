@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
 import { useSocketStore } from '../store/socketStore';
 import type { ChatThread } from '../types/api';
@@ -10,10 +10,16 @@ const RELOAD_DEBOUNCE_MS = 300;
 // contador de no leídos y checks del último mensaje propio.
 const INBOX_EVENTS = ['chat:message', 'chat:read', 'chat:delivered'] as const;
 
+interface SubscribePresenceAck {
+  ok: boolean;
+  status?: Record<string, boolean>;
+}
+
 export const useChatThreads = () => {
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [presence, setPresence] = useState<Record<string, boolean>>({});
   const socket = useSocketStore((state) => state.socket);
   const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -46,5 +52,40 @@ export const useChatThreads = () => {
     };
   }, [socket, reload]);
 
-  return { threads, isLoading, error, reload };
+  // Presencia de la bandeja: se suscribe a todos los contactos de las
+  // conversaciones actuales (no solo la que está abierta) y escucha sus
+  // cambios en vivo, igual que useChatPeer pero para varios a la vez.
+  const otherUserIds = useMemo(
+    () => Array.from(new Set(threads.map((t) => t.otherUser._id))).sort(),
+    [threads]
+  );
+  const idsKey = otherUserIds.join(',');
+
+  useEffect(() => {
+    if (!socket || otherUserIds.length === 0) return;
+
+    const subscribe = () => {
+      socket.emit('chat:subscribePresence', { userIds: otherUserIds }, (resp: SubscribePresenceAck) => {
+        if (resp?.ok && resp.status) setPresence((prev) => ({ ...prev, ...resp.status }));
+      });
+    };
+    if (socket.connected) subscribe();
+    socket.on('connect', subscribe);
+
+    const onPresence = (update: { userId: string; online: boolean }) => {
+      if (!otherUserIds.includes(update.userId)) return;
+      setPresence((prev) => ({ ...prev, [update.userId]: update.online }));
+    };
+    socket.on('presence:update', onPresence);
+
+    return () => {
+      socket.off('connect', subscribe);
+      socket.off('presence:update', onPresence);
+    };
+    // idsKey (no otherUserIds) a propósito: otherUserIds es una referencia nueva
+    // en cada reload del inbox aunque el contenido no cambie.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, idsKey]);
+
+  return { threads, isLoading, error, reload, presence };
 };

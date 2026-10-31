@@ -11,6 +11,7 @@ type Ack = (resp: unknown) => void;
 const MAX_CONTENT = 5000;
 const MAX_READ_BATCH = 200;
 const MAX_DELIVER_BATCH = 500;
+const MAX_PRESENCE_SUBSCRIBE = 200;
 
 const makeThreadId = (a: string, b: string): string => {
   return [a, b].sort().join('_');
@@ -102,6 +103,21 @@ export const setupChatHandlers = (io: SocketIOServer, socket: AuthedSocket): voi
   socket.on('chat:leave', (payload: { otherUserId: string }) => {
     if (!socket.data.userId || !isId(payload?.otherUserId)) return;
     socket.leave(presenceRoom(payload.otherUserId));
+  });
+
+  // Suscribirse a la presencia de varios contactos a la vez (la bandeja de
+  // entrada, no solo la conversación abierta). Devuelve el estado actual de
+  // cada uno; los cambios posteriores llegan por 'presence:update', igual que
+  // en chat:join.
+  socket.on('chat:subscribePresence', (payload: { userIds: string[] }, ack?: Ack) => {
+    if (!socket.data.userId) return ack?.({ ok: false, error: 'No autenticado' });
+    const ids = Array.isArray(payload?.userIds) ? payload.userIds.filter(isId).slice(0, MAX_PRESENCE_SUBSCRIBE) : [];
+    const status: Record<string, boolean> = {};
+    for (const id of ids) {
+      socket.join(presenceRoom(id));
+      status[id] = isOnline(id);
+    }
+    ack?.({ ok: true, status });
   });
 
   // Enviar un mensaje. Se entrega a las rooms personales de ambos usuarios

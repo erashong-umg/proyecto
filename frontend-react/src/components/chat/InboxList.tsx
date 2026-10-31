@@ -9,9 +9,10 @@ interface InboxListProps {
   threads: ChatThread[];
   activeOtherUserId?: string;
   currentUserId: string;
+  presence?: Record<string, boolean>;
 }
 
-export const InboxList = ({ threads, activeOtherUserId, currentUserId }: InboxListProps) => {
+export const InboxList = ({ threads, activeOtherUserId, currentUserId, presence = {} }: InboxListProps) => {
   if (threads.length === 0) {
     return (
       <p className={styles.empty}>
@@ -33,11 +34,20 @@ export const InboxList = ({ threads, activeOtherUserId, currentUserId }: InboxLi
               className={`${styles.item} ${isActive ? styles.active : ''}`}
               aria-current={isActive ? 'true' : undefined}
             >
-              {thread.otherUser.photoUrl ? (
-                <img src={thread.otherUser.photoUrl} alt="" className={styles.photo} />
-              ) : (
-                <span className={styles.avatar}>{getInitials(thread.otherUser.name)}</span>
-              )}
+              <span className={styles.avatarWrap}>
+                {thread.otherUser.photoUrl ? (
+                  <img src={thread.otherUser.photoUrl} alt="" className={styles.photo} />
+                ) : (
+                  <span className={styles.avatar}>{getInitials(thread.otherUser.name)}</span>
+                )}
+                {presence[thread.otherUser._id] !== undefined && (
+                  <span
+                    className={presence[thread.otherUser._id] ? styles.onlineDot : styles.offlineDot}
+                    role="status"
+                    aria-label={presence[thread.otherUser._id] ? 'En línea' : 'Desconectado'}
+                  />
+                )}
+              </span>
 
               <div className={styles.info}>
                 <div className={styles.topRow}>

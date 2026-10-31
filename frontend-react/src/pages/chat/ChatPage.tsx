@@ -20,7 +20,7 @@ export const ChatPage = () => {
   const currentUserId = user?._id ?? '';
   const isConnected = useSocketStore((state) => state.isConnected);
 
-  const { threads, isLoading: threadsLoading, error: threadsError } = useChatThreads();
+  const { threads, isLoading: threadsLoading, error: threadsError, presence: inboxPresence } = useChatThreads();
   const {
     messages,
     isLoading: messagesLoading,
@@ -54,7 +54,7 @@ export const ChatPage = () => {
             ) : threadsError ? (
               <p className={styles.status}>{threadsError}</p>
             ) : (
-              <InboxList threads={threads} activeOtherUserId={otherUserId} currentUserId={currentUserId} />
+              <InboxList threads={threads} activeOtherUserId={otherUserId} currentUserId={currentUserId} presence={inboxPresence} />
             )}
           </aside>
 
@@ -79,11 +79,20 @@ export const ChatPage = () => {
                   </Link>
                   {peer ? (
                     <>
-                      {peer.photoUrl ? (
-                        <img src={peer.photoUrl} alt="" className={styles.headerPhoto} />
-                      ) : (
-                        <span className={styles.headerAvatar}>{getInitials(peer.name)}</span>
-                      )}
+                      <span className={styles.headerAvatarWrap}>
+                        {peer.photoUrl ? (
+                          <img src={peer.photoUrl} alt="" className={styles.headerPhoto} />
+                        ) : (
+                          <span className={styles.headerAvatar}>{getInitials(peer.name)}</span>
+                        )}
+                        {presence && (
+                          <span
+                            className={presence.online ? styles.onlineDot : styles.offlineDot}
+                            role="status"
+                            aria-label={presence.online ? 'En línea' : 'Desconectado'}
+                          />
+                        )}
+                      </span>
                       <div className={styles.headerInfo}>
                         <span className={styles.headerName}>{peer.name}</span>
                         {peerStatus && (

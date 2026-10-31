@@ -35,12 +35,16 @@
   background: color-mix(in srgb, $color-primary 10%, transparent);
 }
 
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .photo,
 .avatar {
   width: 44px;
   height: 44px;
   border-radius: $radius-full;
-  flex-shrink: 0;
 }
 
 .photo {
@@ -53,6 +57,20 @@
   font-weight: 700;
   @include flex-center;
 }
+
+.onlineDot,
+.offlineDot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: $radius-full;
+  border: 2px solid $color-surface;
+}
+
+.onlineDot { background: $color-success; }
+.offlineDot { background: $color-border-strong; }
 
 .info {
   flex: 1;

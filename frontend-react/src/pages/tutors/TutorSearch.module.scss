@@ -110,7 +110,8 @@
   font-weight: 600;
   text-decoration: underline;
   flex-shrink: 0;
-
+  background: none;
+  border: none;
   &:hover { color: $color-primary-dark; }
 }
 

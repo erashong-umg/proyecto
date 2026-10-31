@@ -29,6 +29,7 @@
   --neutral-800: #2b2b2b;
   --neutral-900: #171717;
   --neutral-950: #0a0a0a;
+  --success: #15b943;
 
   // ==============================================================
   // LIGHT MODE — Naranja quemado, cálido y directo (DESIGN.md §1/§3)
@@ -49,8 +50,8 @@
   --color-danger-dark: #8a2f2f;
   --color-warning: #b8860b;
   --color-warning-dark: #8a6308;
-  --color-success: var(--primary-700);
-  --color-success-dark: var(--primary-800);
+  --color-success: var(--success);
+  --color-success-dark: var( --success);
   --color-info: #2e7d8c;
 
   // Backgrounds & Main Surfaces
