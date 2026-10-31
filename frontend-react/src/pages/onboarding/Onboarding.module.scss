@@ -173,6 +173,16 @@
 
 .field { margin-bottom: $space-4; }
 
+// Contador de dígitos del DPI, pegado al campo del número.
+.idCounter {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  margin: (-$space-3) 0 $space-4;
+  text-align: right;
+}
+
+.idCounterOk { color: $color-success; }
+
 .label {
   display: block;
   font-weight: 600;
